@@ -1,2 +1,2 @@
 # Toys
-Nothing here.
+* **Resistance Calculator**: toys for resistance networks.
