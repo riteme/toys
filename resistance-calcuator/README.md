@@ -7,4 +7,4 @@ Calculate the resistance of simple networks made up of pure resistances.
 
 ## TODO List
 
-*   Graphviz output
+- [x] Graphviz output
