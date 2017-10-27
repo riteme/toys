@@ -84,7 +84,7 @@ def calc(n, start, end, E, generate_dot = False):
     if generate_dot:
         buf = ['digraph {', '    rankdir = "LR";']
 
-        buf.append('r [shape = rectangle, label = "%sΩ"];' % ret)
+        buf.append('    r [shape = rectangle, label = "%sΩ"];' % ret)
         for i in range(1, n + 1):
             if i == start + 1:
                 c = 'green'
