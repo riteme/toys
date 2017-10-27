@@ -1,20 +1,19 @@
 #include <cmath>
-#include <cstring>
 
 #include <random>
-#include <iomanip>
 #include <iostream>
 #include <algorithm>
 
 using namespace std;
 
 #define NMAX 500
-#define OUTPUT_EPS 1e-10
-#define NEWTON_MAX 100
-#define NEWTON_EPS 1e-14
-#define NEWTON_RANDFACTOR 1e4
+#define NEWTON_MAX 50
+#define EPS 1e-9
+#define RANDFACTOR 1e4
 
-typedef long double Rational;
+#define inline static
+
+typedef double Rational;
 
 inline Rational randfloat() {
     static random_device rd;
@@ -24,7 +23,7 @@ inline Rational randfloat() {
 }
 
 inline bool nearzero(const Rational &x) {
-    return -NEWTON_EPS < x && x < NEWTON_EPS;
+    return -EPS < x && x < EPS;
 }
 
 inline void get_derivative(int n, const Rational *f, Rational *g) {
@@ -36,7 +35,7 @@ inline void get_derivative(int n, const Rational *f, Rational *g) {
 inline Rational evalf(int n, const Rational *f, const Rational &x) {
     Rational r = f[n];
 
-    for (int i = n - 1; i >= 0; i--) {
+    for (int i = n; i >= 0; i--) {
         r = r * x + f[i];
     }
 
@@ -63,31 +62,26 @@ bool find_root(Rational &r) {
 
         if (nearzero(a))
             break;
-        while (nearzero(b)) {
-            r += randfloat() / NEWTON_RANDFACTOR;
-            a = evalf(n, f, r);
-            b = evalf(n - 1, g, r);
-        }
-
-        r -= a / b;
+        if (nearzero(b))
+            r += randfloat() / RANDFACTOR;
     }
 
     return nearzero(evalf(n, f, r));
 }
 
 void deflation(const Rational &r) {
-    for (int i = n - 1; i > 0; i--) {
+    n--;
+    f[n] = f[n + 1];
+    for (int i = n - 1; i; i--) {
         f[i] += r * f[i + 1];
     }
-
-    memmove(f, f + 1, sizeof(Rational) * n);
-    n--;
+    f[0] /= r;
 }
 
 int main() {
     initialize();
 
-    for (Rational r; n; ) {
+    for (Rational r; n; n--) {
         get_derivative(n, f, g);
         if (!find_root(r))
             break;
@@ -95,14 +89,7 @@ int main() {
         s[cnt++] = r;
     }
 
-    sort(s, s + cnt);
-    cnt = unique(s, s + cnt,
-        [](const Rational &a, const Rational &b) {
-            return fabs(a - b) < OUTPUT_EPS;
-        }) - s;
-
-    cout << setprecision(9) 
-         << "Foound " << cnt << " rational roots." << endl;
+    cout << "Foound " << cnt << " rational roots." << endl;
     for (int i = 0; i < cnt; i++) {
         cout << s[i] << " ";
     }
