@@ -1,3 +1,7 @@
+/**
+ * Lost my precision!
+ */
+
 #include <cmath>
 #include <cstring>
 

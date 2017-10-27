@@ -1,2 +1,3 @@
 # Toys
-* **Resistance Calculator**: toys for resistance networks.
+* **Resistance Calculator**: a toy for resistance networks.
+* **Root Finding**
