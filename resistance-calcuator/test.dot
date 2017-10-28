@@ -1,6 +1,6 @@
 digraph {
     rankdir = "LR";
-r [shape = rectangle, label = "13/7Ω"];
+    r [shape = rectangle, label = "13/7Ω"];
     1 [shape = point, color = green];
     2 [shape = point, color = blue];
     3 [shape = point, color = blue];
