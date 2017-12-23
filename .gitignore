@@ -130,3 +130,8 @@ ENV/
 *.exe
 *.out
 *.app
+
+# Input/Output/Answer Files
+*.in
+*.out
+*.ans
