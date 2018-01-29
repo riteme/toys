@@ -25,3 +25,10 @@ $$
 *   $[a,b)$: $\lceil b \rceil - \lceil a \rceil$
 *   $(a,b]$: $\lfloor b \rfloor - \lfloor a \rfloor$
 *   $(a,b)$: $\lceil b \rceil - \lfloor a \rfloor - 1$
+
+#### P98
+
+对于任意**整数** $n$ 和**正整数** $m$：
+$$
+n = \sum_{k = 0}^{m - 1} \left\lceil {n - k \over m} \right\rceil = \sum_{k = 0}^{m - 1} \left\lfloor {n + k \over m} \right\rfloor
+$$
