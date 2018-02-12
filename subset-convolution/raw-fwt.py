@@ -6,22 +6,22 @@ assert n & (n - 1) == 0, 'Argument "n" must be a power of 2.'
 f = map(int, raw_input().split())
 g = map(int, raw_input().split())
 
-def prefix(X):
+def fwt(X):
     if len(X) == 1:
         return X
 
     m = len(X) >> 1
-    A, B = prefix(X[:m]), prefix(X[m:])
+    A, B = fwt(X[:m]), fwt(X[m:])
     for i in xrange(m):
         A.append(A[i] + B[i])
     return A
 
-def unprefix(X):
+def rfwt(X):
     if len(X) == 1:
         return X
 
     m = len(X) >> 1
-    A, B = unprefix(X[:m]), unprefix(X[m:])
+    A, B = rfwt(X[:m]), rfwt(X[m:])
     for i in xrange(m):
         A.append(B[i] - A[i])
     return A
@@ -45,18 +45,31 @@ def mul(A, B):
 def show(X):
     print ' '.join(map(str, X))
 
-F = prefix(f)
-G = prefix(g)
-F1 = sub(F, f)
-G1 = sub(G, g)
-mu = [(-1)**cnt(x) for x in xrange(n)]
+k = cnt(n - 1) + 1
+F = [[0] * n for i in xrange(k)]
+G = [[0] * n for i in xrange(k)]
+H = [[0] * n for i in xrange(k)]
 
-A = prefix(mu)
-B = prefix(mul(mu, F1))
-C = prefix(mul(mu, G1))
-D = prefix(mul(mu, mul(F1, G1)))
+for i in xrange(n):
+    c = cnt(i)
+    F[c][i] = f[i]
+    G[c][i] = g[i]
 
-H = [F[s] * G[s] * A[s] - G[s] * B[s] - F[s] * C[s] + D[s] for s in xrange(n)]
+for i in xrange(k):
+    F[i] = fwt(F[i])
+    G[i] = fwt(G[i])
 
-show(H)
-show(unprefix(H))
+for i in xrange(k):
+    for j in xrange(k - i):
+        print i, j
+        H[i + j] = add(H[i + j], mul(F[i], G[j]))
+
+for i in xrange(k):
+    H[i] = rfwt(H[i])
+
+R = [0] * n
+for i in xrange(n):
+    c = cnt(i)
+    R[i] = H[c][i]
+
+show(R)
