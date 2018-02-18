@@ -10,6 +10,11 @@ $$
 \lceil f(x) \rceil = \lceil f(\lceil x \rceil) \rceil
 $$
 
+若为增函数，则：
+$$
+\lfloor f(x) \rfloor = \lfloor f(\lceil x \rceil) \rfloor \\
+\lceil f(x) \rceil = \lceil f(\lfloor x \rfloor) \rceil
+$$
 若$x \in \mathbf{R},~n,m \in \mathbf{N}$，则有：
 $$
 \left\lfloor {x + m \over n} \right\rfloor = \left\lfloor {\lfloor x \rfloor + m \over n} \right\rfloor \\
@@ -32,3 +37,24 @@ $$
 $$
 n = \sum_{k = 0}^{m - 1} \left\lceil {n - k \over m} \right\rceil = \sum_{k = 0}^{m - 1} \left\lfloor {n + k \over m} \right\rfloor
 $$
+
+对于任意**实数** $x$：
+$$
+\lfloor mx \rfloor = \sum_{k = 0}^{m - 1} \left\lfloor x + \frac{k}m\right\rfloor
+$$
+
+#### P107
+
+对于任意**正整数** $n$、$m$ 和**实数** $x$：
+$$
+\sum_{k = 0}^{m -1} \left\lfloor {nk + x \over m} \right\rfloor = d \left\lfloor \frac{x}d \right\rfloor + {(m - 1)(n - 1) \over 2} + {d - 1 \over 2} = \sum_{k = 0}^{n -1} \left\lfloor {mk + x \over n} \right\rfloor
+$$
+其中 $d = \gcd(m, n)$。P103-P107: 如何找规律
+
+#### P108
+
+3.3
+$$
+\left\lfloor {\lfloor m \alpha \rfloor n \over \alpha} \right\rfloor = \left\lfloor {(m \alpha - \{m \alpha\}) n \over \alpha} \right\rfloor = mn - 1  \ \ \ \   (m, n \in \mathbf{N}_+, \alpha \in \mathbf{R} - \mathbf{Q}, \alpha > n)
+$$
+P109
