@@ -18,7 +18,7 @@ bool check(int *v, int w) {
             cnt++;
         w -= v[i] * C[i];
     }
-    return w == 0 && cnt == 1;
+    return w == 0;
 }
 
 void print(const char *desc, int *v) {
@@ -66,21 +66,15 @@ int main() {
     for (int i = 1; i < n; i++) {
         G(C[i] - 1);
         memcpy(W, V, sizeof(W));
-        // print("tv", V);
 
-        int w = (W[1] + 1) * C[1], sz = W[1] + 1;
-        for (int j = 2; j <= n; j++) {
+        int w = C[i], sz = 1;
+        for (int j = i + 1; j <= n; j++) {
             w += (W[j] + 1) * C[j] - C[j - 1];
             sz += W[j];
 
-            if (j <= i)
-                continue;
-
-            G(w);
+            G(w);  // Slow here
             if (S(V) > sz && (!found || w < found)) {
                 found = w;
-                // printf("C[i] = %d, C[j] = %d, w = %d\n", C[i], C[j], w);
-                // print("trace", W);
                 memcpy(witW + 1, W + 1, sizeof(int) * j);
                 memset(witW + j + 1, 0, sizeof(int) * (n - j));
                 memcpy(witG, V, sizeof(V));
@@ -93,8 +87,8 @@ int main() {
         puts("PASSED!");
     else {
         printf("%d\n", found);
-        print("   std", witW);
-        print("greedy", witG);
+        // print("   std", witW);
+        // print("greedy", witG);
 
         if (!check(witW, found))
             return -1;
