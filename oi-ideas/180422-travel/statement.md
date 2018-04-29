@@ -4,6 +4,6 @@ Given an **undirected** graph $G = (V,\ E)$ where $V$ and $E$ represent the set 
 
 ### Restrictions
 
-Time limit: $1\ \mathrm{s}$ / Memory limit: $512 \ \mathrm{MB}$
+Time limit: $1\ \mathrm{s}​$ / Memory limit: $512 \ \mathrm{MB}​$
 
- $1 \leqslant n \leqslant 5 \times 10^5$, $1 \leqslant m \leqslant 10^6$, $1 \leqslant q \leqslant 5 \times 10^5$.
+ $3 \leqslant n \leqslant 5 \times 10^5$, $m \leqslant 10^6$, $1 \leqslant q \leqslant 5 \times 10^5$.
