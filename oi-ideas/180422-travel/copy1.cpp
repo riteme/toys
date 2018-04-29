@@ -1,4 +1,4 @@
-#define NDEBUG
+// #define NDEBUG
 // #define USE_FILE_IO
 
 #include <cassert>
@@ -182,17 +182,29 @@ void rotate(int u, int v) {
     g[v] += size[u] * (size[v] - size[u] - CNT(v));
 }
 
-i64 eval(int u, int f) {
-    i64 ret = g[u];
-    if (IS_BLOCK(u))
-        ret *= (num[u] - 2);
+i64 eval(int u, int f, i64 p) {
+    i64 ret = 0;
+    if (IS_BLOCK(u)) {
+        i64 m = num[u];
+        for (int v : T[u]) {
+            i64 s = size[v];
+            i64 contr = m * c(s - 1) - g[v] + (s - 1) * (m - 1);
+            DEBUG("u = %d, v = %d, contr = %d\n", u, v, contr);
+            ret += contr;
+
+            for (int x : T[v]) {
+                if (IS_BLOCK(x) && x != u)
+                    ret -= g[x], DEBUG("u = %d, v = %d, x = %d, g[x] = %d\n", u, v, x, g[x]);
+            }
+        }
+    }
 
     for (int v : T[u]) {
         if (v == f)
             continue;
 
         rotate(u, v);
-        ret += eval(v, u);
+        ret += eval(v, u, p);
         rotate(v, u);
     }
 
@@ -208,8 +220,9 @@ int main() {
 
     i64 ans = 0;
     for (int u = 1; u <= n; u++) {
-        if (!father[u])
-            ans += eval(u, 0);
+        i64 p = size[u];
+        if (!father[u] && p > 2)
+            ans += (p - 2) * c(p) - eval(u, 0, p);
     }
 
     printf("%lld\n", ans);

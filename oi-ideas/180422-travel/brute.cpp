@@ -270,8 +270,6 @@ int main() {
 
         if (ans)
             out++;
-        else
-            printf("%d, %d, k = %d\n", u, v, k);
     }
 
     printf("%d\n", out);
