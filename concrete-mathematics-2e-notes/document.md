@@ -57,4 +57,15 @@ $$
 $$
 \left\lfloor {\lfloor m \alpha \rfloor n \over \alpha} \right\rfloor = \left\lfloor {(m \alpha - \{m \alpha\}) n \over \alpha} \right\rfloor = mn - 1  \ \ \ \   (m, n \in \mathbf{N}_+, \alpha \in \mathbf{R} - \mathbf{Q}, \alpha > n)
 $$
-P109
+取整的性质：
+$$
+\lfloor -x \rfloor = -\lceil x \rceil \\
+\lceil -x \rceil = -\lfloor x \rfloor
+$$
+区间内整数个数：
+$$
+[l,\ r] \rightarrow \lfloor r \rfloor - \lceil l \rceil + 1 \\
+[l,\ r) \rightarrow \lceil r \rceil - \lceil l \rceil \\
+(l,\ r] \rightarrow \lfloor r \rfloor - \lfloor l \rfloor \\
+(l,\ r) \rightarrow \lceil r \rceil - \lfloor l \rfloor - 1 \:\:\:\:  (l < r)
+$$
