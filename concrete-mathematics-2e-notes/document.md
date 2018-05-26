@@ -1,3 +1,9 @@
+$$
+\text{New Commands Here}
+\newcommand{\lf}[]{\lfloor}\newcommand{\rf}[]{\rfloor}\newcommand{\lc}[]{\lceil}\newcommand{\rc}[]{\rceil}
+\newcommand{\dw}[1]{\left\lfloor #1 \right\rfloor}\newcommand{\up}[1]{\left\lceil #1 \right\rceil}
+$$
+
 #### P84
 
 令 $f(x)$ 连续单调递增的函数，并且当函数值为整数时，$x$ 也为整数，即：
@@ -10,11 +16,6 @@ $$
 \lceil f(x) \rceil = \lceil f(\lceil x \rceil) \rceil
 $$
 
-若为增函数，则：
-$$
-\lfloor f(x) \rfloor = \lfloor f(\lceil x \rceil) \rfloor \\
-\lceil f(x) \rceil = \lceil f(\lfloor x \rfloor) \rceil
-$$
 若$x \in \mathbf{R},~n,m \in \mathbf{N}$，则有：
 $$
 \left\lfloor {x + m \over n} \right\rfloor = \left\lfloor {\lfloor x \rfloor + m \over n} \right\rfloor \\
@@ -40,8 +41,10 @@ $$
 
 对于任意**实数** $x$：
 $$
-\lfloor mx \rfloor = \sum_{k = 0}^{m - 1} \left\lfloor x + \frac{k}m\right\rfloor
+\lfloor mx \rfloor = \sum_{k = 0}^{m - 1} \left\lfloor x + \frac{k}m\right\rfloor \\
 $$
+
+常用情形：$m = 2$ 时：$\lfloor x \rfloor + \lfloor x + 1/2  \rfloor = \lfloor 2x \rfloor$，$\up{x} + \up{x + 1/2} = \up{2x}$
 
 #### P107
 
