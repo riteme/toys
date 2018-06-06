@@ -25,7 +25,8 @@ inline bool on_segment(int i, int j, int k) {
 
     int dx1 = X[i] - X[k], dy1 = Y[i] - Y[k];
     int dx2 = X[j] - X[k], dy2 = Y[j] - Y[k];
-    return dx1 * dy2 == dx2 * dy1 && dx1 * dx2 < 0;
+    int p = dx1 ? dx1 * dx2 : dy1 * dy2;
+    return dx1 * dy2 == dx2 * dy1 && p < 0;
 }
 
 void initialize() {

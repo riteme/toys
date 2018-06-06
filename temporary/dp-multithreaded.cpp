@@ -95,7 +95,8 @@ inline bool on_segment(int i, int j, int k) {
 
     int dx1 = X[i] - X[k], dy1 = Y[i] - Y[k];
     int dx2 = X[j] - X[k], dy2 = Y[j] - Y[k];
-    return dx1 * dy2 == dx2 * dy1 && dx1 * dx2 < 0;
+    int p = dx1 ? dx1 * dx2 : dy1 * dy2;
+    return dx1 * dy2 == dx2 * dy1 && p < 0;
 }
 
 inline Float dist(int i, int j) {
@@ -178,7 +179,7 @@ int main(int argc, char *argv[]) {
 
     int size = 1;
     for (int i = 1; i < n; i++) {
-        printf("Stage %d...\n", i);
+        // printf("Stage %d...\n", i);
         size = size * (n - i + 1) / i;
         task.clear();
         task.reserve(size);
