@@ -119,9 +119,9 @@
 
 * **mundane** /mʌnˈdeɪn/ adj 平常的，世俗的
 
-* discrepancy n 矛盾，不符合之处
+* **discrepancy** /dɪsˈkr**e**pənsi/ n 矛盾，不符合之处
 
-* grief n 悲伤悲痛，悲伤的事
+* **grief** /gri:f/ n 悲伤悲痛，悲伤的事
 
 * plug away 坚持下去
 
@@ -147,17 +147,20 @@
 
 * discern 觉察，识别，了解 (to know, recognize or understand sth that is *usually not obvious*); 依稀看出 (to see or hear, but not very clearly)
 
-* tableau ct n (pl tableaux) 由人组成的场景，戏剧性的一幕。
+* **tableau** /ˈtæbl**əʊ**/ ct n (pl **tableaux** /tæˈbloʊ**z**/) 由人组成的场景，戏剧性的一幕。
 
-* fathom v 理解，彻底了解
+* **fathom** /ˈ**fæð**əm/ v 理解，彻底了解 fathom sb/sth (out)
 
 * symmetric adj 对称的
 
 * reciprocity n 互惠，互助 (a situation in which two people, countries, etc. provide *the same* help or advantages to each other)
 
-* biased adj 有偏见的，有倾向性的 (against / for, in favor of，两方面均可) unbiased 公正的
+* **biased** /ˈb**aɪə**st/ adj 有偏见的，有倾向性的 (against / for, in favor of，两方面均可) **unbiased** 公正的
 
-* allude to sb/sth 间接提到 (*in an indirect way*)
+  biased towards sth/sb 偏重，偏向
+  a school biased towards music and art 一所偏重音乐和艺术的学校
+
+* **allude** /əˈlu:d/ **vi** allude to sb/sth 间接提到 (*in an indirect way*) **allusion** n 典故
 
 * derive v 得到  (be derived from sth / derive sth from sth, to come or develop from)
 
@@ -175,15 +178,15 @@
 
 * indebted adj 感激的 (be ~ to sb / for sth) sim. grateful (be ~ to sb / for sth)；负债的
 
-* subtle adj 微妙的，巧妙的，敏感的，狡猾的
+* **subtle** /ˈsʌtl/ adj 微妙的，巧妙的，敏感的，狡猾的
 
-* gut ct 肠子，(pl, informal) guts 勇气，直觉
+* **gut** /gʌt/ ct 肠子，(pl, informal) **guts** 勇气，直觉
 
-* emphasize vt 强调，加强语气
+* **emphasize** /ˈemfəsaɪz/ vt 强调，加强语气
 
-* dedicate vt sim. devote 奉献，题献词，为...举行落成典礼
+* **dedicate** /ˈdedɪkeɪt/ vt sim. *devote* 奉献，题献词，为...举行落成典礼
 
-* legacy n ct legacies 遗产，遗赠 (CS) legacy system 古董级软／硬件／方法（贬义）
+* **legacy** /ˈl**e**gəsi/ n ct legacies 遗产，遗赠 (CS) legacy system 古董级软／硬件／方法（贬义）
 
 * **pejorative** /**pɪ**ˈdʒɒrətɪv/ adj 贬义的，轻蔑的
 
@@ -226,3 +229,66 @@
   the sophisticated pleasures of city life 城市生活中五花八门的享乐
   smart and sophisticated 聪明老成
   sophisticated audience 有鉴赏力的观众
+
+* **rigorous** /ˈrɪgərəs/ adj 谨慎的，细致的，彻底的；严格的，严厉的
+
+* **zeitgeist** /ˈzaɪtgaɪst/ n *spirit of the times* 时代精神，时代思潮
+
+* **plunge** /plʌndʒ/ v/n 突然向前冲/下落，（价格温度）暴跌，（道路表面）陡峭地向下倾斜
+
+  The track plunged down into the valley. 小路陡然直下，直插山谷。
+  plunge in/into sth （用力地）投入，跳进，热情投入，贸然行动
+
+* **immerse** /ɪˈmɜ:s/ vt 使沉浸 immerse sb/sth/oneself in sth
+
+* **notion** /ˈnəʊʃn/ n ct 1. *a idea, a belief or an understanding of sth.* 2. *concept*
+
+* **inclusive** /ɪnˈklu:sɪv/ adj 包容广阔的，范围广泛的 oppo. **exclusive** adj 专用的，独有的，排他的
+
+* **Euclid** /ˈju:klid/
+
+* **convention** /kənˈvenʃn/ n ct 大会，集会；协定，公约；传统，习惯 **conventional** adj 传统的
+
+  by convention 习惯上
+
+* **composite** /ˈkɒm**pəzɪt**/ adj/n 合成的，混合的，复合的 composite numbers 合数
+
+* **integer** /ˈɪnt**ɪdʒə**(r)/
+
+* **arborescence** /'ɑ:bəresns/ n 树形图
+
+* *prefix* **uni-** 表“单一”之意 e.g. *unidirectional* 单向的
+
+* **descendant** /dɪˈsendənt/ n ct 后裔，后代
+
+* **corollary** /**kəˈrɒ**ləri/ n ct 推论
+
+* **devise** /dɪˈvaɪz/ vt 发明，设计，想出 *think up*
+
+* **integrate** /ˈɪntɪgreɪt/ v 使合并，成为一体，使加入，融入群体 integrate (A) into/with B
+
+* **segregate** /ˈsegrɪgeɪt/ vt 隔离并区别对待，使分开 segregate sb/sth from sb/sth
+
+* **incorporate** /ɪnˈkɔ:p**ə**reɪt/ vt incorporate sth in/into/within sth 将...包括在内，包含，集成
+
+* **generic** /**dʒəˈne**rɪk/ adj 一般的，普通的，通用的，无商标的
+
+* **phase** /feɪz/ n 阶段，时期；月亮的盈亏，月相
+
+  in phase/out of phase (with sth) 协调/不协调
+  phase sth in 逐步引入，分阶段进行，phase sth out 逐步废除
+  The new tas will be phased in over two years. 新税种将在两年内逐步实行。
+
+* **meld** /meld/ v 使融合，合并，结合 sim. blend
+
+* **pseudo** /'**sju:**dəʊ/ prefix 伪的，假的 **pseudo-code** 伪代码
+
+* **mantle** /ˈmæntl/ n （可继承的）职责，责任；覆盖物（披风，斗篷，地幔） v 覆盖，遮盖
+
+* **dismantle** /dɪsˈmæntl/ vt 拆开，拆卸，（逐步）废除，取消
+
+* **chronological** /ˌkrɒn**ə**ˈlɒdʒɪkl/ adj 按时间的前后顺序排列的，编年的
+
+* **serene** /səˈr**i:**n/ adj 安详的，沉静的，宁静的 **serenity** /sə'r**e**nətɪ/ n
+
+* **revery** /'revərɪ/ n 空想，幻想
