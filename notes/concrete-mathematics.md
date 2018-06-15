@@ -72,3 +72,15 @@ $$
 (l,\ r] \rightarrow \lfloor r \rfloor - \lfloor l \rfloor \\
 (l,\ r) \rightarrow \lceil r \rceil - \lfloor l \rfloor - 1 \:\:\:\:  (l < r)
 $$
+
+#### P114
+
+$n!$ 的质因数分解中 $2$ 的幂次 $\epsilon_2(n)$：
+$$
+\epsilon_2(n) = n - \mathrm{popcount}(n)
+$$
+`popcount` 即 $n$ 的二进制表示中 $1$ 的个数。原因非常简单，因为：
+$$
+\epsilon_p(n) = \sum_{k = 1}^\infty \dw{n \over p^k}
+$$
+当 $p = 2$ 时，考虑 $n$ 的二进制，表示 $2^m$ 的二进制上的 $1$ 对 $n$ 的贡献为 $2^m$，而对 $\epsilon_2(n)$ 的贡献为 $\sum_{k = 0}^{m-1} 2^k = 2^m - 1$，因此可以得到之前的等式。
