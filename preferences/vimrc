@@ -1,0 +1,60 @@
+" riteme's Vim configurations (Vim 8.1 / 2018.6.16)
+" Flags
+set nocompatible
+set noswapfile
+set expandtab
+set smartindent
+set autoindent
+set softtabstop=4
+set shiftwidth=4
+set lazyredraw
+set lines=45
+set columns=85
+set guifont=Consolas\ Bold\ 12
+set go=
+set background=dark
+set backspace=2
+set mouse=a
+set nu
+set nowrap
+set termguicolors
+set clipboard=unnamedplus
+syntax on
+colo molokai
+
+" Key Mappings
+map ; :
+nnoremap / :set hlsearch<Cr>/
+nnoremap <Esc> :set nohlsearch<Cr>
+
+" Plugins
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'easymotion/vim-easymotion'
+call vundle#end()
+filetype plugin on
+
+" Airline
+set laststatus=2
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#right_sep = ' '
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
+
+" Easymotion
+map m <Plug>(easymotion-prefix)
+let g:EasyMotion_smartcase = 1
+
+" AutoCompl (installed manually)
+set completeopt=longest,menuone
+let g:acp_behaviorKeywordLength = 1
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+inoremap <expr> <C-n> pumvisible() ? '<C-n>' :
+  \ '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+inoremap <expr> <M-,> pumvisible() ? '<C-n>' :
+  \ '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
