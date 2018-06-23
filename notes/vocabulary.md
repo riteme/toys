@@ -178,7 +178,7 @@
 * **flocks and herds** 牛羊（群）
 * **census** /ˈsensəs/ n 统计数据
 * **pitch** /pɪtʃ/ n *sports* 场地，球场
-* **obstacle** /ˈɒbstəkl/ n 障碍物，绊脚石；障碍，阻碍 obstacle to sth/to doing sth
+* **obstacle** /ˈɒbst**ə**kl/ n 障碍物，绊脚石；障碍，阻碍 obstacle to sth/to doing sth
   A lack of qualifications can be a major obstacle to finding a job. 学历不足可能成为谋职的主要障碍。
 * **cryptographic** /'krɪptəʊ'græfɪk/ adj 加密的
 * **hare** /heə(r)/ n 野兔 v 飞跑，疾走
@@ -186,3 +186,26 @@
   *Aesop's Fables* 伊索寓言 /ˈ**i:**sɔp/
 * **glimpse** /glɪmps/ n/vt 一瞥，一看（a glimpse at/of)；初次体验到（a glimpse into/of)
 * **amidst** /ə'**mɪdst**/ prep 在...中，在...的包围中
+* **conspicuous** /kənˈspɪkjuəs/ adj 显而易见的，惹人注意的 oppo. **inconspicuous**
+  The event was a conspicuous success. 这项活动至为成功。
+* **salvage** /ˈsælv**ɪ**dʒ/ n 营救，抢救出的财物；v 抢救，营救，挽回
+* **wreck** /rek/ n 遭损坏、遇难的事物（沉船、失事的飞机、汽车，精神上受打击的人）；vt 破坏、毁坏 *damage, destory or spoil sth*
+* **formidable** /**ˈ**fɔ:mɪdəbl. adj 可怕的，令人敬畏的，难以对付的
+* **feasible** /ˈfi:**zə**bl/ adj 可行的，行得通的 sim. **practicable** /ˈpræktɪkəbl/ oppo. **unfeasible**
+* **feasibility** /ˌfi:**zə'bɪ**lətɪ/ n 可行性，可能性
+* **firm up** 使结实，使更坚硬，把...安排稳妥
+* **preamble** /priˈæmbl/ n 前言，序言，导言，开场白
+* **defer** /dɪˈfɜ:(r)/ vt 推迟，延迟，延缓 (*put off*) n **deferment**/**deferral** vi defer to sb/sth (you respect) 顺从，服从，听从
+* **convoluted** /ˈkɒnvəlu:tɪd/ adj 复杂的，卷曲的，盘绕的
+* **inherent** /ɪnˈh**ɪə**rənt/ adj 天生的，固有的，内在的
+* **weird** /wɪəd/ adj 奇异的，不寻常的，怪诞的，离奇的，诡异的
+* **proposition** /ˌprɒpəˈzɪʃn/ n 建议，提议，主张，(*math*) 命题
+* **vindicate** /ˈvɪndɪkeɪt/ vt 证明，辩护，澄清（责难、嫌疑），证明（某人）无罪 sim. *justify*
+* **totient** /'təʊ**ʃə**nt/ $\varphi(n)$
+* **resurrect** /ˌrezəˈrekt/ vt 重新使用，使复兴，起死回生，使复活 sim. *revive*
+* **culminate** /ˈkʌlmɪneɪt/ vi （以某种结果、在某一点）结束 culminate in/with sth
+  Months of hard work culminated in success. 几个月的艰辛工作终于取得了成功。
+* **intense** /ɪnˈtens/ adj 很大的，十分强烈的 (*extreme*)；严肃紧张的，激烈的，尖锐的，热切的
+* **intensive** /ɪnˈtensɪv/ adj 密集的，彻底的，十分细致的
+* **scrutiny** /ˈskru:**tə**ni/ n *careful & thorough examination/inspection*
+  His proof is being subjected to intense scrutiny. (Andrew Wiles 于 1993 年声明证明了费马大定理)

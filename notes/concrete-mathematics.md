@@ -84,3 +84,61 @@ $$
 \epsilon_p(n) = \sum_{k = 1}^\infty \dw{n \over p^k}
 $$
 当 $p = 2$ 时，考虑 $n$ 的二进制，表示 $2^m$ 的二进制上的 $1$ 对 $n$ 的贡献为 $2^m$，而对 $\epsilon_2(n)$ 的贡献为 $\sum_{k = 0}^{m-1} 2^k = 2^m - 1$，因此可以得到之前的等式。
+
+#### P124
+
+$$
+a \equiv b \pmod{m} \Leftrightarrow a - b = km,\ k \in \mathbf{Z}
+$$
+
+用于判断两数是否同余，仅用一次取模。
+
+证明：
+
+模 $m$ 意义下，如果 $a \equiv b$ 且 $c \equiv d$，则：
+
+$$
+a + c \equiv b + d \\
+a - c \equiv b - d \\
+ac \equiv bd
+$$
+考虑之前所述的等价关系：$a - b$、$c - d$ 均为 $m$ 的倍数，将其线性组合可以得到上述结论。
+
+（$(a - b) + (c - d) = (a + c) - (b + d)$、$(a - b) - (c - d) = (a - c) - (b - d)$、$(a - b)c + (c - d)b = ac - bd$）
+$$
+ab \bmod mb = ab - mb\dw{ab \over mb} = b\left(a - m\dw{a \over m}\right) = (a \bmod m)b
+$$
+如果 $d \neq 0$，可以推出：
+$$
+\begin{aligned}
+a \equiv b \pmod{m} & \Leftrightarrow a \bmod m = b \bmod m \\
+& \Leftrightarrow d(a \bmod m) = d(b \bmod m) \\
+& \Leftrightarrow ad \equiv bd \pmod{md}
+\end{aligned}
+$$
+综合之前的结论：
+$$
+ad \equiv bd \pmod{m} \Leftrightarrow a \equiv b \pmod{m / \gcd(m, d)} \:\:\:\: (a,\ b,\ m,\ d \in \mathbf{Z})
+$$
+换模数大法：如果 $m,\ n > 0$
+$$
+a \equiv b \pmod{m} \text{ and } a \equiv b \pmod{n} \Leftrightarrow a \equiv b \pmod{\mathrm{lcm}(m,\ n)}
+$$
+
+#### P128
+
+独立剩余系：若 $m$ 和 $n$ 互质，用$(x \bmod m,\ x \bmod n)$ 来表示 $x \bmod mn$。
+
+问题已知 $x = (p,\ q)$，如何求出 $x \bmod mn$？（中国剩余定理）
+
+设 $a = (1,\ 0)$ 以及 $b = (0,\ 1)$，则 $x \equiv ap + bq \pmod{mn}$。现在的目标则是求出 $a$ 和 $b$。
+
+Easy！根据扩展欧几里得算法，我们得到：$m'm + n'n = 1$，令 $a = n'n$ 且 $b = m'm$ 即可。
+
+类比向量线性基。
+
+#### P135
+
+$f(n)$ 为积性函数当且仅当 $1 \times f = \sum_{d \mid n} f(d)$ 为积性函数。
+
+证明方法，数学归纳法
