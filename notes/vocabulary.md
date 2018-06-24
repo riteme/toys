@@ -205,7 +205,12 @@
 * **resurrect** /ˌrezəˈrekt/ vt 重新使用，使复兴，起死回生，使复活 sim. *revive*
 * **culminate** /ˈkʌlmɪneɪt/ vi （以某种结果、在某一点）结束 culminate in/with sth
   Months of hard work culminated in success. 几个月的艰辛工作终于取得了成功。
-* **intense** /ɪnˈtens/ adj 很大的，十分强烈的 (*extreme*)；严肃紧张的，激烈的，尖锐的，热切的
+* **intense** /ɪnˈtens/ adj 很大的，十分强烈的 (*extreme*)；严肃紧张的，激烈的，尖锐的，热切的 **intenser**/**internsest**
 * **intensive** /ɪnˈtensɪv/ adj 密集的，彻底的，十分细致的
 * **scrutiny** /ˈskru:**tə**ni/ n *careful & thorough examination/inspection*
   His proof is being subjected to intense scrutiny. (Andrew Wiles 于 1993 年声明证明了费马大定理)
+* **successive** /səkˈsesɪv/ adj 连续的，依次的 adv **successively** sim. *consecutive*
+* **ken** /ken/ n beyond one's ken 为某人不所理解 v 知道，了解 (*know*)
+* **erratic** /ɪˈrætɪk/ adj 飘忽不定的，不稳定的，不可靠的，不规则的
+* **bead** /b**i:**d/ n 有孔小珠，念珠，（液体）小滴（*a small drop of liquid*）
+

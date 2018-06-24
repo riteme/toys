@@ -142,3 +142,34 @@ Easy！根据扩展欧几里得算法，我们得到：$m'm + n'n = 1$，令 $a 
 $f(n)$ 为积性函数当且仅当 $1 \times f = \sum_{d \mid n} f(d)$ 为积性函数。
 
 证明方法，数学归纳法
+
+#### P138
+
+记欧拉函数前缀和：
+$$
+\Phi(n) = \sum_{k = 1}^n \varphi(k)
+$$
+证明：
+$$
+\sum_{k = 1}^n \Phi\left(\dw{n \over k}\right) = {n(n + 1) \over 2}
+$$
+$\Phi(n)$ 表示满足 $0 \leqslant a < b \leqslant n$ 的既约分数 $a/b$ 的个数。考虑统计所有满足 $0 \leqslant a < b \leqslant n$ 的分数 $a/b$ 个数（可能没有约分），其中 $\gcd(a,\ b) = r$ 的分数可表示为 $ra'/rb' = a'/b'$，且 $b' \leqslant \dw{n/r}$，所以这样的分数的个数为 $\Phi(\dw{n/r})$。分数的总个数为右式。
+
+#### P139
+
+莫比乌斯反演真实面目：
+$$
+f(x) = \sum_{k \geqslant 1} g(x/k) \:\Longleftrightarrow\: g(x) = \sum_{k \geqslant 1} \mu(k)f(x/k)
+$$
+由 $\sum_{d \mid n} \mu(d) = [n = 1]$ 可推出。
+
+#### P143
+
+费马小定理加强版：
+$$
+\begin{aligned}
+n^p & \equiv n & \pmod{p} \\
+n^{p^k} & \equiv n^{p^{k - 1}} & \pmod {p}
+\end{aligned}
+$$
+通过数学归纳法 + 二项式定理展开证明
