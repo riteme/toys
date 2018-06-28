@@ -136,4 +136,6 @@ ENV/
 *.out
 *.ans
 
+*.odg
+
 .vscode

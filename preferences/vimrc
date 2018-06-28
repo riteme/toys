@@ -5,10 +5,11 @@ set noswapfile
 set expandtab
 set smartindent
 set autoindent
+set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set lazyredraw
-set lines=45
+set lines=48
 set columns=85
 set guifont=Consolas\ Bold\ 12
 set go=
@@ -19,12 +20,13 @@ set nu
 set nowrap
 set termguicolors
 set clipboard=unnamedplus
+set ignorecase
+set smartcase
 syntax on
 colo molokai
 
 " Key Mappings
 map ; :
-nnoremap / :set hlsearch<Cr>/
 nnoremap <Esc> :set nohlsearch<Cr>
 
 " Plugins
@@ -47,8 +49,15 @@ let g:airline_left_sep = ''
 let g:airline_right_sep = ''
 
 " Easymotion
-map m <Plug>(easymotion-prefix)
+map m <Leader>
 let g:EasyMotion_smartcase = 1
+let g:EasyMotion_startofline = 0
+map  / :set hlsearch<Cr><Plug>(easymotion-sn)
+"omap / <Plug>(easymotion-tn)
+map <Leader>l <Plug>(easymotion-lineforward)
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+map <Leader>h <Plug>(easymotion-linebackward)
 
 " AutoCompl (installed manually)
 set completeopt=longest,menuone

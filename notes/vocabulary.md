@@ -213,4 +213,9 @@
 * **ken** /ken/ n beyond one's ken 为某人不所理解 v 知道，了解 (*know*)
 * **erratic** /ɪˈrætɪk/ adj 飘忽不定的，不稳定的，不可靠的，不规则的
 * **bead** /b**i:**d/ n 有孔小珠，念珠，（液体）小滴（*a small drop of liquid*）
+* **aggregate** /ˈægrɪgət/ n 总数，总计 adj 总计的 v aggregate sth (with sth) 汇集，总计 **aggregation**
+  in aggregate 总共，作为总体
+  on aggregate *sport* 各次比赛相加的总分
+* **cursory** /ˈkɜ:səri/ adj 粗略的，草率的
+* **heuristic** /hjuˈrɪstɪk/ adj 启发式的
 
