@@ -9,11 +9,11 @@ set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set lazyredraw
-set lines=48
+set lines=42
 set columns=85
 set guifont=Consolas\ Bold\ 12
 set go=
-set background=dark
+set background=light
 set backspace=2
 set mouse=a
 set nu
@@ -23,11 +23,14 @@ set clipboard=unnamedplus
 set ignorecase
 set smartcase
 syntax on
-colo molokai
+colo solarized
 
 " Key Mappings
 map ; :
 nnoremap <Esc> :set nohlsearch<Cr>
+nnoremap <A-Left> :bp<Cr>
+nnoremap <A-Right> :bn<Cr>
+nnoremap <A-Down> :bd<Cr>
 
 " Plugins
 filetype off
@@ -37,6 +40,7 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'easymotion/vim-easymotion'
+Plugin 'ntpeters/vim-better-whitespace'
 call vundle#end()
 filetype plugin on
 
@@ -67,3 +71,7 @@ inoremap <expr> <C-n> pumvisible() ? '<C-n>' :
   \ '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
 inoremap <expr> <M-,> pumvisible() ? '<C-n>' :
   \ '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+
+" Vim Better Whitespaces
+autocmd InsertEnter * DisableWhitespace
+autocmd InsertLeave * EnableWhitespace

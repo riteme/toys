@@ -1,3 +1,9 @@
+# 栈　队列
+
+## July 15, 2018, riteme
+
+***
+
 ###### 你们都应该知道的东西
 
 确认一下你们都知道这些东西......方便后面交流......
@@ -351,7 +357,7 @@ stk.pop()  // 删除栈顶元素
 
 ###### DFS & BFS
 
-回溯、函数递归和深度有限搜索 (DFS) 都需要使用栈，只不过系统提供了函数调用栈。
+回溯、函数递归和深度优先搜索 (DFS) 都需要使用栈，只不过系统提供了函数调用栈。
 
 ---
 
@@ -491,7 +497,7 @@ stack: 5 4 读入 +，计算 5 + 4 = 9，即计算结果
 
 ---
 
-题目链接：[【洛谷 P1175】](https://www.luogu.org/problemnew/show/P1175)
+题目链接：[【LG P1175】](https://www.luogu.org/problemnew/show/P1175)
 
 ***
 
@@ -501,7 +507,7 @@ BFS 总是优先访问距离近的状态，所以经常用于搜索最小值。
 
 ---
 
-例题：[【洛谷 P1126】](https://www.luogu.org/problemnew/show/P1126)
+例题：[【LG P1126】](https://www.luogu.org/problemnew/show/P1126)
 
 题目大意：一个机器人在网格图上走路，求从一个点走到另一个点的最短时间。
 
@@ -525,7 +531,7 @@ BFS 总是优先访问距离近的状态，所以经常用于搜索最小值。
 
 ---
 
-另一个广搜练习题：[【洛谷 P1379】](https://www.luogu.org/problemnew/show/P1379)
+另一个广搜练习题：[【LG P1379】](https://www.luogu.org/problemnew/show/P1379)
 
 ***
 
@@ -578,7 +584,7 @@ BFS 总是优先访问距离近的状态，所以经常用于搜索最小值。
 
 可以使用正反两次单调栈扫描完成上述搜索。
 
-类似题：[【洛谷 P1901】](https://www.luogu.org/problemnew/show/P1901)
+类似题：[【LG P1901】](https://www.luogu.org/problemnew/show/P1901)
 
 ***
 
@@ -588,7 +594,7 @@ BFS 总是优先访问距离近的状态，所以经常用于搜索最小值。
 
 ---
 
-例题：[【洛谷 P1440】](https://www.luogu.org/problemnew/show/P1440)
+例题：[【LG P1440】](https://www.luogu.org/problemnew/show/P1440)
 
 题目大意：给定一个长度为 $n$ 的序列，求出每一个长度为 $m$ 的区间内的最小值。$n \leqslant 2 \times 10^6$。
 
@@ -620,7 +626,7 @@ m = 2
 
 ###### 选做题 #1
 
-[【NOIP 2017 Day2 T2 / 洛谷 P2827】](https://www.luogu.org/problemnew/show/P2827)：蚯蚓
+[【NOIP 2017 Day2 T2 / LG P2827】](https://www.luogu.org/problemnew/show/P2827)：蚯蚓
 
 ---
 

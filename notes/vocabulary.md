@@ -1,11 +1,11 @@
 ### 词汇记录册
 
-* **fundamental** /ˌfʌndəˈmentl/ 基础的
+* **fundamental** /ˌfʌndəˈmentl/ adj 基础的
   Since then, suffix arrays have been used as fundamental data structures in a broad spectrum of applications.
-* **retrieve** /rɪˈtri:v/ 检索；取回；恢复 vt/vi/n
+* **retrieve** /rɪˈtri:v/ vt/vi/n 检索；取回；恢复
   The police have managed to retrieve some of the stolen money.
   The program allows you to retrieve items quickly by searching under a keyword.
-* **pursuit** /pəˈsju:t/ 追求，寻找；追赶，跟踪，追捕 uct. n
+* **pursuit** /pəˈsju:t/  n uct. 追求，寻找；追赶，跟踪，追捕
   the pursuit of happiness / knowledge / profit
   She travelled the world in pursuit of her dream.
   We drove away with two police cars in pursuit.
@@ -218,4 +218,43 @@
   on aggregate *sport* 各次比赛相加的总分
 * **cursory** /ˈkɜ:səri/ adj 粗略的，草率的
 * **heuristic** /hjuˈrɪstɪk/ adj 启发式的
-
+* **rear** /rɪə(r)/ n 后面，后部 adj 后面的 v 抚养，培育，饲养 rear sb/sth on sth 用...喂养、培养
+  I was the son of sailors and reared on stories of the sea. 我是水手的儿子，是听海的故事长大的。
+* **acronym** /ˈækrənɪm/ 首字母缩写词
+* **rudiment** /'ru:dɪmənt/ 雏形，萌芽，基本原理，退化器官
+* **designate** /ˈd**ezɪg**neɪt/ vt 命令，指定；选定，指派，委任；标明，标示，指明 adj [*after noun*] （已受任）但暂未上任的
+  designate sth (as) sth / desginate sth as being sth
+  This area has been designated (as) a National Park. 本区已定为国家公园。
+  The different types are designated by the letters A, B and C. 不同的类型分别用字母A、B和C标明。
+* **conceivable** /kənˈsi:vəbl/ adj 可想到的，可相信的 oppo. **inconceivable** adj 难以置信的
+* **understate** /ˌʌndəˈsteɪt/ vt 轻描淡写 oppo. **overstate**
+* **prior** /ˈp**raɪ**ə(r)/ adj 先前的，较早的，优先的，较重要的 prior to = before
+* **cumulative** /ˈkju:mjəl**ə**tɪv/ adj 累积的，聚积的，渐增的
+* **orthodox** /ˈɔ:θədɒks/ adj 普遍接受的，正统的，规范的 sim. traditonal oppo. **unorthodox**
+* **dissect** /d**ɪ**ˈsekt/ v 解剖；把...分成小块；仔细研究，详细评论 n **dissection**
+* **hinge** /hɪndʒ/ n 铰链，合叶 v 给（某物）装铰链
+  hinge on/upon sth (*action, result, etc.*) 取决于，有赖于
+  All our analyses hinge on the following Main Lemma.
+* **blurry** /ˈblɜ:ri/ adj 模糊不清的
+* **erroneous** /ɪˈrəʊniəs/ adj 错误的
+* **prevail** /prɪˈveɪl/ v 普遍存在，流行，盛行；被接受，战胜 (*after a long stuggle*)；劝说
+  Those beliefs still *prevail in/among* certain social groups. 这些信念在某些社会群体中仍很盛行。
+  prevail on/upon sb to do sth 劝说
+  I'm sure he could be prevailed upon to give a talk. 我相信能说服他来做一次报告。
+* **tyranny** /ˈtɪrəni/ n 暴虐，专横，苛政，专政；暴君统治；暴君统治的国家
+* **homogeneous** /ˌhɒməˈdʒi:niəs/ adj 由相同 / 同类型的人或事物组成的，同种类的，同源的 oppo. **heterogeneous** /ˌhetərəˈdʒi:niəs/ adj 各种各样的
+* **entail** /ɪnˈteɪl/ v 牵涉，需要，使必要 sim. involve
+* **egregious** /ɪˈgri:dʒiəs/ adj 极糟的，极坏的，令人发指的 *extremely bad*
+* **snooze** /snu:z/ v/n （白天）小睡，打盹
+* **uncluttered** /ˌʌnˈklʌtəd/ adj 简洁的，整洁的，利落的 sim. **tidy**
+* **strive** /straɪv/ v *strive*-**strove**-**striven** 努力，力争，力求 strive for/against/to do **striving** n
+  We encourage all members to strive for the highest standards. 我们鼓励所有成员为达到最高标准而努力。
+* **robust** /rəʊˈbʌst/ 强健的，强壮的，结实的，耐用的，富有活力的，坚定地，信心十足的 **robustness** n sim **sturdy** /ˈstɜ:di/ adj
+* **scatter** /ˈskætə(r)/ v 撒播，散开，驱散 scatter sth (on/over/around sth) / scatter sth (with sth)
+  Scatter the grass seed over the lawn. 把草籽撒到草坪上。
+  Scatter the lawn with grass seed. 在草坪上撒上草籽。
+* **mutual** /ˈmju:tʃuəl/ adj 相互的，彼此的，共有的，共同的
+* **terminology** /ˌtɜ:**mɪˈnɒ**lədʒi/ n 术语，专业用语
+* **saturate** /ˈsæ**tʃə**reɪt/ v 使湿透，浸透 sim. **soak** /səʊk/；使充满，使饱和 saturate sth/sb (with/in sth)
+* **evict** /ɪˈvɪkt/ v （依法）驱逐，赶出，逐出 **eviction** n
+* **posthumous** /ˈpɒstjʊməs/ adj 死后发生（或做、出版等）的
