@@ -1,12 +1,14 @@
 #include <cstdio>
 #include <cstring>
 
-#include <bitest>
+#include <bitset>
 #include <algorithm>
 
 using namespace std;
 
 #define NMAX 1000
+
+typedef long long data_t;
 
 static int n, m;
 static data_t mat[NMAX + 1];

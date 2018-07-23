@@ -189,7 +189,7 @@ function LCA(int u, int v):
 
 ###### 离线算法
 
-如果允许不即时回答询问，在已知所有询问的情况下，最后统一给出答案，称为离线处理。
+如果允许不即时回答询问，在已知所有询问的情况下，最后统一给出答案，称为**离线处理**。
 
 ---
 
@@ -256,9 +256,9 @@ function dfs(int x):  // ancestor 表示祖先指针，marked 数组表示 DFS �
 	ancestor[find(x)] = x
 	for v in G[x]:  // 遍历 x 的所有儿子 v
 		dfs(v)
-		union(u, v)  // 连接 u 和 v
-		ancestor[find(u)] = u
-	marked[u] = true
+		union(x, v)  // 连接 x 和 v
+		ancestor[find(x)] = x
+	marked[x] = true
 	for each query LCA(u, x):
 		if marked[u]:
 			LCA(u, x) = ancestor[find(u)]
@@ -392,12 +392,32 @@ DFS 的时候先找出重儿子并且优先进入。这样 `id` 实际上也是 
 
 ***
 
+###### 树链剖分：实现
+
+用树链剖分求 LCA：
+
+---
+
+```
+int top[], father[], depth[]  // 链顶、父亲节点、深度
+function LCA(int u, int v):
+	while top[u] != top[v]:  // 如果 u 和 v 不在同一条链上
+		if depth[top[u]] < depth[top[v]]:  // 令 top[u] 为深度较大者，这样 u 所在的链在 v 所在的链下方
+			swap(u, v)
+		u = father[top[u]]  // 上跳
+	// 退出 while 循环后， u 和 v 在同一条链上，其中深度较小的就是 LCA
+	if depth[u] < depth[v]: return u
+	else: return v
+```
+
+***
+
 ###### [【HAOI 2015 / LG P3178】](https://www.luogu.org/problemnew/show/P3178)树上操作
 
 给定一棵 $n$ 个节点的树，并执行 $q$ 次操作：
 
 1. 把某个节点 $x$ 的权值增加 $a$。
-2. 把以某个节点 $x$ 的子树内的所有节点的权值增加 $a$。
+2. 把以某个节点 $x$ 为根的子树内的所有节点的权值增加 $a$。
 3. 查询某个节点 $x$ 到根的路径上所有节点的权值和。
 
 $n,\,q \leqslant 10^5$
@@ -432,8 +452,22 @@ $n,\,q \leqslant 10^5$
 
 ---
 
-按照时间顺序维护一个树状数组，将栈里面所有的修改都加到树状数组上。DFS 进入 / 离开节点的时候可以及时更新。询问时查询前缀和即可。
+按照时间顺序维护一个树状数组，将栈里面所有的修改都加到树状数组上。DFS 进入 / 离开节点的时候可以及时更新。询问时查询前缀和即可。这样就处理了单点修改。
+
+--------
+
+子树修改？当然也是可以的。假设是把子树 $x$ 内所有节点都加上 $v$，对于子树 $x$ 内的一个节点 $y$，查询 $y$ 到根节点的路径和的时候，这个修改操作对查询的贡献是 $(\mathrm{depth}[y] - \mathrm{depth}[x] + 1) \cdot v$。
 
 ---
 
-子树修改？~~由于我太懒了所以~~就先留作思考题吧。
+这个贡献可以视为两部分，一部分是 $-\mathrm{depth}[x] \cdot v$，这一部分只与 $x$ 和 $v$ 有关；另外一部分是 $(\mathrm{depth}[y] + 1) \cdot v$，这一部分与 $y$ 和 $v$ 有关。所以还需要一个树状数组，记录到根节点的路径上所有子树修改的 $v$ 的和，用于计算第二个部分。第一个部分则直接加入之前的树状数组。
+
+---
+
+时间复杂度 $O(n + q \log n)$。
+
+***
+
+###### NOI 水题放送
+
+模板题：[【NOI 2015 / LG P2146】](https://www.luogu.org/problemnew/show/P2146)软件包管理器
