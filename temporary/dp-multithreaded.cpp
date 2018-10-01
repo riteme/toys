@@ -23,9 +23,9 @@
 
 #define NMAX 25
 #define SMAX (1 << (NMAX))
-#define SQRTMAX 100
+#define SQRTMAX 100000
 #define WORDSIZE 5
-#define NUM_THREAD 4
+#define NUM_THREAD 8
 
 typedef float Float;
 #define FLOAT_LITERAL "%f"
@@ -104,6 +104,8 @@ inline Float dist(int i, int j) {
     return SQRT[dx * dx + dy * dy];
 }
 
+Float DIST[32][32];
+
 static State *ref[SMAX];
 static std::vector<int> task;
 
@@ -125,6 +127,8 @@ void initialize() {
     for (int i = 1; i <= SQRTMAX; i++) {
         SQRT[i] = sqrt(i);
     }
+    for (int i = 0; i < 32; i++) for (int j = 0; j < 32; j++)
+        DIST[i][j] = dist(i, j);
 
     for (int i = 0; i < n; i++) {
         State *p = ref[1 << i] = new State(1);
@@ -153,7 +157,7 @@ void dp(int S, State &s) {
             if (cover[x][j] & (~T))
                 continue;
 
-            Float nwdst = s[i].len + dist(x, j);
+            Float nwdst = s[i].len + DIST[x][j];
             if (nwdst > t[k].len) {
                 t[k].len = nwdst;
                 t[k].sol = s[i].sol;
@@ -179,7 +183,7 @@ int main(int argc, char *argv[]) {
 
     int size = 1;
     for (int i = 1; i < n; i++) {
-        // printf("Stage %d...\n", i);
+        printf("Stage %d...\n", i);
         size = size * (n - i + 1) / i;
         task.clear();
         task.reserve(size);

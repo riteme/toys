@@ -258,3 +258,84 @@
 * **saturate** /ˈsæ**tʃə**reɪt/ v 使湿透，浸透 sim. **soak** /səʊk/；使充满，使饱和 saturate sth/sb (with/in sth)
 * **evict** /ɪˈvɪkt/ v （依法）驱逐，赶出，逐出 **eviction** n
 * **posthumous** /ˈpɒstjʊməs/ adj 死后发生（或做、出版等）的
+* **reciprocal** /rɪˈsɪprəkl/ adj 互惠的，相应的；n （数学）倒数
+* **ubiquitous** /ju:ˈbɪkwɪtəs/ adj 无处不在的，十分普遍的
+* **enroll** /ɪn'rəʊl/ v 招收，注册，登记，加入
+* **syllabus** /ˈsɪləbəs/ n 教学大纲
+* **condense** /kənˈdens/ v （气体）冷凝，凝结；浓缩，变浓；简缩，压缩
+* **deceptive** /dɪˈseptɪv/ adj 虚伪的，欺诈的，骗人的，误导的，靠不住的
+  deceptively simple 看似简单（实则并不简单）
+* **minuscule** /ˈmɪnəskju:l/ adj 非常小的 (*extremely small*)
+  $n$ has to be absolutely minuscule for $n!$.
+* **versatile** /ˈvɜ:sətaɪl/ adj （人）多才多艺的，有多种技能的；（食物、建筑物）多用途的，多功能的
+  Eggs are easy to cook and are an extremely versatile food. 鸡蛋容易烹煮，怎么做着吃都行。
+  Trie is a powerful and versatile data structure.
+* **foray** /ˈfɒreɪ/ n （改变职业、活动）尝试；突袭；短途（寻物）；短暂访问（某地） foray into sth
+* **substantial** /səbˈstænʃl/ adj 大量的，价值巨大的，重大的；大而坚固的，结实的，牢固的
+  He ate a substantial breakfast. 他吃了一顿丰盛的早餐。
+* **hasty** /ˈheɪsti/ adj 匆忙的，草率的，考虑不周密的 hasty in doing sth
+  Perhaps I was too hasty in rejecting his offer. 我也许过于草率地拒绝他的提议了。
+* **negligible** /ˈneglɪdʒəbl/ adj 微不足道的，不重要的，不值一提的
+* **raid** /reɪd/ n/vt 突袭，突击检查，突然搜查，抢劫，打劫 (n) raid on sth
+  They carried out a bombing raid on enemy bases. 他们突然出击，轰炸了敌军的基地。
+  Villages along the border are regularly raided. 边境附近的村庄经常遭受突袭。 
+* **penetrate** /ˈpe**nɪ**treɪt/ vt 穿过，进入 (go into or through sth)；渗透，打入；看透，透过…看见；洞察，发现，揭示；被领悟，被理解 penetrate into/through/to std
+  The war penetrates every area of the nation's life. 战争波及全国国民生活的各个领域。 
+  Science can penetrate many of nature's mysteries. 科学能揭示自然界的许多奥秘。
+  / I was at the door before his words penetrated. 我走到门口才听懂了他说的话。
+* **peculiar** /pɪˈkju:liə(r)/ adj 怪异的，奇怪的，不寻常的 sim. **odd**；（某人、地、情况）特有的，特殊的
+  He has his own peculiar style which you'll soon get used to. 他有自己独特的风格，你会很快习惯的。
+* **top-notch** /tɔp nɔtʃ/ adj 最好的，卓越的，第一流的
+* **vow** /vaʊ/ n/v 誓言；发誓
+* **dire** /ˈdaɪə(r)/ adj 极其严重的，危急的，极糟的，极差的 *direr*, *direst*
+* **unify** /ˈju:nɪfaɪ/ v 统一 **unification** n
+* **perusal** /**pə'ru:**zl/ n uct 阅读，读
+* **ponder** /ˈpɒndə(r)/ v 沉思，考虑，琢磨 ponder about/on/over sth sim. consider
+* **dearth** /dɜ:θ/ n 缺乏，不足 dearth of sth
+* **ointment** /ˈɔɪntmənt/ n 软膏，药膏，油膏
+  a fly in the ointment 美中不足
+* **introspect** /ˌɪntrəʊ'spekt/ v 内省，自省 **introspection** n
+* **boilerplate** /ˈbɔɪləpleɪt/ n （可供模仿的）样板文件，文件范例
+* **intrusive** /ɪnˈtru:sɪv/ adj 侵入的，闯入的，侵扰的，烦扰的
+* **copious** /ˈkəʊpiəs/ adj 大量的，丰富的，冗长的 sim. abundant
+* **all-encompassing** adj 包罗万象的
+* **prerequisite** /ˌpri:ˈ**re**k**wəzɪt**/ n 先决条件，前提，必备条件 adj 必备的
+* **seasoned** /ˈsi:znd/ 富有经验的；（食物）调好味的；（木料）风干的，晾干的（供加工使用）
+* **traverse** /trə**ˈvɜ**:s/
+* **prune** /pru:n/ n 干梅子，西梅干，李子干；vt 修剪树枝，裁剪，精简 prune sth (back)
+* **hog** /hɒg/ n （喂肥供食用的）猪
+* *sheer lunacy* /ˈlu:nəsi/ （习语）脑袋发热，精神失常
+* **fallacy** /ˈfæləsi/ n 谬论，谬见
+* **atrocious** /əˈtrəʊʃəs/ adj 槽透的，十分讨厌的，残暴的，残忍的 (*very bad, unpleasant, cruel or shocking*)
+* **linear** /**ˈlɪniə(r)**/ （注意读音）
+* **concede** /kənˈsi:d/ v *concede sth to sb*/*concede sb sth* 承认，妥协，让步 **concession** n
+* **nifty** /ˈnɪfti/ adj *skilful, accurate, practical, working well* sim. **handy**
+* **inevitable** /ɪnˈevɪtəbl/ adj 不可避免的，不能防止的 **inevitability** n sim. **unavoidable** /ˌʌ**nəˈ**vɔɪdəbl/
+* **parity** /ˈpærəti/ n uct 平等，相同，对等 *parity with sb/sth* *parity between A and B*；奇偶性
+* **unravel** /ʌnˈrævl/ v 解开，拆散，松开；解体，崩溃；阐释，说明，澄清
+  I unravelled the string and wound it into a ball. 我把绳子解开并绕成一个球。
+* **superior** /su:ˈpɪəriə(r)/ adj 更好的，占优势，更好的 n 上级，上司 oppo. **inferior** /ɪnˈfɪəriə(r)/
+* **catenary** /**kə'ti:**nərɪ/ n 悬链线
+* **jargon** /ˈdʒɑ:gən/ n uct 行话，行业术语
+* **jocular** /ˈdʒɒkjələ(r)/ adj 幽默的，诙谐的，滑稽的，爱开玩笑的 sim. **jolly**/**humorous**
+* **mutate** /mju:ˈteɪt/ v 变异，突变；转变，转换 *mutate into sth*
+* **traction** /ˈtrækʃn/ n uct 牵引，牵引力，拉力，拖拉
+* **enduring** /ɪnˈdjʊərɪŋ/ adj 持久的，耐久的，永恒的，不朽的
+* **colloquial** /kəˈləʊkwiəl/ adj 口语的，会话的
+* **pervade** /pəˈveɪd/ v 渗透，弥漫，遍及 sim. **permeate** /ˈpɜ:mieɪt/
+* **parenthetical** /ˌpærənˈθetɪkl/ adj 插入的，插入成分的
+* **sophomore** /ˈsɒfəmɔ:(r)/ n 大二生
+* **faculty** /ˈ**fæ**klti/ n 天赋，才能；全体教师
+* **overwhelming** /ˌəʊvəˈwelmɪŋ/ adj 压倒性的，势不可挡的
+* **superstitious** /ˌsu:pəˈstɪʃəs/ adj 迷信的
+* **efficacy** /ˈ**e**fɪkəsi/ n 功效，效验，效力
+* **ridge** /rɪdʒ/ n 山脊
+* **temporal** /ˈtempərəl/ adj 世俗的，现世的，时间的
+* **spatial** /ˈs**peɪ**ʃl/ adj 空间的
+* **glitch** /glɪtʃ/ n 小过失，差错
+* **compelling** /kəmˈpelɪŋ/ adj 引人入胜的，扣人心弦的
+* **semaphore** /ˈseməfɔ:(r)/ n uct 信号标，旗语；v 打旗语
+* **tenable** /ˈtenəbl/ adj 站得住脚的，合理的
+* **elaborate** /ɪˈlæbərət/ adj 复杂的，详尽的，精心制作的；v 详尽陈述 *elaborate on/upon sth*，精心制作 **elaboration** n
+  The importance of the plan needs no further elaboration. 这个计划的重要性无须赘述。
+* **vulgar** /ˈvʌlgə(r)/ adj 庸俗的，粗俗的，不雅的，粗鲁的，下流的

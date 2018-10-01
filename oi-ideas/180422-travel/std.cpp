@@ -1,4 +1,4 @@
-#define NDEBUG
+// #define NDEBUG
 // #define USE_FILE_IO
 
 #include <cassert>
@@ -40,7 +40,6 @@ struct Pair {
 };
 
 static int n, m, cnt;  // cnt: number of blocks
-static vector<int> G[NMAX + 10], T[NMAX + 10];
 static int father[NMAX + 10], in[NMAX + 10];
 static i64 num[NMAX + 10];
 static i64 size[NMAX + 10], g[NMAX + 10];  // g: explained in document
@@ -49,69 +48,48 @@ static i64 size[NMAX + 10], g[NMAX + 10];  // g: explained in document
 #define CNT(x) (IS_BLOCK(x) ? 0 : 1)
 
 // Biconnected components
+#define ACM_BEGIN
+static vector<int> G[NMAX + 10], T[NMAX + 10];
 void bcc(int u, int f = 0) {
     static stack<Pair> stk;
     static bool marked[NMAX + 10];
-    static int low[NMAX + 10], cur;
+    static int in[NMAX + 10], low[NMAX + 10], cur;
     in[u] = low[u] = ++cur;
-
     for (int v : G[u]) {
-        if (v == f) {
-            f = 0;  // Cancel on the first edge to father
-            continue;
-        }
-
-        if (in[v]) 
-            low[u] = min(low[u], in[v]);
+        if (v == f) f = 0;  // 应对重边
+        else if (in[v]) low[u] = min(low[u], in[v]);
         else {
-            stk.push(Pair(u, v));
+            stk.push(Pair(u, v));  // stk 内存储 DFS 树上的边
             bcc(v, u);
             low[u] = min(low[u], low[v]);
-
-            if (low[v] > in[u]) {
-                DEBUG("bcc: cut edge: (%d, %d)\n", u, v);
+            if (low[v] > in[u]) {  // 割边 u - v
                 T[u].push_back(v);
                 T[v].push_back(u);
                 stk.pop();
-            } else if (low[v] >= in[u]) {
+            } else if (low[v] >= in[u]) {  // 可能有点双了
                 cnt++;
-                DEBUG("bcc: %d: ", cnt);
-                int linked = 0, p = n + cnt;
+                int linked = 0, p = n + cnt;  // linked 点数, p 圆方树上的新方点
                 auto add = [p, &linked](int x) {
                     if (!marked[x]) {
                         marked[x] = true;
                         T[p].push_back(x);
                         T[x].push_back(p);
                         linked++;
-
-                        DEBUG("%d ", x);
-                    }
-                };
-
+                }};
                 while (!stk.empty()) {
                     Pair x = stk.top();
                     stk.pop();
                     add(x.u);
                     add(x.v);
-
-                    if (x.u == u && x.v == v)
-                        break;
+                    if (x.u == u && x.v == v) break;
                 }
-
-                for (int v : T[p])
-                    marked[v] = false;
-
+                for (int v : T[p]) marked[v] = false;
+#define ACM_END
                 num[p] = linked;
-                if (linked == 0) {
-                    cnt--;
-                    DEBUG("(empty)");
-                }
-
-                DEBUG("\n");
-            }
-        }
-    }
-}
+#define ACM_BEGIN
+                if (linked == 0) cnt--;  // 假点双
+}}}}
+#define ACM_END
 
 void dfs(int x, int f) {
     i64 sum = 0;
