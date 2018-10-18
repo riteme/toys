@@ -3,6 +3,8 @@
 #ifndef __CG_H__
 #define __CG_H__
 
+#define _USE_MATH_MARCOS
+
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -289,10 +291,10 @@ inline vec2 operator*(const vec2 &a, const mat2 &b) {
     };
 }
 
-struct Line {
+struct Line2d {
     // Line p + vt, t in R
-    Line() = default;
-    Line(const vec2 &_p, const vec2 &_v) : p(_p), v(_v) {}
+    Line2d() = default;
+    Line2d(const vec2 &_p, const vec2 &_v) : p(_p), v(_v) {}
 
     vec2 p, v;
 
@@ -301,9 +303,61 @@ struct Line {
     }
 };
 
-inline Line line(const vec2 &A, const vec2 &B) {
+inline Line2d line(const vec2 &A, const vec2 &B) {
     return {A, B - A};
 }
+
+double tris(const vec2 &, const vec2 &);
+
+struct Poly2d {
+    Poly2d() = default;
+    Poly2d(vec2 *_a, int _n) : n(_n), a(_a) {
+        ASSERT(n >= 3, "Too few vertices");
+    }
+    Poly2d(const std::vector<vec2> &src) : n(src.size()) {
+        ASSERT(n >= 3, "Too few vertices");
+        a = new vec2[n];
+        for (int i = 0; i < n; i++) a[i] = src[i];
+    }
+
+    int n = 0;
+    vec2 *a = nullptr;
+
+    bool valid() const {
+        return n;
+    }
+
+    vec2 &operator[](const unsigned i) {
+        return a[i];
+    }
+
+    vec2 operator[](const unsigned i) const {
+        return a[i];
+    }
+
+    double area() const {
+        double r = 0.0;
+        for (int i = 2; i < n; i++)
+            r += tris(a[i - 1] - a[0], a[i] - a[0]);
+        return fabs(r) * 0.5;
+    }
+
+    void dispose() {
+        delete[] a;
+    }
+};
+
+struct Circle {
+    Circle() = default;
+    Circle(const vec2 &_p, double _r) : p(_p), r(_r) {}
+
+    vec2 p;
+    double r = 0.0;
+
+    double area() const {
+        return M_PI * r * r;
+    }
+};
 
 // Utilities
 
@@ -318,12 +372,12 @@ inline double cross(const vec2 &a, const vec2 &b) {
 inline double shadow(const vec2 &a, const vec2 &b) {
     // b shot on a
     ASSERT(a != vec2(0.0), "'a' is a zero vector");
-    return cross(a, b) / a.len();
+    return dot(a, b) / a.len();
 }
 
 inline vec2 shdvec(const vec2 &a, const vec2 &b) {
     ASSERT(a != vec2(0.0), "'a' is a zero vector");
-    return cross(a, b) / cross(a, a) * a;
+    return dot(a, b) / dot(a, a) * a;
 }
 
 inline vec2 mirror(const vec2 &a, const vec2 &b) {
@@ -359,23 +413,23 @@ inline vec2 rot2(const vec2 &a, double t) {
     return rot2(t) * a;
 }
 
+inline double tris(const vec2 &a, const vec2 &b) {
+    return cross(a, b) * 0.5;
+}
+
 inline double dist(const vec2 &A, const vec2 &B) {
     return (A - B).len();
 }
 
-inline double dist(const vec2 &P, const Line &l) {
+inline double dist(const vec2 &P, const Line2d &l) {
     ASSERT(l.valid(), "Invalid line");
     vec2 u = P - l.p;
     return (u - shdvec(u, l.v)).len();
 }
 
-inline double dist(const Line &p, const Line &q) {
+inline double dist(const Line2d &p, const Line2d &q) {
     ASSERT(eq(cross(p.v, q.v), 0.0), "'p' intersects with 'q'");
     return dist(p.p, q);
-}
-
-inline double tris(const vec2 &a, const vec2 &b) {
-    return cross(a, b) * 0.5;
 }
 
 inline vec2 intrp(const vec2 &A, const vec2 &B, double k) {
@@ -390,7 +444,7 @@ inline vec2 intrp(const vec2 &A, const vec2 &B, double a, double b) {
     return (b * A + a * B) / (a + b);
 }
 
-inline vec2 lli(const Line &p, const Line &q) {
+inline vec2 lli(const Line2d &p, const Line2d &q) {
     // Line-Line intersection
     ASSERT(neq(cross(p.v, q.v), 0.0), "Parallel lines")
     vec2 d = q.p - p.p;
@@ -423,17 +477,17 @@ inline bool tstsegi2(
 }
 
 template <typename T>
-inline T center3(const T &a, const T &b, const T &c) {
+inline T massc3(const T &a, const T &b, const T &c) {
     return (a + b + c) / 3.0;
 }
 
 template <typename T>
-inline T center(const vector<T> &P) {
+inline T massc(const std::vector<T> &P) {
     return accumulate(P.begin(), P.end()) / P.size();
 }
 
 template <typename T>
-inline T center(const vector<T> &P, const vector<double> &w) {
+inline T massc(const std::vector<T> &P, const std::vector<double> &w) {
     ASSERT(P.size() == w.size(), "Different length with 'P' and 'w'");
     T c = T(0.0);
     double W = 0.0;
@@ -443,5 +497,67 @@ inline T center(const vector<T> &P, const vector<double> &w) {
     }
     return c / W;
 }
+
+inline vec2 massc(const Poly2d &poly) {
+    ASSERT(poly.valid(), "Invalid polygen");
+    double s = 0.0;
+    vec2 r = vec2(0.0);
+    for (int i = 2; i < poly.n; i++) {
+        double w = tris(poly[i - 1] - poly[0], poly[i] - poly[0]);
+        r += massc3(poly[0], poly[i - 1], poly[i]) * w;
+        s += w;
+    }
+    return r / s;
+}
+
+inline bool inpoly(const Poly2d &poly, const vec2 &p) {
+    ASSERT(poly.valid(), "Invalid polygen");
+    bool r = 1;
+    auto chk = [&](const vec2 &a, const vec2 &b) {
+        if (eq(a.y, b.y)) return;
+        if (eq(p.y, a.y)) r ^= gt(a.y, a.y);
+        else if (eq(p.y, b.y)) r ^= gt(b.y, a.y);
+        else r ^= lt(p.y, a.y) ^ lt(p.y, b.y);
+    };
+    for (int i = 1; i < poly.n; i++) chk(poly[i - 1], poly[i]);
+    chk(poly[0], poly[poly.n - 1]);
+    return r;
+}
+
+inline bool incir(const Circle &c, const vec2 &p) {
+    return leqt(dist(c.p, p), c.r);
+}
+
+inline void lciri(
+    const Circle &c, const Line &l,
+    vec2 *o1 = nullptr, vec2 *o2 = nullptr, int *on = nullptr
+) {
+    ASSERT(l.valid(), "Invalid line");
+#define FILL(a, b) if (a) *a = b;
+    double d = dist(c.p, l);
+    if (gt(d, c.r)) {
+        FILL(on, 0);
+        return;
+    }
+
+    vec2 q = c.p - l.p;
+    vec2 h = shadow(q, l.v) - q;
+    vec2 u = c.p + h;
+    if (eq(d, c.r)) {
+        FILL(o1, u);
+        FILL(on, 1);
+        return;
+    }
+
+    vec2 v = l.v.norm() * sqrt(c.r * c.r - d * d);
+    FILL(o1, u + v);
+    FILL(o2, u - v);
+    FILL(on, 2);
+#undef FILL
+}
+
+#undef ASSERT
+#undef FAIL
+#undef EPS
 
 #endif // __CG_H__
