@@ -36,8 +36,8 @@ def provider():
 
 import utils
 from multiprocessing import Pool
-utils.OFFSET_X = 162
-utils.OFFSET_Y = 64
+utils.OFFSET_X = 160
+utils.OFFSET_Y = 62
 with open('data') as reader:
     data = reader.read()
     T = filter(lambda x : x.strip() != '', data.split('\n'))

@@ -6,7 +6,6 @@ from colorsys import rgb_to_hsv
 import sys
 
 imagePath = sys.argv[1]
-WIDTH, HEIGHT = 36, 36
 
 colors = {
     (0, 0, 0): 0,
@@ -68,13 +67,12 @@ def min_color_diff(color_to_match, colors):
 
 def main():
     im = Image.open(imagePath)
-    im = im.resize((WIDTH, HEIGHT))
     data = []
     w, h = im.size
     print("width", w, "height", h)
 
     writer = open("data", 'w')
-    preview = Image.new("RGB", (WIDTH, HEIGHT), 0xffffff)
+    preview = Image.new("RGB", (w, h), 0xffffff)
     for i in range(0, w, 1):
         for j in range(0, h, 1):
             color = get_color(im.getpixel((i, j)))
