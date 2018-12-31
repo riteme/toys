@@ -1,0 +1,7 @@
+2018-12-31 15:07:39,781 - server.py[line:48] - INFO: Image size: 36x36
+2018-12-31 15:07:40,053 - server.py[line:56] - INFO: Fetched canvas.
+2018-12-31 15:07:40,053 - server.py[line:63] - INFO: Rendered 0 pixel(s).
+2018-12-31 15:07:55,307 - server.py[line:56] - INFO: Fetched canvas.
+2018-12-31 15:07:55,414 - utils.py[line:43] - WARNING: [0] 操作过于频繁
+2018-12-31 15:08:10,508 - utils.py[line:43] - WARNING: [0] 操作过于频繁
+2018-12-31 15:08:25,637 - utils.py[line:46] - INFO: [0] OK. (192, 82, 15)

@@ -282,7 +282,7 @@
 * **penetrate** /ˈpe**nɪ**treɪt/ vt 穿过，进入 (go into or through sth)；渗透，打入；看透，透过…看见；洞察，发现，揭示；被领悟，被理解 penetrate into/through/to std
   The war penetrates every area of the nation's life. 战争波及全国国民生活的各个领域。 
   Science can penetrate many of nature's mysteries. 科学能揭示自然界的许多奥秘。
-  / I was at the door before his words penetrated. 我走到门口才听懂了他说的话。
+  I was at the door before his words penetrated. 我走到门口才听懂了他说的话。
 * **peculiar** /pɪˈkju:liə(r)/ adj 怪异的，奇怪的，不寻常的 sim. **odd**；（某人、地、情况）特有的，特殊的
   He has his own peculiar style which you'll soon get used to. 他有自己独特的风格，你会很快习惯的。
 * **top-notch** /tɔp nɔtʃ/ adj 最好的，卓越的，第一流的
