@@ -1,7 +1,17 @@
-2018-12-31 15:07:39,781 - server.py[line:48] - INFO: Image size: 36x36
-2018-12-31 15:07:40,053 - server.py[line:56] - INFO: Fetched canvas.
-2018-12-31 15:07:40,053 - server.py[line:63] - INFO: Rendered 0 pixel(s).
-2018-12-31 15:07:55,307 - server.py[line:56] - INFO: Fetched canvas.
-2018-12-31 15:07:55,414 - utils.py[line:43] - WARNING: [0] 操作过于频繁
-2018-12-31 15:08:10,508 - utils.py[line:43] - WARNING: [0] 操作过于频繁
-2018-12-31 15:08:25,637 - utils.py[line:46] - INFO: [0] OK. (192, 82, 15)
+2019-01-01 23:21:28,589 - server.py[line:56] - INFO: Image size: 35x34
+2019-01-01 23:21:30,050 - server.py[line:69] - INFO: Fetched canvas.
+2019-01-01 23:21:30,050 - server.py[line:76] - INFO: Rendered 0 pixel(s).
+2019-01-01 23:22:30,644 - server.py[line:69] - INFO: Fetched canvas.
+2019-01-01 23:22:30,644 - server.py[line:76] - INFO: Rendered 0 pixel(s).
+2019-01-01 23:23:31,219 - server.py[line:69] - INFO: Fetched canvas.
+2019-01-01 23:23:31,219 - server.py[line:76] - INFO: Rendered 0 pixel(s).2019-01-01 23:24:32,512 - server.py[line:69] - INFO: Fetched canvas.
+2019-01-01 23:24:32,512 - server.py[line:76] - INFO: Rendered 0 pixel(s).
+2019-01-01 23:25:33,253 - server.py[line:69] - INFO: Fetched canvas.
+2019-01-01 23:25:33,253 - server.py[line:76] - INFO: Rendered 0 pixel(s).
+2019-01-01 23:26:33,911 - server.py[line:83] - ERROR: [TypeError] 'NoneType' object has no attribute '__getitem__'
+2019-01-01 23:26:33,912 - server.py[line:84] - ERROR: Python traceback:
+  File "./server.py", line 68, in <module>
+    D = utils.slice(utils.fetch(), WIDTH, HEIGHT)
+  File "/home/riteme/Code/toys/luogu-paint/utils.py", line 58, in slice
+    ret = data[x:x + w]
+2019-01-01 23:26:33,912 - server.py[line:85] - CRITICAL: PAINT SERVICE EXITED.

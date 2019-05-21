@@ -46,8 +46,12 @@ rev = {}
 for key, value in colors.items():
     rev[value] = key
 
-
+FORBIDDEN_COLOR = False
+if '-f' in sys.argv:
+    FORBIDDEN_COLOR = True
 def get_color(pixel):
+    if FORBIDDEN_COLOR and pixel == (255,255,255):
+        return -1
     return min_color_diff(pixel, colors)[1]
 
 
@@ -76,10 +80,11 @@ def main():
     for i in range(0, w, 1):
         for j in range(0, h, 1):
             color = get_color(im.getpixel((i, j)))
-            preview.putpixel((i, j), rev[color])
+            if color >= 0:
+                preview.putpixel((i, j), rev[color])
             writer.write(str(color) + ' ')
         writer.write('\n')
-    preview.save("preview.bmp", "bmp")
+    preview.save("preview.png", "png")
 
 
 if __name__ == '__main__':

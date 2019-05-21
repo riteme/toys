@@ -9,9 +9,9 @@ PAINT_DATA_URL = 'https://www.luogu.org/paintBoard/board'
 PAINT_POST_URL = 'https://www.luogu.org/paintBoard/paint'
 OFFSET_X = 0
 OFFSET_Y = 0
-TIMEOUT = 10
-REST_TIME = 30
-RETRY_TIME = 15
+TIMEOUT = 3
+REST_TIME = 10
+RETRY_TIME = 10
 MAX_RETRY = 3
 
 def parse(s):
@@ -27,7 +27,7 @@ def fetch():
         return None
     return parse(r.content)
 
-def draw(args):
+def draw(args, no_block=False):
     pixel, user, userid = args
     x, y, c = pixel
     ok = False
@@ -36,7 +36,10 @@ def draw(args):
             'user-agent': USER_AGENT,
             'cookie': user
         }, data={'x': x, 'y': y, 'color': c}, timeout=TIMEOUT)
-        ret = json.loads(r.content)
+        try:
+            ret = json.loads(r.content)
+        except:
+            ret = {'status': 404}
         if r.status_code == 200 and ret['status'] == 200:
             ok = True
             break
@@ -46,7 +49,8 @@ def draw(args):
         log.info('[%s] OK. (%s, %s, %s)' % (userid, x, y, c))
     else:
         log.error('[%s] Failed.' % userid)
-    sleep(REST_TIME)
+    if not no_block:
+        sleep(REST_TIME)
     return userid
 
 def slice(data, w, h):
@@ -63,6 +67,7 @@ def diff(pre, nxt, user_provider):
     shuffle(yl)
     for x in xl:
         for y in yl:
-            if pre[x][y] != nxt[x][y]:
+            if pre[x][y] != -1 and nxt[x][y] != -1 and pre[x][y] != nxt[x][y]:
                 user, userid = user_provider()
                 yield (OFFSET_X + x, OFFSET_Y + y, nxt[x][y]), user, userid
+
