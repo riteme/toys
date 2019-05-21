@@ -86,7 +86,7 @@ int main() {
     }
     auto t2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> t = t2 - t1;
-    fprintf(stderr, "time = %.3lfs\n", t.count());
+    fprintf(stderr, "%.6lf\n", t.count());
 
     for (int i = 1; i <= cnt[2]; i++) printf("%d\n", ans[i]);
     return 0;
