@@ -64,7 +64,9 @@ int main() {
     }
 
     // expose + fastcut is slightly slower.
+    lct.init(n, q, cnt[0], cnt[1], cnt[2]);  // Initialization time is not taken into account.
     auto t1 = std::chrono::high_resolution_clock::now();
+
     lct.link(1, q + 1);
     for (int i = 2; i <= cnt[1]; i++) lct.link(q + i - 1, q + i);
     for (int i = 2; i <= cnt[0]; i++) lct.link(top[i], i);
@@ -76,7 +78,15 @@ int main() {
             lct.link(sp[i], q + i);
         }
         for (int i : tog[t]) lct.toggle(i);
-        for (auto &e : queries[t]) ans[e.i] = lct.count(e.x, e.y);
+        for (auto &e : queries[t]) {
+            // The following 5 lines of code are used to test evert.
+            // lct.evert(e.x);
+            // lct.expose((e.x + e.y) >> 1);
+            // lct.evert(e.y);
+            // lct.expose(996);
+            // lct.evert(1);
+            ans[e.i] = lct.count(e.x, e.y);
+        }
         for (int i : del[t]) {
             // lct.expose(sp[i]);
             // lct.fastcut(q + i);
@@ -84,10 +94,11 @@ int main() {
             lct.link(q + i - 1, q + i);
         }
     }
+
     auto t2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> t = t2 - t1;
-    fprintf(stderr, "%.6lf\n", t.count());
 
+    fprintf(stderr, "%.6lf\n", t.count());
     for (int i = 1; i <= cnt[2]; i++) printf("%d\n", ans[i]);
     return 0;
 }

@@ -79,6 +79,8 @@ inline void spaly(int x, bool accessed = false) {
     }
 }
 
+void LCT::init(int /*n*/, int /*q*/, int /*c1*/, int /*c2*/, int /*c3*/) {}
+
 auto LCT::splice(int x) -> int {
     assert(m[x].fa < 0);
     int p = -m[x].fa;

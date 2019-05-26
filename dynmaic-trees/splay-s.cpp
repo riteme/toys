@@ -1,5 +1,5 @@
 /**
- * Authentic splay tree. 1ms slower than splay-s
+ * Simplified splay tree, c approx 3.16+
  */
 
 #include <cassert>
@@ -79,27 +79,11 @@ inline void splay(int x, bool accessed = false) {
     while (m[x].fa > 0) {
         int p = m[x].fa, p2 = m[p].fa;
         if (p2 > 0) {
-            if (m[p].lch == x) {
-                if (m[p2].lch == p) {
-                    lrot(p2);
-                    lrot(p);
-                } else {
-                    lrot(p);
-                    rrot(p2);
-                }
-            } else if (m[p].rch == x) {
-                if (m[p2].lch == p) {
-                    rrot(p);
-                    lrot(p2);
-                } else {
-                    rrot(p2);
-                    rrot(p);
-                }
-            }
-        } else {
-            if (m[p].lch == x) lrot(p);
-            else rrot(p);
+            if (m[p].lch == x && m[p2].lch == p) lrot(p2);
+            else if (m[p].rch == x && m[p2].rch == p) rrot(p2);
         }
+        if (m[p].lch == x) lrot(p);
+        else rrot(p);
     }
 }
 

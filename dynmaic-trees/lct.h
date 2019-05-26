@@ -6,6 +6,7 @@
 
 class LCT {
   public:
+    void init(int n, int q, int c1, int c2, int c3);
     auto splice(int x) -> int;
     void expose(int x);
     void link(int x, int y);
@@ -15,6 +16,8 @@ class LCT {
     void set(int x, int v);
     void toggle(int x);
     auto count(int x, int y) -> int;
+
+    void debug();
 };
 
 #endif  // LCT_H
