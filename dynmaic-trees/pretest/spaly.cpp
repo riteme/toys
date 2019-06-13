@@ -1,10 +1,4 @@
-/**
- * Authentic splay tree. 1ms slower than splay-s
- */
-
 #include <cassert>
-#include <cstdio>
-#include <cstring>
 
 #include <algorithm>
 
@@ -13,7 +7,7 @@
 using std::swap;
 
 static struct Node {
-    int val, mx, pos;
+    int w, sum;
     int fa, lch, rch;
     bool rev;
 } m[NMAX + 1];
@@ -28,10 +22,7 @@ inline void push(int x) {
 }
 
 inline void update(int x) {
-    m[x].mx = m[x].val;
-    m[x].pos = x;
-    chkmax(m[x], m[m[x].lch]);
-    chkmax(m[x], m[m[x].rch]);
+    m[x].sum = m[x].w + m[m[x].lch].sum + m[m[x].rch].sum;
 }
 
 inline void lrot(int x) {
@@ -49,8 +40,7 @@ inline void lrot(int x) {
     }
     m[y].fa = m[x].fa;
     m[x].fa = y;
-    m[y].mx = m[x].mx;
-    m[y].pos = m[x].pos;
+    m[y].sum = m[x].sum;
     update(x);
     // update(y);
 }
@@ -70,8 +60,7 @@ inline void rrot(int x) {
     }
     m[y].fa = m[x].fa;
     m[x].fa = y;
-    m[y].mx = m[x].mx;
-    m[y].pos = m[x].pos;
+    m[y].sum = m[x].sum;
     update(x);
     // update(y);
 }
@@ -81,45 +70,21 @@ inline void access(int x) {
     push(x);
 }
 
-inline void splay(int x, bool accessed = false) {
+inline void spaly(int x, bool accessed = false) {
     if (!accessed) access(x);
     while (m[x].fa > 0) {
-        int p = m[x].fa, p2 = m[p].fa;
-        if (p2 > 0) {
-            if (m[p].lch == x) {
-                if (m[p2].lch == p) {
-                    lrot(p2);
-                    lrot(p);
-                } else {
-                    lrot(p);
-                    rrot(p2);
-                }
-            } else if (m[p].rch == x) {
-                if (m[p2].lch == p) {
-                    rrot(p);
-                    lrot(p2);
-                } else {
-                    rrot(p2);
-                    rrot(p);
-                }
-            }
-        } else {
-            if (m[p].lch == x) lrot(p);
-            else rrot(p);
-        }
+        int p = m[x].fa;
+        if (m[p].lch == x) lrot(p);
+        else rrot(p);
     }
 }
 
-void LCT::init(int n) {
-    fprintf(stderr, "sizeof = %lu\n", sizeof(Node));
-    memset(m + 1, 0, sizeof(Node) * n);
-    for (int i = 1; i <= n; i++) m[i].pos = i;
-}
+void LCT::init(int /*n*/, int /*q*/, int /*c1*/, int /*c2*/, int /*c3*/) {}
 
 auto LCT::splice(int x) -> int {
     assert(m[x].fa < 0);
     int p = -m[x].fa;
-    splay(p);
+    spaly(p);
     m[m[p].rch].fa = -p;
     m[p].rch = x;
     m[x].fa = p;
@@ -128,7 +93,7 @@ auto LCT::splice(int x) -> int {
 }
 
 void LCT::expose(int x) {
-    splay(x);
+    spaly(x);
     m[m[x].rch].fa = -x;
     m[x].rch = 0;
     update(x);
@@ -136,7 +101,7 @@ void LCT::expose(int x) {
 }
 
 void LCT::link(int x, int y) {
-    splay(y);
+    spaly(y);
     assert(!m[y].fa);
     m[y].fa = -x;
     // expose(y);
@@ -144,13 +109,13 @@ void LCT::link(int x, int y) {
 
 void LCT::fastcut(int x) {
     // assume the father of x on the tree has been exposed.
-    splay(x);
+    spaly(x);
     m[x].fa = 0;
 }
 
 void LCT::cut(int x) {
     expose(x);
-    splay(x);
+    spaly(x);
     int y = m[x].lch;
     if (!y) return;
     push(y);
@@ -158,7 +123,7 @@ void LCT::cut(int x) {
         y = m[y].rch;
         push(y);
     }
-    splay(y, true);
+    spaly(y, true);
     m[m[y].rch].fa = 0;
     m[y].rch = 0;
     update(y);
@@ -166,27 +131,33 @@ void LCT::cut(int x) {
 
 void LCT::evert(int x) {
     expose(x);
-    splay(x);
+    spaly(x);
     m[x].rev ^= 1;
 }
 
 void LCT::set(int x, int v) {
-    splay(x);
-    m[x].val = v;
-    if (v > m[x].mx) {
-        m[x].mx = v;
-        m[x].pos = x;
-    }
+    spaly(x);
+    m[x].sum += v - m[x].w;
+    m[x].w = v;
 }
 
-auto LCT::query(int x, int y) -> int {
-    evert(x);
+void LCT::toggle(int x) {
+    spaly(x);
+    m[x].sum += m[x].w ? 1 : -1;
+    m[x].w ^= 1;
+}
+
+auto LCT::count(int x, int y) -> int {
+    if (x == y) return 0;
+    if (x < y) swap(x, y);
+    expose(x);
     expose(y);
-    splay(y);
-    while (m[x].fa) x = m[x].fa;
-    return x != y ? 0 : m[y].pos;
-}
-
-auto LCT::get(int x) -> int {
-    return m[x].val;
+    spaly(x);
+    int r = m[x].sum;
+    if (m[x].fa != -y) {
+        expose(-m[x].fa);
+        spaly(y);
+        r += m[y].sum;
+    }
+    return r;
 }

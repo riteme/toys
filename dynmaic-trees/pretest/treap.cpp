@@ -3,9 +3,7 @@
  */
 
 #include <cassert>
-#include <cstdio>
 #include <cstdlib>
-#include <cstring>
 
 #include <random>
 #include <algorithm>
@@ -43,8 +41,7 @@ inline int mrand(int n) {
 }
 
 static struct Node {
-    int val, mx, pos;
-    int wt, size;
+    int val, wt, sum, size;
     int fa, lch, rch;
     bool rev;
 } m[NMAX + 1];
@@ -59,10 +56,7 @@ inline void push(int x) {
 }
 
 inline auto update(int x) -> int {
-    m[x].mx = m[x].val;
-    m[x].pos = x;
-    chkmax(m[x], m[m[x].lch]);
-    chkmax(m[x], m[m[x].rch]);
+    m[x].sum = m[x].val + m[m[x].lch].sum + m[m[x].rch].sum;
     m[x].size = m[x].wt + m[m[x].lch].size + m[m[x].rch].size;
     return x;
 }
@@ -131,8 +125,7 @@ static auto split(int x) -> Triple {
     }
     m[l].fa = m[r].fa = m[x].lch = m[x].rch = m[x].fa = 0;
     // m[x].size = m[x].wt;
-    m[x].mx = m[x].val;
-    m[x].pos = x;
+    m[x].sum = m[x].val;
     return {l, r, t};
 }
 
@@ -149,13 +142,8 @@ inline void reweight(int x, int d) {
     m[x].fa = t.p;
 }
 
-void LCT::init(int n) {
-    fprintf(stderr, "sizeof = %lu\n", sizeof(Node));
-    memset(m + 1, 0, sizeof(Node) * n);
-    for (int i = 1; i <= n; i++) {
-        m[i].wt = m[i].size = 1;
-        m[i].pos = i;
-    }
+void LCT::init(int n, int q, int c1, int c2, int c3) {
+    for (int i = 1; i <= NMAX; i++) m[i].wt = m[i].size = 1;
 }
 
 auto LCT::splice(int x) -> int {
@@ -206,26 +194,26 @@ void LCT::evert(int x) {
 }
 
 void LCT::set(int x, int v) {
+    for (int y = x; y > 0; y = m[y].fa) m[y].sum += v - m[x].val;
     m[x].val = v;
-    if (v > m[x].mx) {
-        m[x].mx = v;
-        m[x].pos = x;
-    }
-    while (m[x].fa > 0) {
-        int p = m[x].fa;
-        chkmax(m[p], m[x]);
-        x = p;
-    }
 }
 
-auto LCT::query(int x, int y) -> int {
-    evert(x);
+void LCT::toggle(int x) {
+    for (int y = x; y > 0; y = m[y].fa) m[y].sum += m[x].val ? -1 : 1;
+    m[x].val ^= 1;
+}
+
+auto LCT::count(int x, int y) -> int {
+    if (x == y) return 0;
+    if (x < y) swap(x, y);
+    expose(x);
     expose(y);
-    while (m[x].fa) x = m[x].fa;
-    while (m[y].fa) y = m[y].fa;
-    return x != y ? 0 : m[x].pos;
-}
-
-auto LCT::get(int x) -> int {
-    return m[x].val;
+    while (m[x].fa > 0) x = m[x].fa;
+    int r = m[x].sum;
+    if (m[x].fa != -y) {
+        expose(-m[x].fa);
+        while (m[y].fa > 0) y = m[y].fa;
+        r += m[y].sum;
+    }
+    return r;
 }

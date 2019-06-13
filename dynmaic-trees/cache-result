@@ -1,0 +1,72 @@
+# log n = 1
+        kruskal: 0.018
+          spaly: 0.495
+          splay: 0.543
+ locally-biased: 1.17
+          treap: 0.764
+# log n = 2
+        kruskal: 0.0187
+          spaly: 0.504
+          splay: 0.551
+ locally-biased: 1.19
+          treap: 0.776
+# log n = 3
+        kruskal: 0.0190
+          spaly: 0.516
+          splay: 0.563
+ locally-biased: 1.24
+          treap: 0.794
+# log n = 4
+        kruskal: 0.0199
+          spaly: 0.548
+          splay: 0.596
+ locally-biased: 1.31
+          treap: 0.838
+# log n = 5
+        kruskal: 0.0212
+          spaly: 0.576
+          splay: 0.627
+ locally-biased: 1.35
+          treap: 0.871
+# log n = 6
+        kruskal: 0.0226
+          spaly: 0.602
+          splay: 0.655
+ locally-biased: 1.40
+          treap: 0.895
+# log n = 7
+        kruskal: 0.0254
+          spaly: 0.623
+          splay: 0.677
+ locally-biased: 1.48
+          treap: 0.921
+# log n = 8
+        kruskal: 0.0286
+          spaly: 0.684
+          splay: 0.745
+ locally-biased: 1.81
+          treap: 1.08
+# log n = 9
+        kruskal: 0.0315
+          spaly: 0.863
+          splay: 0.920
+ locally-biased: 2.26
+          treap: 1.36
+# log n = 10
+        kruskal: 0.0337
+          spaly: 1.07
+          splay: 1.14
+ locally-biased: 2.65
+          treap: 1.58
+# log n = 11
+        kruskal: 0.0361
+          spaly: 1.24
+          splay: 1.32
+ locally-biased: 2.95
+          treap: 1.76
+
+kruskal2 := {{1,0.018},{2,0.0187},{3,0.0190},{4,0.0199},{5,0.0212},{6,0.0226},{7,0.0254},{8,0.0286},{9,0.0315},{10,0.0337},{11,0.0361}}
+spaly2 := {{1,0.495},{2,0.504},{3,0.516},{4,0.548},{5,0.576},{6,0.602},{7,0.623},{8,0.684},{9,0.863},{10,1.07},{11,1.24}}
+splay2 := {{1,0.543},{2,0.551},{3,0.563},{4,0.596},{5,0.627},{6,0.655},{7,0.677},{8,0.745},{9,0.920},{10,1.14},{11,1.32}}
+biased2 := {{1,1.17},{2,1.19},{3,1.24},{4,1.31},{5,1.35},{6,1.40},{7,1.48},{8,1.81},{9,2.26},{10,2.65},{11,2.95}}
+treap2 := {{1,0.764},{2,0.776},{3,0.794},{4,0.838},{5,0.871},{6,0.895},{7,0.921},{8,1.08},{9,1.36},{10,1.58},{11,1.76}}

@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cstring>
 
 #include <algorithm>
 
@@ -7,7 +8,7 @@
 using std::swap;
 
 static struct Node {
-    int w, sum;
+    int val, mx, pos;
     int fa, lch, rch;
     bool rev;
 } m[NMAX + 1];
@@ -22,7 +23,10 @@ inline void push(int x) {
 }
 
 inline void update(int x) {
-    m[x].sum = m[x].w + m[m[x].lch].sum + m[m[x].rch].sum;
+    m[x].mx = m[x].val;
+    m[x].pos = x;
+    chkmax(m[x], m[m[x].lch]);
+    chkmax(m[x], m[m[x].rch]);
 }
 
 inline void lrot(int x) {
@@ -40,7 +44,8 @@ inline void lrot(int x) {
     }
     m[y].fa = m[x].fa;
     m[x].fa = y;
-    m[y].sum = m[x].sum;
+    m[y].mx = m[x].mx;
+    m[y].pos = m[x].pos;
     update(x);
     // update(y);
 }
@@ -60,7 +65,8 @@ inline void rrot(int x) {
     }
     m[y].fa = m[x].fa;
     m[x].fa = y;
-    m[y].sum = m[x].sum;
+    m[y].mx = m[x].mx;
+    m[y].pos = m[x].pos;
     update(x);
     // update(y);
 }
@@ -79,7 +85,10 @@ inline void spaly(int x, bool accessed = false) {
     }
 }
 
-void LCT::init(int /*n*/, int /*q*/, int /*c1*/, int /*c2*/, int /*c3*/) {}
+void LCT::init(int n) {
+    memset(m + 1, 0, sizeof(Node) * n);
+    for (int i = 1; i <= n; i++) m[i].pos = i;
+}
 
 auto LCT::splice(int x) -> int {
     assert(m[x].fa < 0);
@@ -137,27 +146,21 @@ void LCT::evert(int x) {
 
 void LCT::set(int x, int v) {
     spaly(x);
-    m[x].sum += v - m[x].w;
-    m[x].w = v;
-}
-
-void LCT::toggle(int x) {
-    spaly(x);
-    m[x].sum += m[x].w ? 1 : -1;
-    m[x].w ^= 1;
-}
-
-auto LCT::count(int x, int y) -> int {
-    if (x == y) return 0;
-    if (x < y) swap(x, y);
-    expose(x);
-    expose(y);
-    spaly(x);
-    int r = m[x].sum;
-    if (m[x].fa != -y) {
-        expose(-m[x].fa);
-        spaly(y);
-        r += m[y].sum;
+    m[x].val = v;
+    if (v > m[x].mx) {
+        m[x].mx = v;
+        m[x].pos = x;
     }
-    return r;
+}
+
+auto LCT::query(int x, int y) -> int {
+    evert(x);
+    expose(y);
+    spaly(y);
+    while (m[x].fa) x = m[x].fa;
+    return x != y ? 0 : m[y].pos;
+}
+
+auto LCT::get(int x) -> int {
+    return m[x].val;
 }

@@ -1,39 +1,64 @@
-#!/usr/bin/env pypy
+#!/usr/bin/env python3
 
 from os import *
 from sys import *
+from collections import defaultdict
 import io
 
+BLOCK = 512
+TARGETS = ["spaly", "splay", "locally-biased", "treap"]
+
 def sh(x):
+    print(f"→ {x}")
     assert not system(x)
 
-if len(argv) < 3:
-    print "%s [source] [data]" % argv[0]
+if len(argv) < 7:
+    print("Usage: %s [T] [S] [Nmin] [Nmax] [K] [Cmax] [gen] [args...]" % argv[0])
     exit(-1)
 
-def run():
-    sh("./a.out < data.in > /dev/null 2> time.out")
-    with io.open("time.out", "r") as reader:
-        t = float(reader.read())
-    return t
+def compile(x):
+    sh(f"clang++ -std=c++14 main.cpp {x}.cpp -O3 -Ofast -DNDEBUG -o {x} -Wno-macro-redefined")
 
-source, data = argv[1:]
+def readtime():
+    with io.open("data.err", "r") as reader:
+        return float(reader.read())
+
+T, S, Nmin, Nmax, K, Cmax = map(int, argv[1:7])
+gen = argv[7]
+args = argv[8:]
+sh(f"cp {gen} /tmp/gen")
+sh("cp kruskal.cpp /tmp/kruskal.cpp")
 sh("cp main.cpp /tmp")
 sh("cp lct.h /tmp")
-sh("cp %s.cpp /tmp/source.cpp" % source)
-sh("cp data/%s.in /tmp/data.in" % data)
-sh("cp data/%s.ans /tmp/data.ans" % data)
-chdir("/tmp")
-sh("clang++ -std=c++14 -O3 -Ofast -DNDEBUG main.cpp source.cpp")
-sh("./a.out < data.in > a.ans 2> /dev/null")
-sh("diff -Bb a.ans data.ans")
+for x in TARGETS:
+    sh(f"cp {x}.cpp /tmp/{x}.cpp")
 
-n1, n2 = 5, 100
-for i in xrange(n1):
-    print "(%s)" % run()
-s = 0.0
-for i in xrange(n2):
-    t = run();
-    s += t
-    print t
-print "average =", s / n2
+chdir("/tmp")
+sh(f"clang++ -std=c++14 kruskal.cpp -O3 -Ofast -DNDEBUG -o kruskal")
+for x in TARGETS:
+    compile(x)
+
+for i in range(Nmin, Nmax + 1):
+    print("")
+    n = 1 << i
+    m = n * K * BLOCK
+    print(f"### log n = {i} (n = {n})")
+    cnt = defaultdict(lambda: 0.0)
+    for t in range(T):
+        sh(f"./gen {n} {m} {Cmax} {' '.join(args)} > data.in")
+        sh(f"./kruskal {S // m + 1} < data.in > data.ans 2> data.err")
+        tm = readtime()
+        print(f"= {tm}")
+        cnt["kruskal"] += tm
+        for x in TARGETS:
+            sh(f"./{x} {S // m + 1} < data.in > data.out 2> data.err")
+            tm = readtime()
+            print(f"= {tm}")
+            cnt[x] += tm
+            sh("diff -Bb data.out data.ans")
+    with io.open("result", "a") as fp:
+        fp.write(f"# log n = {i}\n")
+        for key, val in cnt.items():
+            ret = f"{key:>15}: {val / T:.3g}"
+            print(ret)
+            fp.write(ret + '\n')

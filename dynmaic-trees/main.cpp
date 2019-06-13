@@ -1,104 +1,75 @@
-#include <cstdio>
+#include <cstring>
 
 #include <chrono>
 #include <vector>
+#include <iostream>
 #include <algorithm>
 
 #include "lct.h"
 
-using std::vector;
+using namespace std;
 
-inline void chkmax(int &a, int b) {
-    if (b > a) a = b;
-}
+#define NMAX 1048576
+#define MMAX (NMAX * 8)
 
-inline void chkmin(int &a, int b) {
-    if (b < a) a = b;
-}
+typedef long long i64;
 
-struct Query {
-    int i, x, y;
-};
-
-static int n, q, sp[NMAX + 1], ans[NMAX + 1];
-static int L[NMAX + 1], R[NMAX + 1], top[NMAX + 1];
+static int n, m;
+static struct Edge {
+    int u, v, w;
+} E[MMAX];
+static i64 ans;
+static Allocator *mem;
 static LCT lct;
-static vector<Query> queries[NMAX + 1];
-static vector<int> ins[NMAX + 1], del[NMAX + 1];
-static vector<int> tog[NMAX + 2];
+static Edge *ptr[NMAX + 1];
 
-int main() {
-    scanf("%d%d", &n, &q);
-    int cnt[3] = {1, 1, 0}, op;
-    L[1] = 1;
-    R[1] = n;
-    tog[1].push_back(1);
-    for (int i = 0; i < q; i++) {
-        scanf("%d", &op);
-        switch (op) {
-            case 0: {
-                int l, r;
-                scanf("%d%d", &l, &r);
-                top[++cnt[0]] = q + cnt[1];
-                tog[l].push_back(cnt[0]);
-                tog[r + 1].push_back(cnt[0]);
-                L[cnt[0]] = l;
-                R[cnt[0]] = r;
-            } break;
-            case 1: {
-                int l, r, x;
-                scanf("%d%d%d", &l, &r, &x);
-                chkmax(l, L[x]);
-                chkmin(r, R[x]);
-                if (l > r) continue;
-                sp[++cnt[1]] = x;
-                ins[l].push_back(cnt[1]);
-                del[r].push_back(cnt[1]);
-            } break;
-            case 2: {
-                int x, u, v;
-                scanf("%d%d%d", &x, &u, &v);
-                queries[x].push_back({++cnt[2], u, v});
-            } break;
+inline void mst() {
+    mem->reset(1, n);
+    lct.init(n * 2);
+    ans = 0;
+    for (int i = 0; i < m; i++) {
+        auto &e = E[i];
+        int p = lct.query(e.u, e.v), t;
+        if (p && lct.get(p) <= e.w) continue;
+        if (p) {
+            t = p - n;
+            lct.evert(p);
+            lct.expose(p);
+            lct.fastcut(ptr[t]->u);
+            lct.fastcut(ptr[t]->v);
+            mem->release(t);
+            ans -= ptr[t]->w;
         }
+        t = mem->alloc();
+        ptr[t] = &e;
+        p = n + t;
+        lct.set(p, e.w);
+        lct.link(e.u, p);
+        lct.evert(p);
+        lct.link(e.v, p);
+        ans += e.w;
     }
+}
 
-    // expose + fastcut is slightly slower.
-    lct.init(n, q, cnt[0], cnt[1], cnt[2]);  // Initialization time is not taken into account.
-    auto t1 = std::chrono::high_resolution_clock::now();
+int main(int argc, char *argv[]) {
+    if (argc < 2) return fprintf(stderr, "Usage: %s [T]\n", argv[0]), -1;
+    int T = atoi(argv[1]);
 
-    lct.link(1, q + 1);
-    for (int i = 2; i <= cnt[1]; i++) lct.link(q + i - 1, q + i);
-    for (int i = 2; i <= cnt[0]; i++) lct.link(top[i], i);
-    for (int t = 1; t <= n; t++) {
-        for (int i : ins[t]) {
-            // lct.expose(q + i - 1);
-            // lct.fastcut(q + i);
-            lct.cut(q + i);
-            lct.link(sp[i], q + i);
-        }
-        for (int i : tog[t]) lct.toggle(i);
-        for (auto &e : queries[t]) {
-            // The following 5 lines of code are used to test evert.
-            // lct.evert(e.x);
-            // lct.expose((e.x + e.y) >> 1);
-            // lct.evert(e.y);
-            // lct.expose(996);
-            // lct.evert(1);
-            ans[e.i] = lct.count(e.x, e.y);
-        }
-        for (int i : del[t]) {
-            // lct.expose(sp[i]);
-            // lct.fastcut(q + i);
-            lct.cut(q + i);
-            lct.link(q + i - 1, q + i);
-        }
-    }
+    ios::sync_with_stdio(false);
+    cin >> n >> m;
+    mem = new Allocator(n);
+    for (int i = 0; i < m; i++) cin >> E[i].u >> E[i].v >> E[i].w;
 
-    auto t2 = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> t = t2 - t1;
+    mst();
+    int cnt = T;
+    auto t1 = chrono::high_resolution_clock::now();
+    while (cnt--) mst();
+    auto t2 = chrono::high_resolution_clock::now();
+    chrono::duration<double> t = t2 - t1;
+    auto aver = t.count() / (1ll * T * m);
+    cerr << aver << endl;
+    cout << ans  << endl;
 
-    fprintf(stderr, "%.6lf\n", t.count());
-    for (int i = 1; i <= cnt[2]; i++) printf("%d\n", ans[i]);
+    delete mem;
     return 0;
 }

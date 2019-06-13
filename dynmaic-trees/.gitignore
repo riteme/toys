@@ -1,4 +1,8 @@
 *.txt
+spaly
 splay
 treap
 biased
+kruskal
+*gen
+*-gen
