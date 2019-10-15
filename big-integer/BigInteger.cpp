@@ -18,8 +18,7 @@ constexpr int TMAX = 1000000;
 constexpr int CBYTES = sizeof(u32);
 constexpr int CBITS = CBYTES * 8;
 constexpr u32 MASK = 0xFFFFFFFFu;
-// TODO: reduce memory allocation
-static u32 T[TMAX];  // temporary storage
+static u32 T[TMAX], T0[TMAX];  // temporary storage, T0 for output
 static u64 D[TMAX];  // for multiplication
 struct Unsigned {
     // 构造函数
@@ -52,8 +51,10 @@ struct Unsigned {
     Unsigned(const Unsigned &z) : a(new u32[z.len]), len(z.len) { memcpy(a, z.a, CBYTES * len); }
     Unsigned(Unsigned &&z) : a(z.a), len(z.len) { z.a = nullptr; }
     Unsigned &operator=(const Unsigned &z) {
-        if (a) delete[] a;
-        a = new u32[z.len];
+        if (a && z.len > len) {
+            delete[] a;
+            a = new u32[z.len];
+        }
         len = z.len;
         memcpy(a, z.a, CBYTES * len);
         return *this;
@@ -97,17 +98,19 @@ struct Unsigned {
             a[i] = ~a[i];
         return *this;
     }
-    Unsigned operator<<(int k) const {
+    Unsigned &operator<<=(int k) {
         int p = k / CBITS, r = k % CBITS;
-        Unsigned t(len + p + (r > 0), 0);
+        int tlen = len + p + (r > 0);
+        memset(T, 0, CBYTES * tlen);
         for (int i = 0; i < len; i++) {
-            t[i + p] |= a[i] << r;
-            if (r) t[i + p + 1] = a[i] >> (CBITS - r);
+            T[i + p] |= a[i] << r;
+            if (r)  T[i + p + 1] = a[i] >> (CBITS - r);
         }
-        t.shrink();
-        return t;
+        if (tlen > len) realloc(tlen);
+        memcpy(a, T, CBYTES * tlen);
+        shrink();
+        return *this;
     }
-    Unsigned &operator<<=(int k) { return *this = *this << k; }
     Unsigned &operator>>=(int k) {
         int p = k / CBITS, r = k % CBITS;
         if (p >= len) {
@@ -123,6 +126,7 @@ struct Unsigned {
         }
         return *this;
     }
+    Unsigned operator<<(int k) const { return Unsigned(*this) <<= k; }
     Unsigned operator>>(int k) const { return Unsigned(*this) >>= k; }
     bool is_odd() const { return a[0] & 1; }
     // 比较运算。cmp: -1 <, 0 =, 1 >
@@ -139,19 +143,21 @@ struct Unsigned {
     bool operator>(const Unsigned &z) const { return cmp(z) > 0; }
     bool operator>=(const Unsigned &z) const { return cmp(z) >= 0; }
     // 小整型运算
-    Unsigned operator+(u32 x) const {
-        Unsigned t(len + 1, nullptr);
+    Unsigned &operator+=(u32 x) {
         u64 c = x;
         for (int i = 0; i < len; i++) {
-            c += a[i];
-            t[i] = c & MASK;
+            T[i] = (c += a[i]) & MASK;
             c >>= CBITS;
         }
-        t[len] = c;
-        t.shrink();
-        return t;
+        memcpy(a, T, CBYTES * len);
+        if (c) {
+            realloc(len + 1);
+            a[len - 1] = c;
+        }
+        shrink();
+        return *this;
     }
-    Unsigned &operator+=(u32 x) { return *this = *this + x; }
+    Unsigned operator+(u32 x) const { return Unsigned(*this) += x; }
     Unsigned &operator-=(u32 x) {
         if (x == 0) return *this;
         u64 c = -x;
@@ -164,35 +170,42 @@ struct Unsigned {
         return *this;
     }
     Unsigned operator-(u32 x) const { return Unsigned(*this) -= x; }
-    Unsigned operator*(u32 x) const {
-        Unsigned t(len + 1, nullptr);
+    Unsigned &operator*=(u32 x) {
         u64 c = 0;
         for (int i = 0; i < len; i++) {
             c += (u64) a[i] * x;
-            t[i] = c & MASK;
+            T[i] = c & MASK;
             c >>= CBITS;
         }
-        t[len] = c;
-        t.shrink();
-        return t;
+        memcpy(a, T, CBYTES * len);
+        if (c) {
+            realloc(len + 1);
+            a[len - 1] = c;
+        }
+        shrink();
+        return *this;
     }
-    Unsigned &operator*=(u32 x) { return *this = *this * x; }
+    Unsigned operator*(u32 x) const { return Unsigned(*this) *= x; }
     void divide(u32 z, Unsigned *q, u32 *r) const {
         assert(z);
-        if (q) *q = Unsigned(len, nullptr);
         u64 c = 0;
         for (int i = len - 1; i >= 0; i--) {
             c = (c << CBITS) + a[i];
             if (z <= c) {
-                if (q) q->a[i] = c / z;
+                if (q) T[i] = c / z;
                 c %= z;
-            } else if (q) q->a[i] = 0;
+            } else if (q) T[i] = 0;
         }
-        if (q) q->shrink();
+        if (q) {
+            if (!q->valid()) q->realloc(len);
+            memcpy(q->a, T, CBYTES * len);
+            q->len = len;
+            q->shrink();
+        }
         if (r) *r = c;
     }
     Unsigned operator/(u32 x) const {
-        Unsigned t;
+        Unsigned t(len, nullptr);
         divide(x, &t, nullptr);
         return t;
     }
@@ -200,40 +213,50 @@ struct Unsigned {
         divide(x, nullptr, &x);
         return x;
     }
-    Unsigned &operator/=(u32 x) { return *this = *this / x; }
-    Unsigned &operator%=(u32 x) { return *this = *this % x; }
-    // 大整型运算
-    Unsigned operator+(const Unsigned &z) const {
-        if (len < z.len) return z + *this;
-        Unsigned t(len + 1, this);
-        u64 c = 0;
-        for (int i = 0; i < len; i++) {
-            c += (u64) a[i] + (i < z.len ? z[i] : 0);
-            t[i] = c & MASK;
-            c >>= CBITS;
-        }
-        t[len] = c;
-        t.shrink();
-        return t;
+    Unsigned &operator/=(u32 x) {
+        divide(x, this, nullptr);
+        return *this;
     }
-    Unsigned &operator+=(const Unsigned &z) { return *this = *this + z; }
-    Unsigned &operator-=(const Unsigned &z) {
-        assert(*this >= z);
-        if (!z) return *this;
-        u64 c = 1;
-        for (int i = 0; i < len; i++) {
-            c += (u64) a[i] + (i < z.len ? ~z[i] : MASK);
-            a[i] = c & MASK;
+    Unsigned &operator%=(u32 x) {
+        divide(x, nullptr, &x);
+        return *this = x;
+    }
+    // 大整型运算
+    Unsigned &operator+=(const Unsigned &z) {
+        int tlen = max(len, z.len);
+        u64 c = 0;
+        for (int i = 0; i < tlen; i++) {
+            c += (u64) (i < len ? a[i] : 0) + (i < z.len ? z[i] : 0);
+            T[i] = c & MASK;
             c >>= CBITS;
         }
+        if (c) T[tlen++] = c;
+        if (tlen > len) realloc(tlen);
+        memcpy(a, T, CBYTES * tlen);
         shrink();
         return *this;
     }
+    Unsigned operator+(const Unsigned &z) const { return Unsigned(*this) += z; }
+    Unsigned &operator-=(const Unsigned &z) {
+        if (a == z.a) *this = Unsigned(0);
+        else {
+            assert(*this >= z);
+            if (!z) return *this;
+            u64 c = 1;
+            for (int i = 0; i < len; i++) {
+                c += (u64) a[i] + (i < z.len ? ~z[i] : MASK);
+                a[i] = c & MASK;
+                c >>= CBITS;
+            }
+            shrink();
+        }
+        return *this;
+    }
     Unsigned operator-(const Unsigned &z) const { return Unsigned(*this) -= z; }
-    Unsigned operator*(const Unsigned &z) const {
+    Unsigned &operator*=(const Unsigned &z) {
         // CAUTION: ensure len < 2^32 to avoid overflow
-        int nlen = len + z.len;
-        memset(D, 0, sizeof(u64) * (len + z.len));
+        int tlen = len + z.len;
+        memset(D, 0, sizeof(u64) * tlen);
         for (int i = 0; i < len; i++) for (int j = 0; j < z.len; j++) {
             int k = i + j;
             D[k] += (u64) a[i] * z[j];
@@ -242,13 +265,12 @@ struct Unsigned {
                 D[k] &= MASK;
             }
         }
-        Unsigned t(nlen, nullptr);
-        for (int i = 0; i < nlen; i++)
-            t[i] = D[i];
-        t.shrink();
-        return t;
+        realloc(tlen);
+        for (int i = 0; i < tlen; i++) a[i] = D[i];
+        shrink();
+        return *this;
     }
-    Unsigned &operator*=(const Unsigned &z) { return *this = *this * z; }
+    Unsigned operator*(const Unsigned &z) const { return Unsigned(*this) *= z; }
     void divide(const Unsigned &z, Unsigned *q, Unsigned *r) const {
         assert(z);
         if (*this < z) {
@@ -257,20 +279,23 @@ struct Unsigned {
         } else {
             assert(len >= z.len && z[z.len - 1]);
             int lz = CBITS * (len - z.len) + __builtin_clz(z[z.len - 1]);
-            if (q) *q = Unsigned(lz / CBITS + 1, 0);
+            int qlen = lz / CBITS + 1;
+            // if (q) *q = Unsigned(lz / CBITS + 1, 0);
             Unsigned d = z << lz, R = *this;
-            for (int s = lz; s >= 0; s--) {
+            memset(T, 0, CBYTES * qlen);
+            for (int s = lz; s >= 0; s--, d >>= 1) {
                 int i = s / CBITS, j = s % CBITS;
                 if (d <= R) {
                     R -= d;
-                    if (q) q->a[i] |= 1u << j;
+                    T[i] |= 1u << j;
                 }
-                for (int i = 0; i < d.len - 1; i++)
-                    d[i] = (d[i] >> 1) | (d[i + 1] << 31);
-                d[d.len - 1] >>= 1;
-                if (!d[d.len - 1]) d.len--;
             }
-            if (q) q->shrink();
+            if (q) {
+                if (!q->valid()) q->realloc(qlen);
+                memcpy(q->a, T, CBYTES * qlen);
+                q->len = qlen;
+                q->shrink();
+            }
             if (r) *r = move(R);
         }
     }
@@ -284,8 +309,14 @@ struct Unsigned {
         divide(z, nullptr, &t);
         return t;
     }
-    Unsigned &operator/=(const Unsigned &z) { return *this = *this / z; }
-    Unsigned &operator%=(const Unsigned &z) { return *this = *this % z; }
+    Unsigned &operator/=(const Unsigned &z) {
+        divide(z, this, nullptr);
+        return *this;
+    }
+    Unsigned &operator%=(const Unsigned &z) {
+        divide(z, nullptr, this);
+        return *this;
+    }
     // 其它操作
     int popcount() const {
         int ret = 0;
@@ -305,7 +336,7 @@ struct Unsigned {
     }
     Unsigned sqrt() const { }  // TODO: integer sqrt
     // 输出
-    void print() const {
+    USED void print() const {
         printf("[len = %d, %lx]\n", len, (unsigned long) a);
         for (int i = len - 1; i >= 0; i--) {
             for (int j = CBYTES - 1; j >= 0; j--) {
@@ -319,29 +350,29 @@ struct Unsigned {
         print_hex();
         putchar('\n');
     }
-    void print_dec() const {
+    USED void print_dec() const {
         Unsigned t = *this, q;
         int i = 0; u32 r;
         for ( ; t; i++) {
             t.divide(10u, &q, &r);
-            T[i] = r;
+            T0[i] = r;
             t = move(q);
         }
         for (i--; i >= 0; i--)
-            printf("%1u", T[i]);
+            printf("%1u", T0[i]);
     }
     void _print_dec(ostream &os) const {
         Unsigned t = *this, q;
         int i = 0; u32 r;
         for ( ; t; i++) {
             t.divide(10u, &q, &r);
-            T[i] = r;
+            T0[i] = r;
             t = move(q);
         }
         for (i--; i >= 0; i--)
-            os << T[i];
+            os << T0[i];
     }
-    void print_hex() const {
+    USED void print_hex() const {
         printf("0x");
         for (int i = len - 1; i >= 0; i--)
             printf(i == len - 1 ? "%X" : "%.8X", a[i]);
@@ -367,7 +398,7 @@ int main() {
     while (cin >> op >> buf) {
         // printf("⇒ %s %s\n", op, buf);
         Unsigned x(buf);
-        // u32 x = atoll(buf);
+        // u32 x = strtol(buf, NULL, 10);
         // x.print_hex();
         switch (op[0]) {
             case '+': u += x; break;
@@ -378,6 +409,8 @@ int main() {
             // case '%': printf("0x%X\n", u % x); continue;
         }
         cout << u << endl;
+        // u.print_hex();
+        // puts("");
     }
     return 0;
 }

@@ -1,11 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 BASE = 10
 
-x = int(raw_input(), base=BASE)
+x = int(input(), base=BASE)
 while True:
     try:
-        op, v = raw_input().split()
+        op, v = input().split()
+        # print("⇒ ", op, v)
     except:
         exit(0)
     v = int(v, base=BASE)
@@ -16,8 +17,8 @@ while True:
     elif op == '*':
         x *= v
     elif op == '/':
-        x /= v
+        x //= v
     elif op == '%':
-        print "%s" % (x % v)
+        print("%s" % (x % v))
         continue
-    print "%s" % x
+    print("%s" % x)
