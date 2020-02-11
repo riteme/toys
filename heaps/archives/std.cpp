@@ -1,75 +1,20 @@
-#include <cassert>
 #include <cstdio>
 #include <cstring>
 
+#include <queue>
 #include <vector>
 #include <algorithm>
 
 using namespace std;
 
 #define NMAX 100000
-#define LOGN 17
 
 template <typename T>
 struct Heap {
-    struct Node {
-        Node(const T &_val) : val(_val), ch(NULL), nxt(NULL) {}
+    Heap() {}
 
-        T val;
-        Node *ch, *nxt;
+    priority_queue<T> Q;
 
-        Node *fuse(Node *y) {
-            assert(!y->nxt);
-            y->nxt = ch;
-            ch = y;
-        }
-    }
-
-    static Node *fuse(Node *x, Node *y) {
-        assert(x);
-        assert(!x->nxt);
-        assert(y);
-        assert(!y->nxt);
-        if (x->val < y->val) swap(x, y);
-        y->nxt = x->ch;
-        x->ch = y;
-        return x;
-    }
-
-    Heap() {
-        memset(buc, 0, sizeof(buc));
-    }
-
-    Node *buc[LOGN];
-
-    Node *&operator[](int i) {
-        return buc[i];
-    }
-
-    Heap &operator+=(const Heap &z) {
-        Node *carry = NULL;
-        for (int i = 0; i < LOGN - 1; i++) {
-            if (buc[i] && carry) {
-                carry = fuse(buc[i], carry);
-                buc[i] = NULL;
-            } else {
-                buc[i] = carry;
-                carry = NULL;
-            }
-            if (buc[i] && z[i]) {
-                carry = fuse(buc[i], z[i]);
-                buc[i] = NULL;
-            } else {
-                buc[i] = z[i];
-            }
-        }
-        buc[LOGN - 1] = carry;
-        return *this;
-    }
-};
-
-template <typename T>
-struct HeapInterface {
     void pop() {
         Q.pop();
     }
@@ -104,7 +49,7 @@ void shortest() {
         }
     };
 
-    HeapInterface<State> q;
+    Heap<State> q;
     memset(dist, 0x3f, sizeof(dist));
     dist[s] = 0;
     q.push({s, 0});
