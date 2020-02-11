@@ -1,21 +1,33 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -O3 -flto
-FRAMEWORK = main.o hackers.o shortest-path.o
+
 BUILD_DIR = build
+DEPS_DIR = deps
+
+SOURCES := $(wildcard *.cpp) $(wildcard impl/*.cpp)
+TARGETS := $(basename $(notdir $(wildcard impl/*.cpp)))
+FRAMEWORK := $(addprefix $(BUILD_DIR)/, $(patsubst %.cpp, %.o, $(wildcard *.cpp)))
 
 REPEAT = 3
 WORKLOAD = 500000000
 
-all: $(basename $(notdir $(wildcard impl/*.cpp)))
+.PHONY: all
+all: $(TARGETS)
 
-main.o hackers.o: framework.h hackers.h
-shortest-path.o impl/*.o: framework.h
+$(BUILD_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-%: $(FRAMEWORK) impl/%.o
+-include $(addprefix $(DEPS_DIR)/, $(SOURCES:.cpp=.d))
+
+$(DEPS_DIR)/%.d: %.cpp
+	@mkdir -p $(dir $@)
+	python depend.py $< > $@
+
+$(TARGETS) : % : $(FRAMEWORK) $(BUILD_DIR)/impl/%.o
 	$(CXX) $(CXXFLAGS) $^ -o $(BUILD_DIR)/$@
 
 .PHONY: clean
 clean:
-	@rm *.o impl/*.o build -rf
-	@mkdir build
-	@touch build/.gitkeeper
+	-rm build -rf
+	-rm deps -rf

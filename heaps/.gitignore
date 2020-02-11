@@ -1,3 +1,4 @@
 *.o
-build/*
-!build/.gitkeeper
+*.d
+build/
+deps/
