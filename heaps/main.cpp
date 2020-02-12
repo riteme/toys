@@ -23,17 +23,19 @@ static i64 EMAX = DEFAULT_EMAX;
 static int repeat = 1;
 static i64 max_task_bound = -1;
 static bool enable_hack = false;
+static bool quiet = false;
 
 void parse_opt(int argc, char *argv[]) {
     char c;
 
-    const char *opts = ":hus:r:e:m:";
+    const char *opts = ":huqs:r:e:m:";
     while ((c = getopt(argc, argv, opts)) != -1)
     switch (c) {
         case 'h': printf(
             "Usage: %s [%s]\n"
             "   -h  print this message\n"
             "   -u  enable \"max_decrease\" hacker\n"
+            "   -q  output less information\n"
             "   -s  specify the seed for hacker's random genenrator\n"
             "   -r  number of runs for one task\n"
             "   -e  expected maximum number of edges to be processed\n"
@@ -41,6 +43,7 @@ void parse_opt(int argc, char *argv[]) {
             argv[0], opts + 1
         ); exit(0);
         case 'u': enable_hack = true; break;
+        case 'q': quiet = true; break;
         case 's': seed = atoll(optarg); break;
         case 'r': repeat = atoi(optarg); break;
         case 'e': EMAX = atoll(optarg); break;
@@ -132,10 +135,15 @@ int main(int argc, char *argv[]) {
     );
     if (max_task_bound >= 0 && max_task > max_task_bound)
         max_task = max_task_bound;
-    fprintf(stderr,
-        "n = %d; m = %d; max_task = %lld; seed = 0x%llx\n",
-        instance->n, instance->m, max_task, seed
-    );
+
+    if (!quiet)
+        fprintf(stderr,
+            "n = %d; m = %d; max_task = %lld; seed = 0x%llx\n",
+            instance->n, instance->m, max_task, seed
+        );
+    if (!isatty(STDOUT_FILENO))
+        printf("n = %d; m = %d; seed = 0x%llx; hack = %d\n",
+            instance->n, instance->m, seed, enable_hack);
 
     i64 estimate = -1;
     auto t_start = high_resolution_clock::now();
