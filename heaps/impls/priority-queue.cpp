@@ -1,4 +1,4 @@
-#include "../framework.h"
+#include "framework.h"
 
 #include <queue>
 
@@ -21,13 +21,13 @@ void HeapInterface::clear() {
     while (!q.empty()) q.pop();
 }
 
-void HeapInterface::push(int x, i64 v) {
+void HeapInterface::push(int x) {
     remain++;
-    q.push({x, v});
+    q.push({x, w[x]});
 }
 
-void HeapInterface::decrease(int x, i64 v) {
-    q.push({x, v});
+void HeapInterface::decrease(int x) {
+    q.push({x, w[x]});
 }
 
 auto HeapInterface::pop() -> int {

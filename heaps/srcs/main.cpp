@@ -24,11 +24,13 @@ static int repeat = 1;
 static i64 max_task_bound = -1;
 static bool enable_hack = false;
 static bool quiet = false;
+static char *filename = NULL;
+static FILE *file_handle = NULL;
 
 void parse_opt(int argc, char *argv[]) {
     char c;
 
-    const char *opts = ":huqs:r:e:m:";
+    const char *opts = ":huqs:r:e:m:o:";
     while ((c = getopt(argc, argv, opts)) != -1)
     switch (c) {
         case 'h': printf(
@@ -39,7 +41,8 @@ void parse_opt(int argc, char *argv[]) {
             "   -s  specify the seed for hacker's random genenrator\n"
             "   -r  number of runs for one task\n"
             "   -e  expected maximum number of edges to be processed\n"
-            "   -m  maximum number of tasks\n",
+            "   -m  maximum number of tasks\n"
+            "   -o  save stdout to file\n",
             argv[0], opts + 1
         ); exit(0);
         case 'u': enable_hack = true; break;
@@ -48,6 +51,7 @@ void parse_opt(int argc, char *argv[]) {
         case 'r': repeat = atoi(optarg); break;
         case 'e': EMAX = atoll(optarg); break;
         case 'm': max_task_bound = atoll(optarg); break;
+        case 'o': filename = optarg; break;
         case ':': fprintf(stderr, "Option \"-%c\" needs argument.\n", optopt); exit(-1);
         case '?': fprintf(stderr, "Unknown option \"-%c\".\n", optopt); exit(-1);
         default: abort();
@@ -55,6 +59,14 @@ void parse_opt(int argc, char *argv[]) {
 
     assert(1 <= repeat);
     assert(0 <= EMAX);
+
+    if (filename) {
+        file_handle = fopen(filename, "w");
+        if (!file_handle) {
+            fprintf(stderr, "Failed to open file \"%s\".", filename);
+            exit(-1);
+        }
+    }
 }
 
 auto initialize() -> ShortestPath* {
@@ -104,6 +116,20 @@ void status_line(int progress, i64 _estimate, const char *_status, ...) {
     fflush(stderr);
 }
 
+void output(bool front, const char *fmt, ...) {
+    va_list args;
+
+    if (front) {
+        va_start(args, fmt);
+        vprintf(fmt, args);
+    }
+
+    if (file_handle) {
+        va_start(args, fmt);
+        vfprintf(file_handle, fmt, args);
+    }
+}
+
 void prepare(ShortestPath *instance, int s) {
     if (enable_hack)
         hack::max_decrease(*instance, s);
@@ -141,9 +167,10 @@ int main(int argc, char *argv[]) {
             "n = %d; m = %d; max_task = %lld; seed = 0x%llx\n",
             instance->n, instance->m, max_task, seed
         );
-    if (!isatty(STDOUT_FILENO))
-        printf("n = %d; m = %d; seed = 0x%llx; hack = %d\n",
-            instance->n, instance->m, seed, enable_hack);
+    output(!isatty(STDOUT_FILENO),
+        "n = %d; m = %d; seed = 0x%llx; hack = %d\n",
+        instance->n, instance->m, seed, enable_hack
+    );
 
     i64 estimate = -1;
     auto t_start = high_resolution_clock::now();
@@ -169,13 +196,14 @@ int main(int argc, char *argv[]) {
         result.time = average(records);
 
         clear_line();
-        printf("  %-4lld %.16llx %-11.6f %-8d %-8d %.2fx\t",
+        output(true,
+            "  %-4lld %.16llx %-11.6f %-8d %-8d %.2fx\t",
             i, result.hash, result.time, result.peek, result.count,
             static_cast<double>(result.count) / instance->n
         );
         for (auto tm : records)
-            printf("%.1f ", tm);
-        puts("");
+            output(true, "%.1f ", tm);
+        output(true, "\n");
 
         auto t_end = high_resolution_clock::now();
         auto ms = duration_cast<milliseconds>(t_end - t_start).count();

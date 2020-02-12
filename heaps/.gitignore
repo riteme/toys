@@ -2,4 +2,5 @@
 *.d
 build/
 deps/
-results/
+results/*
+!results/.gitkeeper

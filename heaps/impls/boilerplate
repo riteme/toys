@@ -1,0 +1,31 @@
+#include "framework.h"
+
+#include <algorithm>
+
+using namespace std;
+
+
+
+void HeapInterface::clear() {
+
+}
+
+void HeapInterface::push(int x) {
+
+}
+
+void HeapInterface::decrease(int x) {
+
+}
+
+auto HeapInterface::pop() -> int {
+
+}
+
+auto HeapInterface::size() -> int {
+
+}
+
+auto HeapInterface::empty() -> bool {
+
+}

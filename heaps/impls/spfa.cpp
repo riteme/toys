@@ -1,4 +1,4 @@
-#include "../framework.h"
+#include "framework.h"
 
 #include <queue>
 #include <vector>
@@ -13,15 +13,15 @@ void HeapInterface::clear() {
     in.resize(n + 1, false);
 }
 
-void HeapInterface::push(int x, i64 v) {
+void HeapInterface::push(int x) {
     if (!in[x]) {
         q.push(x);
         in[x] = true;
     }
 }
 
-void HeapInterface::decrease(int x, i64 v) {
-    push(x, v);
+void HeapInterface::decrease(int x) {
+    push(x);
 }
 
 auto HeapInterface::pop() -> int {

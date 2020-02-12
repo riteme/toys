@@ -46,7 +46,7 @@ auto ShortestPath::solve(int s) -> Result {
     memset(dist + 1, INF_BYTE, sizeof(i64) * n);
     dist[s] = 0;
     q->clear();
-    q->push(s, 0);
+    q->push(s);
 
     auto t_start = high_resolution_clock::now();
     do {
@@ -54,14 +54,15 @@ auto ShortestPath::solve(int s) -> Result {
         int u = q->pop();
 
         for (auto &e : G[u]) {
-            i64 neo = dist[u] + e.w;
-            if (dist[e.v] > neo) {
-                if (dist[e.v] == INF)
-                    q->push(e.v, neo);
-                else
-                    q->decrease(e.v, neo);
+            if (dist[e.v] > dist[u] + e.w) {
+                bool neo = dist[e.v] == INF;
+                dist[e.v] = dist[u] + e.w;
 
-                dist[e.v] = neo;
+                if (neo)
+                    q->push(e.v);
+                else
+                    q->decrease(e.v);
+
                 ret.count++;
             }
         }

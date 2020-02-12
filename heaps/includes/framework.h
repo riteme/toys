@@ -2,29 +2,14 @@
 
 #include <vector>
 
+using std::vector;
+
 typedef long long i64;
 typedef unsigned long long u64;
 
 constexpr i64 INF = 0x3f3f3f3f'3f3f3f3f;
 constexpr int INF_BYTE = 0x3f;
 constexpr i64 WMAX = 1'000'000'000;
-
-class ShortestPath;
-
-struct HeapInterface {
-    HeapInterface(int _n, ShortestPath *_instance):
-        n(_n), instance(_instance) {}
-
-    void clear();
-    void push(int x, i64 v);
-    void decrease(int x, i64 v);
-    auto pop() -> int;
-    auto size() -> int;
-    auto empty() -> bool;
-
-    int n;
-    ShortestPath *instance;
-};
 
 class ShortestPath {
 public:
@@ -59,6 +44,22 @@ private:
     auto operator=(ShortestPath&&) = delete;
 
     i64 *dist;
-    std::vector<Edge> *G;
-    HeapInterface *q;
+    vector<Edge> *G;
+    struct HeapInterface *q;
+};
+
+struct HeapInterface {
+    HeapInterface(int _n, ShortestPath *_instance):
+        n(_n), instance(_instance), w(instance->dist) {}
+
+    void clear();
+    void push(int x);
+    void decrease(int x);
+    auto pop() -> int;
+    auto size() -> int;
+    auto empty() -> bool;
+
+    int n;
+    ShortestPath *instance;
+    i64 *w;
 };
