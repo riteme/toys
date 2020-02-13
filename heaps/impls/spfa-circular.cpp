@@ -39,7 +39,7 @@ auto HeapInterface::pop() -> int {
 }
 
 auto HeapInterface::size() -> int {
-    return l <= r ? r - l : r + n - l;
+    return l <= r ? r - l : r + n + 1 - l;
 }
 
 auto HeapInterface::empty() -> bool {

@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <unordered_map>
 
+typedef std::vector<std::unordered_map<int, i64>> HashMap;
+
 static i64 seed;
 static std::mt19937_64 randi;
 
@@ -22,16 +24,15 @@ void hack::initiailize(i64 _seed) {
 }
 
 void hack::uniform(ShortestPath &instance, int s) {
-    std::unordered_map<i64, i64> mp;
-    mp.reserve(instance.m);
+    HashMap mp(instance.n + 1);
 
     for (int u = 1; u <= instance.n; u++)
     for (auto &e : instance[u]) if (e.u < e.v)
-        mp[eid(e.u, e.v)] =  e.w = randint(1, WMAX);
+        mp[e.u][e.v] =  e.w = randint(1, WMAX);
 
     for (int u = 1; u <= instance.n; u++)
     for (auto &e : instance[u]) if (e.u > e.v)
-        e.w = mp[eid(e.v, e.u)];
+        e.w = mp[e.v][e.u];
 }
 
 void hack::max_decrease(ShortestPath &instance, int s) {
@@ -43,9 +44,11 @@ void hack::max_decrease(ShortestPath &instance, int s) {
     vector id(n + 1, 0);
     vector last(n + 1, 0);
     vector<int> sequence;
-    vector<vector<i64>> levels(n + 1);
-    std::unordered_map<i64, i64> mp;
-    mp.reserve(instance.m);
+    sequence.reserve(n);
+
+    // assume this hacker run on the same graph
+    static vector<vector<i64>> levels(n + 1);
+    static HashMap mp(n + 1);
 
     // generate random traversal sequence
     std::deque<int> q;
@@ -86,11 +89,11 @@ void hack::max_decrease(ShortestPath &instance, int s) {
         int v = e.v;
         dist[v] = levels[v].back();
         levels[v].pop_back();
-        mp[eid(u, v)] = dist[v] - id[u];
+        mp[u][v] = dist[v] - id[u];
     }
 
     // assign edge weights
     for (int u = 1; u <= n; u++)
     for (auto &e : instance[u])
-        e.w = id[u] < id[e.v] ? mp[eid(u, e.v)] : mp[eid(e.v, u)];
+        e.w = id[u] < id[e.v] ? mp[u][e.v] : mp[e.v][u];
 }

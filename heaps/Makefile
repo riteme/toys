@@ -1,5 +1,4 @@
--include $(DEPS)
- .DEFAULTGOAL: help
+.DEFAULT_GOAL = run
 
 COMMANDS = help all clean data run ranklist $(TARGETS)
 .PHONY: $(COMMANDS)
@@ -9,9 +8,10 @@ help:
 	@echo "\t" all "\t\t" compile all implementations.
 	@echo "\t" clean "\t\t" clean up objects and dependency files. Results are preserved.
 	@echo "\t" data "\t\t" use utils/random-gen.py to generate new data.
-	@echo "\t" run "\t\t" run all implementations.
+	@echo "\t" [run] RUN= "\t" run all implementations.
 	@echo "\t" ranklist "\t" list ranklist based on the results of last run.
 	@echo "\n" available implementations: "\n\t" $(TARGETS)
+
 
 # for make data
 n = 100000
@@ -26,7 +26,8 @@ HACK = 0
 
 # Compiler setting
 CXX = g++
-PYTHON = pypy
+PYTHON = python
+PYPY = pypy
 DEBUG = 0
 
 CXXFLAGS := -std=c++17 -I./includes/ -Wno-unused-result -Wno-char-subscripts
@@ -50,22 +51,31 @@ ifeq ($(HACK), 1)
 RUNFLAGS += -u
 endif
 
+
 SRCS := $(wildcard srcs/*.cpp)
 IMPLS := $(wildcard impls/*.cpp)
 SOURCES := $(SRCS) $(IMPLS)
 DEPS := $(addprefix deps/, $(SOURCES:.cpp=.d))
 TARGETS := $(basename $(notdir $(IMPLS)))
-RESULTS := $(addprefix results/, $(addsuffix .txt, $(TARGETS)))
 REAL_TARGETS := $(addprefix build/, $(TARGETS))
 FRAMEWORK := $(addprefix build/, $(patsubst %.cpp, %.o, $(SRCS)))
+LIB := build/libframework.a
+
+
+ifneq ($(MAKECMDGOALS), clean)
+-include $(DEPS)
+endif
 
 
 all: $(REAL_TARGETS)
 
-$(REAL_TARGETS): build/% : $(FRAMEWORK) build/impls/%.o
+$(REAL_TARGETS): build/% : $(LIB) build/impls/%.o
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-$(TARGETS): $(REAL_TARGETS)
+$(TARGETS): % : build/%
+
+$(LIB): $(FRAMEWORK)
+	ar -r $@ $^
 
 build/%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -73,24 +83,25 @@ build/%.o: %.cpp
 
 deps/%.d: %.cpp
 	@mkdir -p $(dir $@)
-	python utils/depend.py $(CXX) $< $(CXXFLAGS) -fsyntax-only > $@
+	$(PYTHON) utils/depend.py $(CXX) $< $(CXXFLAGS) > $@
 
 clean:
 	-rm build -rf
 	-rm deps -rf
 
-_mkdata := $(PYTHON) utils/random-gen.py $(n) $(m) $(GENFLAGS) > data.in
+_mkdata := $(PYPY) utils/random-gen.py $(n) $(m) $(GENFLAGS) > data.in
 data: ; $(_mkdata)
 data.in: ; $(_mkdata)
 
-run: $(TARGETS) data.in
+RUN = $(TARGETS)
+run: $(RUN) data.in
 	@mkdir -p results
 	@echo   FLAGS: $(RUNFLAGS)
-	@echo TARGETS: $(TARGETS)
-	@for t in $(TARGETS) ; do \
+	@echo TARGETS: $(RUN)
+	@for t in $(RUN) ; do \
 		echo Running \"$$t\" \> results/$$t.txt ; \
 		./build/$$t $(RUNFLAGS) -o results/$$t.txt < data.in ; \
 	done
 
-ranklist: $(RESULTS)
-	@python utils/ranklist.py results
+ranklist:
+	@$(PYTHON) utils/ranklist.py results

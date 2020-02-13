@@ -1,4 +1,21 @@
+# Heaps
+Comparisons over variants of heaps in Dijkstra's algorithm on randomly generated graphs.
+
 ## TODO
-* [ ] Replace `std::queue` in SPFA algorithm.
+* [x] Replace `std::queue` in SPFA algorithm.
 * [x] Makefiles.
-* [ ] Make rules for auto tests.
+* [x] Make rules for auto tests.
+* [ ] Implementations
+    * [ ] `pairing`
+    * [ ] `elmasry`
+    * [ ] `fibonacci`
+    * [ ] `rank-pairing`
+    * [ ] `quake`
+    * [ ] `hollow`
+    * [ ] `hollow-dag`
+
+## Prerequisite
+* `make ranklist`: PrettyTable (PyPI)
+  ```shell
+  sudo pip install PTable
+  ```
