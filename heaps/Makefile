@@ -22,7 +22,7 @@ PRUFER = 0
 repeat = 4
 max = 100
 maxe = 10000000000
-HACK = 0
+HACK = uniform
 
 # Compiler setting
 CXX = g++
@@ -43,12 +43,9 @@ ifeq ($(PRUFER), 1)
 GENFLAGS += --prufer
 endif
 
-RUNFLAGS := -q -r $(repeat) -m $(max) -e $(maxe)
+RUNFLAGS := -q -r $(repeat) -m $(max) -e $(maxe) -u $(HACK)
 ifdef seed
 RUNFLAGS += -s $(seed)
-endif
-ifeq ($(HACK), 1)
-RUNFLAGS += -u
 endif
 
 

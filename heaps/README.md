@@ -6,7 +6,7 @@ Comparisons over variants of heaps in Dijkstra's algorithm on randomly generated
 * [x] Makefiles.
 * [x] Make rules for auto tests.
 * [ ] Implementations
-    * [ ] `pairing`
+    * [x] `pairing`
     * [ ] `elmasry`
     * [ ] `fibonacci`
     * [ ] `rank-pairing`

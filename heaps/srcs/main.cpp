@@ -7,7 +7,9 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstdarg>
+#include <cstring>
 
+#include <string>
 #include <vector>
 #include <chrono>
 #include <algorithm>
@@ -22,31 +24,33 @@ static i64 seed = DEFAULT_SEED;
 static i64 EMAX = DEFAULT_EMAX;
 static int repeat = 1;
 static i64 max_task_bound = -1;
-static bool enable_hack = false;
 static bool quiet = false;
-static char *filename = NULL;
+static std::string hacker_name;
+static hack::Hacker hacker;
+static std::string filename;
 static FILE *file_handle = NULL;
 
 void parse_opt(int argc, char *argv[]) {
     char c;
 
-    const char *opts = ":huqs:r:e:m:o:";
+    const char *opts = ":hqu:s:r:e:m:o:";
     while ((c = getopt(argc, argv, opts)) != -1)
     switch (c) {
         case 'h': printf(
             "Usage: %s [%s]\n"
             "   -h  print this message\n"
-            "   -u  enable \"max_decrease\" hacker\n"
             "   -q  output less information\n"
+            "   -u  choose hacker\n"
             "   -s  specify the seed for hacker's random genenrator\n"
             "   -r  number of runs for one task\n"
             "   -e  expected maximum number of edges to be processed\n"
             "   -m  maximum number of tasks\n"
-            "   -o  save stdout to file\n",
-            argv[0], opts + 1
+            "   -o  save stdout to file\n"
+            "\navailable hackers: %s",
+            argv[0], opts + 1, AVAILABLE_HACKERS
         ); exit(0);
-        case 'u': enable_hack = true; break;
         case 'q': quiet = true; break;
+        case 'u': hacker_name = optarg; break;
         case 's': seed = atoll(optarg); break;
         case 'r': repeat = atoi(optarg); break;
         case 'e': EMAX = atoll(optarg); break;
@@ -59,11 +63,14 @@ void parse_opt(int argc, char *argv[]) {
 
     assert(1 <= repeat);
     assert(0 <= EMAX);
+    assert(strstr(AVAILABLE_HACKERS, hacker_name.c_str()) != NULL);
 
-    if (filename) {
-        file_handle = fopen(filename, "w");
+    hacker = hack::get_hacker(hacker_name);
+
+    if (!filename.empty()) {
+        file_handle = fopen(filename.c_str(), "w");
         if (!file_handle) {
-            fprintf(stderr, "Failed to open file \"%s\".", filename);
+            fprintf(stderr, "Failed to open file \"%s\".", filename.c_str());
             exit(-1);
         }
     }
@@ -131,10 +138,7 @@ void output(bool front, const char *fmt, ...) {
 }
 
 void prepare(ShortestPath *instance, int s) {
-    if (enable_hack)
-        hack::max_decrease(*instance, s);
-    else
-        hack::uniform(*instance, s);
+    hacker(*instance, s);
 }
 
 auto average(const std::vector<double> &li) -> double {
@@ -168,8 +172,8 @@ int main(int argc, char *argv[]) {
             instance->n, instance->m, max_task, seed
         );
     output(!isatty(STDOUT_FILENO),
-        "n = %d; m = %d; seed = 0x%llx; hack = %d\n",
-        instance->n, instance->m, seed, enable_hack
+        "n = %d; m = %d; seed = 0x%llx; hack = %s\n",
+        instance->n, instance->m, seed, hacker_name.c_str()
     );
 
     i64 estimate = -1;

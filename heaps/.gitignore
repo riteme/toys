@@ -1,5 +1,6 @@
 *.o
 *.d
+*.ans
 build/
 deps/
 results/*
