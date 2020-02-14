@@ -4,28 +4,28 @@
 
 using namespace std;
 
+namespace HeapInterface {
 
 
-void HeapInterface::clear() {
 
-}
-
-void HeapInterface::push(int x) {
+void clear() {
 
 }
 
-void HeapInterface::decrease(int x) {
+void push(int x) {
 
 }
 
-auto HeapInterface::pop() -> int {
+void decrease(int x) {
 
 }
 
-auto HeapInterface::size() -> int {
+auto pop() -> int {
 
 }
 
-auto HeapInterface::empty() -> bool {
+auto empty() -> bool {
+
+}
 
 }

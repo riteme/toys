@@ -14,7 +14,7 @@ Comparisons over variants of heaps in Dijkstra's algorithm on randomly generated
     * [ ] `hollow`
     * [ ] `hollow-dag`
 
-## Prerequisite
+## Prerequisites
 * `make ranklist`: PrettyTable (PyPI)
   ```shell
   sudo pip install PTable

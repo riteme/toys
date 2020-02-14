@@ -30,9 +30,9 @@ PYTHON = python
 PYPY = pypy
 DEBUG = 0
 
-CXXFLAGS := -std=c++17 -I./includes/ -Wno-unused-result -Wno-char-subscripts
+CXXFLAGS := -std=c++17 -I./headers/ -Wno-unused-result -Wno-char-subscripts
 ifeq ($(DEBUG), 0)
-CXXFLAGS += -O3 -flto
+CXXFLAGS += -O3 -flto -fno-stack-protector
 else
 CXX = clang++
 CXXFLAGS += -g -fsanitize=undefined,address -Wall -Wextra -fno-inline

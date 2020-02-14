@@ -5,36 +5,36 @@
 
 using namespace std;
 
+namespace HeapInterface {
+
 static queue<int> q;
 static vector<bool> in;
 
-void HeapInterface::clear() {
+void clear() {
     while (!q.empty()) q.pop();
     in.resize(n + 1, false);
 }
 
-void HeapInterface::push(int x) {
+void push(int x) {
     if (!in[x]) {
         q.push(x);
         in[x] = true;
     }
 }
 
-void HeapInterface::decrease(int x) {
+void decrease(int x) {
     push(x);
 }
 
-auto HeapInterface::pop() -> int {
+auto pop() -> int {
     int u = q.front();
     q.pop();
     in[u] = false;
     return u;
 }
 
-auto HeapInterface::size() -> int {
-    return q.size();
+auto empty() -> bool {
+    return q.size() == 0;
 }
 
-auto HeapInterface::empty() -> bool {
-    return size() == 0;
 }

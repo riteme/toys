@@ -108,7 +108,7 @@ void status_line(int progress, i64 _estimate, const char *_status, ...) {
     if (isatty(STDOUT_FILENO))
         fprintf(stderr,
             CLR "[%3d%%] %-16s %-11s %-8s %-8s %s\t\"%s\" %s",
-            progress, "hash", "time (ms)", "peek", "count", "ratio",
+            progress, "hash", "time (ms)", "aux", "count", "ratio",
             status, estimate
         );
     else
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
         clear_line();
         output(true,
             "  %-4lld %.16llx %-11.6f %-8d %-8d %.2fx\t",
-            i, result.hash, result.time, result.peek, result.count,
+            i, result.hash, result.time, result.aux, result.count,
             static_cast<double>(result.count) / instance->n
         );
         for (auto tm : records)

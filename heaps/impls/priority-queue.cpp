@@ -4,6 +4,8 @@
 
 using namespace std;
 
+namespace HeapInterface {
+
 struct State {
     int x;
     i64 t;
@@ -16,34 +18,32 @@ struct State {
 static int remain;
 static priority_queue<State> q;
 
-void HeapInterface::clear() {
+void clear() {
     remain = 0;
     while (!q.empty()) q.pop();
 }
 
-void HeapInterface::push(int x) {
+void push(int x) {
     remain++;
     q.push({x, w[x]});
 }
 
-void HeapInterface::decrease(int x) {
+void decrease(int x) {
     q.push({x, w[x]});
 }
 
-auto HeapInterface::pop() -> int {
+auto pop() -> int {
     remain--;
     State u;
     do {
         u = q.top();
         q.pop();
-    } while (u.t > instance->dist[u.x]);
+    } while (u.t > w[u.x]);
     return u.x;
 }
 
-auto HeapInterface::size() -> int {
-    return q.size();
+auto empty() -> bool {
+    return remain == 0;
 }
 
-auto HeapInterface::empty() -> bool {
-    return remain == 0;
 }

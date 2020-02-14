@@ -24,13 +24,13 @@ double convert_span(const T &x) {
 ShortestPath::ShortestPath(int _n, int _m):
     n(_n), m(_m),
     dist(new i64[n + 1]),
-    G(new std::vector<Edge>[n + 1]),
-    q(new HeapInterface(n, this)) {}
+    G(new std::vector<Edge>[n + 1]) {
+    HeapInterface::initialize(this);
+}
 
 ShortestPath::~ShortestPath() {
     delete[] dist;
     delete[] G;
-    delete q;
 }
 
 void ShortestPath::link(int u, int v, i64 w) {
@@ -45,13 +45,14 @@ auto ShortestPath::solve(int s) -> Result {
 
     memset(dist + 1, INF_BYTE, sizeof(i64) * n);
     dist[s] = 0;
-    q->clear();
-    q->push(s);
+
+    HeapInterface::aux = 0;
+    HeapInterface::clear();
+    HeapInterface::push(s);
 
     auto t_start = high_resolution_clock::now();
     do {
-        ret.peek = std::max(ret.peek, q->size());
-        int u = q->pop();
+        int u = HeapInterface::pop();
 
         for (auto &e : G[u]) {
             if (dist[e.v] > dist[u] + e.w) {
@@ -59,18 +60,19 @@ auto ShortestPath::solve(int s) -> Result {
                 dist[e.v] = dist[u] + e.w;
 
                 if (neo)
-                    q->push(e.v);
+                    HeapInterface::push(e.v);
                 else
-                    q->decrease(e.v);
+                    HeapInterface::decrease(e.v);
 
                 ret.count++;
             }
         }
-    } while (!q->empty());
+    } while (!HeapInterface::empty());
     auto t_end = high_resolution_clock::now();
     ret.time = convert_span(t_end - t_start);
 
     ret.hash = dist_hash(dist, n);
+    ret.aux = HeapInterface::aux;
     return ret;
 }
 

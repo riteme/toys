@@ -4,8 +4,9 @@
 
 using namespace std;
 
+namespace HeapInterface {
+
 static int m;
-static i64 *w;
 static vector<int> h;
 static vector<int> pos;
 
@@ -50,24 +51,23 @@ inline void swim(int i) {
         _swap(i, F(i));
 }
 
-void HeapInterface::clear() {
+void clear() {
     h.resize(n + 1, 0);
     pos.resize(n + 1, 0);
     m = 0;
-    ::w = this->w;
 }
 
-void HeapInterface::push(int x) {
+void push(int x) {
     h[++m] = x;
     pos[x] = m;
     swim(m);
 }
 
-void HeapInterface::decrease(int x) {
+void decrease(int x) {
     swim(pos[x]);
 }
 
-auto HeapInterface::pop() -> int {
+auto pop() -> int {
     int u = h[1];
     h[1] = h[m--];
     pos[h[1]] = 1;
@@ -75,10 +75,8 @@ auto HeapInterface::pop() -> int {
     return u;
 }
 
-auto HeapInterface::size() -> int {
-    return m;
+auto empty() -> bool {
+    return m == 0;
 }
 
-auto HeapInterface::empty() -> bool {
-    return m == 0;
 }

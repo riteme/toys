@@ -4,22 +4,23 @@
 
 using namespace std;
 
-static int l, r, n;
+namespace HeapInterface {
+
+static int l, r;
 static vector<int> q;
 static vector<bool> in;
 
 inline void inc(int &x) {
-    x = x + 1 == n ? 0 : x + 1;
+    x = x == n ? 0 : x + 1;
 }
 
-void HeapInterface::clear() {
+void clear() {
     l = r = 0;
-    ::n = this->n + 1;
     q.resize(n + 1, 0);
     in.resize(n + 1, 0);
 }
 
-void HeapInterface::push(int x) {
+void push(int x) {
     if (!in[x]) {
         q[r] = x;
         inc(r);
@@ -27,21 +28,19 @@ void HeapInterface::push(int x) {
     }
 }
 
-void HeapInterface::decrease(int x) {
+void decrease(int x) {
     push(x);
 }
 
-auto HeapInterface::pop() -> int {
+auto pop() -> int {
     int u = q[l];
     inc(l);
     in[u] = false;
     return u;
 }
 
-auto HeapInterface::size() -> int {
-    return l <= r ? r - l : r + n + 1 - l;
+auto empty() -> bool {
+    return l == r;
 }
 
-auto HeapInterface::empty() -> bool {
-    return l == r;
 }

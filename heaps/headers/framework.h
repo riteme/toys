@@ -11,6 +11,23 @@ constexpr i64 INF = 0x3f3f3f3f'3f3f3f3f;
 constexpr int INF_BYTE = 0x3f;
 constexpr i64 WMAX = 1'000'000'000;
 
+class ShortestPath;
+
+namespace HeapInterface {
+    extern ShortestPath *instance;
+    extern int n;
+    extern int aux;
+    extern i64 *w;  // key values (distances)
+
+    void initialize(ShortestPath *_instance);
+
+    void clear();
+    void push(int x);
+    void decrease(int x);
+    auto pop() -> int;
+    auto empty() -> bool;
+}
+
 class ShortestPath {
 public:
     struct Edge {
@@ -22,7 +39,7 @@ public:
         u64 hash = 0;   // hash for distance array
         double time;    // in milliseconds
         int count = 0;  // number of decrease_key operations
-        int peek = 0;   // maximum number of element in the heap
+        int aux = 0;   // auxiliary counter
     };
 
     ShortestPath(int _n, int _m);
@@ -36,7 +53,7 @@ public:
     auto operator[](int u) -> std::vector<Edge>&;
 
 private:
-    friend struct HeapInterface;
+    friend void HeapInterface::initialize(ShortestPath*);
 
     ShortestPath(const ShortestPath&) = delete;
     ShortestPath(ShortestPath&&) = delete;
@@ -45,21 +62,4 @@ private:
 
     i64 *dist;
     vector<Edge> *G;
-    struct HeapInterface *q;
-};
-
-struct HeapInterface {
-    HeapInterface(int _n, ShortestPath *_instance):
-        n(_n), instance(_instance), w(instance->dist) {}
-
-    void clear();
-    void push(int x);
-    void decrease(int x);
-    auto pop() -> int;
-    auto size() -> int;
-    auto empty() -> bool;
-
-    int n;
-    ShortestPath *instance;
-    i64 *w;
 };
