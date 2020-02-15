@@ -8,8 +8,8 @@
 #define AVAILABLE_HACKERS "uniform span stack"
 
 namespace hack {
-    typedef ShortestPath Graph;
-    typedef std::function<void(Graph&, int)> Hacker;
+    using Graph = ::ShortestPath;
+    using Hacker = std::function<void(Graph&, int)>;
 
     void initiailize(i64 _seed);
     auto get_hacker(const std::string &name) -> Hacker;
