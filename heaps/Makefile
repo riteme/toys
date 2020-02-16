@@ -23,6 +23,7 @@ repeat = 4
 max = 100
 maxe = 10000000000
 HACK = uniform
+NOSPFA = 0
 
 # Compiler setting
 CXX = g++
@@ -90,7 +91,14 @@ _mkdata := $(PYPY) utils/random-gen.py $(n) $(m) $(GENFLAGS) > data.in
 data: ; $(_mkdata)
 data.in: ; $(_mkdata)
 
-RUN = $(TARGETS)
+ifeq ($(filter-out run, $(MAKECMDGOALS)), )
+ifeq ($(NOSPFA), 1)
+RUN := $(filter-out spfa spfa-circular, $(TARGETS))
+else
+RUN := $(TARGETS)
+endif
+endif
+
 run: $(RUN) data.in
 	@mkdir -p results
 	@echo   FLAGS: $(RUNFLAGS)

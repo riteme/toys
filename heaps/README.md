@@ -7,12 +7,13 @@ Comparisons over variants of heaps in Dijkstra's algorithm on randomly generated
 * [x] Make rules for auto tests.
 * [ ] Implementations
     * [x] `pairing`
-    * [ ] `elmasry`
+        * [x] `pbds-pairing`
+        * [x] `elmasry`
     * [ ] `fibonacci`
     * [ ] `rank-pairing`
     * [ ] `quake`
     * [ ] `hollow`
-    * [ ] `hollow-dag`
+        * [ ] `hollow-dag`
 
 ## Prerequisites
 * `make ranklist`: PrettyTable (PyPI)

@@ -16,7 +16,7 @@ class ShortestPath;
 namespace HeapInterface {
     extern ShortestPath *instance;
     extern int n;
-    extern int aux;
+    extern int _aux;
     extern i64 *w;  // key values (distances)
 
     void initialize(ShortestPath *_instance);

@@ -46,7 +46,7 @@ auto ShortestPath::solve(int s) -> Result {
     memset(dist + 1, INF_BYTE, sizeof(i64) * n);
     dist[s] = 0;
 
-    HeapInterface::aux = 0;
+    HeapInterface::_aux = 0;
     HeapInterface::clear();
     HeapInterface::push(s);
 
@@ -72,7 +72,7 @@ auto ShortestPath::solve(int s) -> Result {
     ret.time = convert_span(t_end - t_start);
 
     ret.hash = dist_hash(dist, n);
-    ret.aux = HeapInterface::aux;
+    ret.aux = HeapInterface::_aux;
     return ret;
 }
 

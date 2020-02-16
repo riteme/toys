@@ -4,7 +4,7 @@ namespace HeapInterface {
 
 ShortestPath *instance;
 int n;
-int aux;
+int _aux;
 i64 *w;
 
 void initialize(ShortestPath *_instance) {
