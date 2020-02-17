@@ -114,7 +114,7 @@ run: $(RUN) data.in
 		echo Running \"$$t\" \> results/$$t.txt ; \
 		./build/$$t $(RUNFLAGS) -o results/$$t.txt < data.in ; \
 	done
-	tar cfv results/$(HACK).tar $(addprefix results/, $(addsuffix .txt, $(RUN)))
+	tar -cf results/$(HACK).tar $(addprefix results/, $(addsuffix .txt, $(RUN)))
 
 TARNAME =
 ifeq ($(TARNAME), )
@@ -127,4 +127,4 @@ ranklist:
 	@$(PYTHON) utils/ranklist.py $(_RANK_TARGET)
 
 pack:
-	tar cfv $(_RANK_TARGET) results/*.txt
+	tar -cfv $(_RANK_TARGET) results/*.txt
