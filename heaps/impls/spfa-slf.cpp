@@ -1,23 +1,26 @@
 #include "framework.h"
 
-#include <queue>
+#include <deque>
 #include <vector>
 
 using namespace std;
 
 namespace HeapInterface {
 
-static queue<int> q;
+static deque<int> q;
 static vector<bool> in;
 
 void clear() {
-    while (!q.empty()) q.pop();
+    q.clear();
     in.resize(n + 1, false);
 }
 
 void push(int x) {
     if (!in[x]) {
-        q.push(x);
+        if (q.empty() || w[x] <= w[q[0]])
+            q.push_front(x);
+        else
+            q.push_back(x);
         in[x] = true;
     }
 }
@@ -27,8 +30,8 @@ void decrease(int x) {
 }
 
 auto pop() -> int {
-    int u = q.front();
-    q.pop();
+    int u = q[0];
+    q.pop_front();
     in[u] = false;
     return u;
 }

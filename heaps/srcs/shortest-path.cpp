@@ -53,6 +53,7 @@ auto ShortestPath::solve(int s) -> Result {
     auto t_start = high_resolution_clock::now();
     do {
         int u = HeapInterface::pop();
+        ret.trace = ret.trace * HASH_BASE + u;
 
         for (auto &e : G[u]) {
             if (dist[e.v] > dist[u] + e.w) {

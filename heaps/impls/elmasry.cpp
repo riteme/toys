@@ -1,5 +1,6 @@
 #include "framework.h"
 
+#include <cmath>
 #include <cstring>
 
 #include <algorithm>
@@ -15,8 +16,7 @@ struct Node {
     int lch, rch, par;
 };
 
-constexpr int THRESHOLD = 20;
-
+static int THRESHOLD = 16;
 static vector<Node> m;
 static vector<int> buf, aux;
 
@@ -25,6 +25,8 @@ inline void reset(int x) {
 }
 
 void clear() {
+    THRESHOLD = int(log2(n + 1));
+    _aux = THRESHOLD;
     m.resize(n + 1);
     buf.reserve(n);
     aux.reserve(THRESHOLD);

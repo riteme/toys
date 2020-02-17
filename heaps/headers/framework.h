@@ -14,17 +14,65 @@ constexpr i64 WMAX = 1'000'000'000;
 class ShortestPath;
 
 namespace HeapInterface {
+    /**
+     * @brief associated instance of Dijkstra'a algorithm
+     */
     extern ShortestPath *instance;
-    extern int n;
-    extern int _aux;
-    extern i64 *w;  // key values (distances)
 
+    /**
+     * @brief number of vertices
+     */
+    extern int n;
+
+    /**
+     * @brief auxiliary counter
+     */
+    extern int _aux;
+
+    /**
+     * @brief key values (distances)
+     */
+    extern i64 *w;
+
+    /**
+     * @brief initialize environment
+     *
+     * @param _instance associated instance
+     */
     void initialize(ShortestPath *_instance);
 
+    /**
+     * @brief initialize & clean up heap structure
+     */
     void clear();
+
+    /**
+     * @brief push new vertex into heap
+     *
+     * @param x new vertex
+     */
     void push(int x);
+
+    /**
+     * @brief notify that the key of vertex x has been decreased
+     *
+     * @param x target vertex
+     */
     void decrease(int x);
+
+    /**
+     * @brief remove the vertex of minimum key and return it
+     *
+     * @return int minimum vertex
+     */
     auto pop() -> int;
+
+    /**
+     * @brief return whether the heap is empty
+     *
+     * @return true  the heap is empty
+     * @return false the heap is not empty
+     */
     auto empty() -> bool;
 }
 
@@ -37,9 +85,10 @@ public:
 
     struct Result {
         u64 hash = 0;   // hash for distance array
+        u64 trace = 0;  // hash for access sequence
         double time;    // in milliseconds
         int count = 0;  // number of decrease_key operations
-        int aux = 0;   // auxiliary counter
+        int aux = 0;    // auxiliary counter
     };
 
     ShortestPath(int _n, int _m);
@@ -50,7 +99,7 @@ public:
 
     int n, m;
 
-    auto operator[](int u) -> std::vector<Edge>&;
+    auto operator[](int u) -> vector<Edge>&;
 
 private:
     friend void HeapInterface::initialize(ShortestPath*);
