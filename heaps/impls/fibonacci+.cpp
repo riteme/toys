@@ -24,8 +24,7 @@ int tr;
 
 void clear() {
     tr = 0;
-    aux.reserve(S);
-    aux.clear();
+    aux.resize(S);
     m.resize(n + 1);
     for (int i = 0; i <= n; i++) {
         memset(&m[i], 0, sizeof(Node));
@@ -50,7 +49,7 @@ inline void link(int x, int y) {
     m[y].parent = x;
     int &u = m[x].head;
     if (u) insert(u, y);
-    else u = y;
+    else u = m[y].prev = m[y].next = y;
 }
 
 inline void cut(int x) {
@@ -62,8 +61,6 @@ inline void cut(int x) {
         m[m[x].prev].next = m[x].next;
         m[m[x].next].prev = m[x].prev;
     }
-    m[x].next = m[x].prev = x;
-    // m[x].parent = 0;
 }
 
 inline int meld(int x, int y) {
@@ -101,25 +98,24 @@ auto pop() -> int {
 
     tr = 0;
     if (m[u].head) {
-        aux.clear();
-        int v = m[u].head;
+        int mx = 0, v = m[u].head;
         do {
             int r = m[v].rank, t = m[v].next;
 
-            m[v].next = m[v].prev = v;
-            for (; r < aux.size() && aux[r]; r++) {
+            for (; aux[r]; r++) {
                 v = meld(v, aux[r]);
                 aux[r] = 0;
             }
-            if (r >= aux.size())
-                aux.resize(r + 1);
+            mx = max(mx, r);
             aux[r] = v;
 
             v = t;
         } while (v != m[u].head);
 
-        for (int x : aux)
-            if (x) tr = meld(tr, x);
+        for (int i = 0; i <= mx; i++) if (aux[i]) {
+            tr = meld(tr, aux[i]);
+            aux[i] = 0;
+        }
     }
 
     return u;

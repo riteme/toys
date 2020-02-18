@@ -19,7 +19,7 @@ struct Node {
 constexpr int S = 32;
 
 vector<Node> m;
-vector<int> aux, buf;
+vector<int> aux, buf;  // TODO: optimize for aux
 int minp;
 
 void clear() {
