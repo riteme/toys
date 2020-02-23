@@ -51,8 +51,8 @@ struct Unsigned {
     Unsigned(const Unsigned &z) : a(new u32[z.len]), len(z.len) { memcpy(a, z.a, CBYTES * len); }
     Unsigned(Unsigned &&z) : a(z.a), len(z.len) { z.a = nullptr; }
     Unsigned &operator=(const Unsigned &z) {
-        if (a && z.len > len) {
-            delete[] a;
+        if (!a || z.len > len) {
+            if (a) delete[] a;
             a = new u32[z.len];
         }
         len = z.len;
@@ -122,7 +122,7 @@ struct Unsigned {
                     a[i - p] = (a[i] >> r) | (a[i + 1] << (CBITS - r));
                 a[len - p - 1] = a[len - 1] >> r;
             } else memmove(a, a + p, CBYTES * (len - p));
-            len -= p + !a[len - p - 1];
+            if (len > 1) len -= p + !a[len - p - 1];
         }
         return *this;
     }
@@ -358,6 +358,7 @@ struct Unsigned {
             T0[i] = r;
             t = move(q);
         }
+        if (!i) printf("0");
         for (i--; i >= 0; i--)
             printf("%1u", T0[i]);
     }
@@ -369,6 +370,7 @@ struct Unsigned {
             T0[i] = r;
             t = move(q);
         }
+        if (!i) os << '0';
         for (i--; i >= 0; i--)
             os << T0[i];
     }
@@ -389,14 +391,16 @@ ostream &operator<<(ostream &os, const Unsigned &z) {
 // TODO: "Signed" adaptor
 
 int main() {
-    char op[8], buf[1024];
+    char op[8], buf[1000000];
     // scanf("%s", buf);
     cin >> buf;
     // Unsigned u = atoll(buf);
     Unsigned u(buf);
     // u.print();
     while (cin >> op >> buf) {
-        // printf("⇒ %s %s\n", op, buf);
+        #ifndef NOP
+        fprintf(stderr, "⇒ %s %s\n", op, buf);
+        #endif
         Unsigned x(buf);
         // u32 x = strtol(buf, NULL, 10);
         // x.print_hex();
@@ -406,6 +410,8 @@ int main() {
             case '*': u *= x; break;
             case '/': u /= x; break;
             case '%': cout << u % x << endl; continue;
+            case '<': u <<= x[0]; break;
+            case '>': u >>= x[0]; break;
             // case '%': printf("0x%X\n", u % x); continue;
         }
         cout << u << endl;
