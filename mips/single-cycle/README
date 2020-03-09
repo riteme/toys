@@ -35,7 +35,7 @@ sub		$rd, $rs, $rt
 and		$rd, $rs, $rt
 xor		$rd, $rs, $rt
 nor		$rd, $rs, $rt
-sli		$rd, $rs, $rt
+slt		$rd, $rs, $rt
 addi	$rt, $rs, imm
 andi	$rt, $rs, imm
 ori		$rt, $rs, imm
@@ -65,13 +65,13 @@ jal		addr
 
 `sw`, `lw`: I; (`101011`, `100011`), `rt` & `imm(rs)`, SignImm.
 
-`j`: I; (`10`), JTA extension.
+`j`: J; (`10`), JTA extension.
 
 `nop`: *equivalent to* `sll $0, $0, 0`.
 
 `beq`, `bne`: I; (`100`, `101`) compare `rs` & `rt`, BTA extension.
 
-`jal`: I; (`11`), JTA extension, save next `PC` to `$ra`.
+`jal`: J; (`11`), JTA extension, save next `PC` to `$ra`.
 
 `jr`: R; (`1000`) `PC` = `rs`.
 
