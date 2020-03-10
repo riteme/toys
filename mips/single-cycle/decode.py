@@ -55,6 +55,7 @@ def parse_imm(imm):
     return f'{value}/{neg}'
 
 def parse(line, pc):
+    line = '{:032b}'.format(int(line, base=16))
     op, rs, rt, rd, shamt, funct = [
         line[0:6], line[6:11],
         line[11:16], line[16:21],

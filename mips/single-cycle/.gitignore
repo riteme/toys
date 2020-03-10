@@ -1,3 +1,6 @@
 obj_dir/
+build/
 *.hex
 *.rev
+*.txt
+*.asm
