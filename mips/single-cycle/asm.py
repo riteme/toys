@@ -115,6 +115,14 @@ def preprocess(tokens, pc_start, addr_start):
             target = target[3:]
         emit(['sw', [rt, target]])
 
+    def b(addr):
+        emit(['j', [addr]])
+    def j(target):
+        if target.startswith('$'):
+            emit(['jr', [target]])
+        else:
+            emit(['j', [target]])
+
     # END OF Polyfills
 
     has_error = False
@@ -288,16 +296,12 @@ def translate(tokens, mp):
 
         return cat(op, bi(int(addr), 26))
 
-    def b(addr):  # actual j
+    def j(addr):
         return _jtype('000010', addr)
     def jal(addr):
         return _jtype('000011', addr)
-
-    def j(rs):  # j or jr
-        if rs.startswith('$'):
-            return cat('000000', idx(rs), '00000' * 3, '001000')
-        else:
-            return b(rs)
+    def jr(rs):  # j or jr
+        return cat('000000', idx(rs), '00000' * 3, '001000')
 
     # END OF Instructions
 

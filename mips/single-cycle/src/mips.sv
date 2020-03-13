@@ -1,3 +1,5 @@
+`timescale 1ps / 1ps
+
 module mips(
     input logic clk, reset,
     input logic [31:0] instr,
