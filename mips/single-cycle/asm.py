@@ -25,11 +25,10 @@ def tokenize(fp):
             tags.append(escape(tag))
             line = remain.strip()
 
-        if len(line) == 0:
-            continue
-
         if '#' in line:
             line, _ = line.split('#')
+        if len(line) == 0:
+            continue
 
         parts = line.split()
         instr = parts[0]
@@ -80,8 +79,16 @@ def preprocess(tokens, pc_start, addr_start):
             ['bne', [at, '$0', t]]
         ])
 
+    def slt(rd, rs, rt):
+        if rt.startswith('$'):
+            emit(['slt', [rd, rs, rt]])
+        else:
+            emit(['slti', [rd, rs, rt]])
+
     def addu(*args):
         emit(['add', args])
+    def subu(*args):
+        emit(['sub', args])
 
     def addiu(*args):
         emit(['addi', args])
@@ -98,6 +105,15 @@ def preprocess(tokens, pc_start, addr_start):
     def li(rt, imm):
         lui(rt, f'%hi({imm})')
         emit(['ori', [rt, rt, f'%lo({imm})']])
+
+    def lw(rt, target):
+        if target.startswith('%lo') or target.startswith('%hi'):
+            target = target[3:]
+        emit(['lw', [rt, target]])
+    def sw(rt, target):
+        if target.startswith('%lo') or target.startswith('%hi'):
+            target = target[3:]
+        emit(['sw', [rt, target]])
 
     # END OF Polyfills
 
@@ -181,7 +197,7 @@ def idx(r):
     return '{:05b}'.format(i)
 
 def extract(pat, mp=None):
-    imm, _rs = pat.split('(')
+    imm, _rs = pat.rsplit('(', maxsplit=1)
     return eval(imm, None, mp), _rs[:-1]
 
 def bi(imm, n):
@@ -277,8 +293,11 @@ def translate(tokens, mp):
     def jal(addr):
         return _jtype('000011', addr)
 
-    def j(rs):  # actual jr
-        return cat('000000', idx(rs), '00000' * 3, '001000')
+    def j(rs):  # j or jr
+        if rs.startswith('$'):
+            return cat('000000', idx(rs), '00000' * 3, '001000')
+        else:
+            return b(rs)
 
     # END OF Instructions
 
@@ -312,6 +331,8 @@ def translate(tokens, mp):
                 print(f'(error) Unknown instruction "{token}" at line {lineos}.')
                 mem.append(0)
             else:
+                # print(token, args, lineos, addr)
+
                 _pc = addr
                 ret = handler(*args)
                 if type(ret) != int:

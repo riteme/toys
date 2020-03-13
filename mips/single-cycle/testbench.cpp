@@ -11,7 +11,7 @@
 
 typedef uint32_t u32;
 
-int tickcnt = 0;
+int tickcnt = 1;
 u32 imem[IMEM_SIZE], dmem[DMEM_SIZE];
 u32 regs[32];
 
@@ -36,7 +36,7 @@ void write(u32 addr, u32 data, int pc = -1) {
 
     if (addr >= DMEM_SIZE) {
         if (pc >= 0)
-            printf("[pc = %d] ", pc);
+            printf("[pc = %d] ", pc + 1);
         printf("write: invalid access to %d [data = %u]\n", addr << 2, data);
         exit(-1);
     }
@@ -66,10 +66,9 @@ void load_memory(const char *filename, int n, u32 *mem) {
 }
 
 void tick(VCore *t) {
-    tickcnt++;
-
     int pc = t->PC >> 2;
-    // printf("pc = %d\n", pc);
+    // printf("pc = %d\n", pc + 1);
+
     if (pc >= IMEM_SIZE)
         return;
 
@@ -81,7 +80,7 @@ void tick(VCore *t) {
 
     /* ALU
     printf("[%d/%d] ALU: %d [%d] %d -> RET = %d\n",
-        tickcnt, pc,
+        tickcnt, pc + 1,
         t->Core__DOT___DP__DOT__SrcA,
         (t->Core__DOT__Signals >> 9) & 0x3f,
         t->Core__DOT___DP__DOT__SrcB,
@@ -90,24 +89,35 @@ void tick(VCore *t) {
 
     t->CLK = 1;
     if (t->SIG_WRITE) {
-        printf("[%d/%d] write@%d: %u\n",
-            tickcnt, t->PC >> 2, t->MEM_ADDR, t->MEM_DATA
-        );
+        // if (t->MEM_ADDR == 0) {
+            printf("[%d/%d] write@%d: %u\n",
+                tickcnt, (t->PC >> 2) + 1, t->MEM_ADDR, t->MEM_DATA
+            );
+        // }
         write(t->MEM_ADDR, t->MEM_DATA, pc);
     }
     t->MEM_READ = read(t->MEM_ADDR, pc);
     t->eval();
 
-    if (pc + 1 != (t->PC >> 2))
+    if (pc + 1 != (t->PC >> 2)) {
         printf("[%d/%d] jump: %d -> %d\n",
-            tickcnt, pc, pc, t->PC >> 2);
+            tickcnt, pc + 1, pc + 1, (t->PC >> 2) + 1);
+
+        if (pc == (t->PC >> 2)) {
+            printf("[%d/%d] infinte loop!\n",
+                tickcnt, pc + 1);
+            exit(-1);
+        }
+    }
 
     auto r = t->Core__DOT___DP__DOT__Reg__DOT__Registers;
     for (int i = 0; i < 32; i++) {
         if (regs[i] != r[i])
-            printf("[%d/%d] $%d <- %u\n", tickcnt, pc, i, r[i]);
+            printf("[%d/%d] $%d <- %u\n", tickcnt, pc + 1, i, r[i]);
         regs[i] = r[i];
     }
+
+    tickcnt++;
 }
 
 int main(int argc, char *argv[]) {
