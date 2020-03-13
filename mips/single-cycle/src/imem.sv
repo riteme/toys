@@ -3,9 +3,9 @@
 module imem #(
     parameter RAMSIZE = 64
 ) (
-        input logic [5:0] a,
+        input logic [29:0] a,
         output logic [31:0] rd
     );
-    logic [31:0] RAM[64];
+    logic [31:0] RAM[RAMSIZE];
     assign rd = RAM[a];
 endmodule

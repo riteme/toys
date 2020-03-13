@@ -32,6 +32,8 @@ u32 read(u32 addr, int pc = -1) {
 }
 
 void write(u32 addr, u32 data, int pc = -1) {
+    // fprintf(stderr, "[0x%08x]=0x%08x\n", addr, data);
+
     addr = addr >> 2;
 
     if (addr >= DMEM_SIZE) {
