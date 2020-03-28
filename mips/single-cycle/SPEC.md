@@ -47,7 +47,7 @@ bne		$rs, $rt, imm
 jr		$rs
 sll		$rd, $rt, shamt
 srl		$rd, $rt, shamt
-sra		$rd, $Rt, shamt
+sra		$rd, $rt, shamt
 jal		addr
 ```
 
