@@ -6,12 +6,14 @@
 
 #include <vector>
 
+#include <errno.h>
+#include <unistd.h>
+#include <signal.h>
+
 #include "VDatapath.h"
 
 typedef uint32_t u32;
 typedef const char *cstr;
-
-extern std::vector<class ITest*> *p_test_list;
 
 const char *r[] = {
     "$0", "at", "v0", "v1",
@@ -158,15 +160,18 @@ private:
 
     void _check_addr(int addr, int size, const char *category) {
         if (addr < 0 || addr >= size) {
-            fprintf(stderr, "ERR! %s: out of range: addr = %d\n", category, addr);
+            fprintf(stderr, "\033[33mERR!\033[0m %s: out of range: addr = %d\n", category, addr);
             exit(-1);
         }
         if (addr & 3) {
-            fprintf(stderr, "ERR! %s: addr not aligned: addr = %d\n", category, addr);
+            fprintf(stderr, "\033[33mERR!\033[0m %s: addr not aligned: addr = %d\n", category, addr);
             exit(-1);
         }
     }
 };
+
+extern std::vector<class ITest*> *p_test_list;
+extern class ITest *current_test;
 
 class ITest {
 public:
@@ -175,20 +180,42 @@ public:
     }
 
     void run() {
+        current_test = this;
         _run();
-        printf("[OK] %s\n", name);
+        printf("\033[32m[OK]\033[0m %s\n", name);
+        current_test = nullptr;
     }
 
-private:
     cstr name;
+
+private:
     virtual void _run() = 0;
 };
 
-#define BEGIN \
-    static class Test##__LINE__ : public ITest { \
+#define BEGIN(id) \
+    static class Test##id : public ITest { \
         using ITest::ITest; \
         void _run() {
 
-#define END(name) \
+#define END(id, name) \
         } \
-    } test##__LINE__(name);
+    } test##id(name);
+
+typedef void handler_t(int);
+
+void unix_error(const char *msg) {
+    fprintf(stdout, "%s: %s\n", msg, strerror(errno));
+    exit(1);
+}
+
+handler_t *Signal(int signum, handler_t *handler) {
+    struct sigaction action, old_action;
+
+    action.sa_handler = handler;
+    sigemptyset(&action.sa_mask); /* block sigs of type being handled */
+    action.sa_flags = SA_RESTART; /* restart syscalls if possible */
+
+    if (sigaction(signum, &action, &old_action) < 0)
+        unix_error("Signal error");
+    return (old_action.sa_handler);
+}
