@@ -6,26 +6,26 @@ module RWMask(
     input logic [14:0] fields,
     output logic [30:0] rmask, wmask
 );
-    logic [4:0] rs = fields[14:10];
-    logic [4:0] rt = fields[9:5];
-    logic [4:0] rd = fields[4:0];
+    logic [4:0] rs, rt, rd;
+    assign rs = fields[14:10];
+    assign rt = fields[9:5];
+    assign rd = fields[4:0];
 
-    logic [30:0] rs_mask = (1 << rs) >> 1;
-    logic [30:0] rt_mask = (1 << rt) >> 1;
-    logic [30:0] rd_mask = (1 << rd) >> 1;
-    logic [30:0] ra_mask = 1 << 30;
+    logic [30:0] rs_mask, rt_mask, rd_mask, ra_mask;
+    assign rs_mask = (1 << rs) >> 1;
+    assign rt_mask = (1 << rt) >> 1;
+    assign rd_mask = (1 << rd) >> 1;
+    assign ra_mask = 1 << 30;
 
-    logic read_rs = type_tb[`RTYPE] | type_tb[`IRTYPE] |
+    logic read_rs, read_rt, write_rt, write_rd, write_ra;
+    assign read_rs = type_tb[`RTYPE] | type_tb[`IRTYPE] |
         instr_tb[`SW] | instr_tb[`LW] |
         instr_tb[`BEQ] | instr_tb[`BNE];
-
-    logic read_rt = type_tb[`RTYPE] | instr_tb[`LW] |
+    assign read_rt = type_tb[`RTYPE] | instr_tb[`LW] |
         instr_tb[`BEQ] | instr_tb[`BNE];
-    logic write_rt = instr_tb[`SW] | type_tb[`IRTYPE];
-
-    logic write_rd = type_tb[`RTYPE];
-
-    logic write_ra = instr_tb[`JAL];
+    assign write_rt = instr_tb[`SW] | type_tb[`IRTYPE];
+    assign write_rd = type_tb[`RTYPE];
+    assign write_ra = instr_tb[`JAL];
 
     assign rmask = (read_rs ? rs_mask : 0) | (read_rt ? rt_mask : 0);
     assign wmask = (write_rt ? rt_mask : 0) | (write_rd ? rd_mask : 0) | (write_ra ? ra_mask : 0);

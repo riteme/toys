@@ -9,14 +9,14 @@ a.out: $(LIBS)
 build/verilated.o: $(VERILATED_SRC)
 	g++ $(CXXFLAGS) $< -c -o $@
 
-build/testbench.o: testbench.cpp testbench.h build/VDatapath.mk
+build/testbench.o: testbench.cpp testbench.h literal.h build/VDatapath.mk
 	g++ $(CXXFLAGS) $< -c -o $@
 
 $(VDATAPATH_LIB): build/VDatapath.mk
 	cd build; make -f VDatapath.mk
 
-build/VDatapath.mk: src/*.sv
-	verilator -Wall -cc -Mdir build -I./src src/Datapath.sv -O3
+build/VDatapath.mk: src/*.sv src/*.vh
+	verilator -Wall -cc -Mdir build -I./src src/Datapath.sv
 
 .PHONY: clean verilator
 clean:

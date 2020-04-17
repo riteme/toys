@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cassert>
 #include <cstring>
+#include <cstdarg>
 
 #include <vector>
 
@@ -11,61 +12,18 @@
 #include <signal.h>
 
 #include "VDatapath.h"
-
-typedef uint32_t u32;
-typedef const char *cstr;
-
-const char *r[] = {
-    "$0", "at", "v0", "v1",
-    "a0", "a1", "a2", "a3",
-    "t0", "t1", "t2", "t3",
-    "t4", "t5", "t6", "t7",
-    "s0", "s1", "s2", "s3",
-    "s4", "s5", "s6", "s7",
-    "t8", "t9", "k0", "k1",
-    "gp", "sp", "fp", "ra"
-};
-
-#define $0 0
-#define $at 1
-#define $v0 2
-#define $v1 3
-#define $a0 4
-#define $a1 5
-#define $a2 6
-#define $a3 7
-#define $t0 8
-#define $t1 9
-#define $t2 10
-#define $t3 11
-#define $t4 12
-#define $t5 13
-#define $t6 14
-#define $t7 15
-#define $s0 16
-#define $s1 17
-#define $s2 18
-#define $s3 19
-#define $s4 20
-#define $s5 21
-#define $s6 22
-#define $s7 23
-#define $t8 24
-#define $t9 25
-#define $k0 26
-#define $k1 27
-#define $gp 28
-#define $sp 29
-#define $fp 30
-#define $ra 31
+#include "literal.h"
 
 class Device {
 public:
     std::vector<u32> imem;
     std::vector<u32> dmem;
+    VDatapath *dp;
 
     Device() {
-        _dp = new VDatapath;
+        dp = new VDatapath;
+        _dp_v = dp->Datapath__DOT__register__DOT__v;
+
         imem.resize(8);
         dmem.resize(8);
 
@@ -73,43 +31,60 @@ public:
     }
 
     ~Device() {
-        delete _dp;
+        delete dp;
+    }
+
+    int pc0() const {
+        return dp->Datapath__DOT__pc0;
+    }
+
+    u32 instr0() const {
+        return dp->Datapath__DOT__instr0;
     }
 
     void reset() {
-        _dp->reset = 1;
-        _dp->clk = 0;
+        dp->reset = 1;
+        dp->clk = 0;
         tick();
         tick();
-        _dp->reset = 0;
-        _dp->eval();
+        dp->reset = 0;
+        dp->eval();
+        load_memory();
+        dp->eval();
 
         memset(_dp_cpy, 0, sizeof(_dp_cpy));
     }
 
+    void load_memory() {
+        if (dp->mem_en)
+            dwrite(dp->addr, dp->mem_data);
+
+        dp->imem_out = iread(dp->iaddr);
+        dp->mem_out = dread(dp->addr);
+    }
+
     void tick() {
-        _dp->clk ^= 1;
-        _dp->eval();
+        dp->clk ^= 1;
+        dp->eval();
 
-        if (_dp->mem_en) {
-            dwrite(_dp->addr, _dp->mem_data);
-        }
+        load_memory();
+        dp->eval();
+    }
 
-        _dp->imem_out = iread(_dp->iaddr);
-        _dp->mem_out = dread(_dp->addr);
-        _dp->eval();
+    void checkout_register() {
+        for (int i = 0; i < 32; i++)
+        if (_dp_cpy[i] != _dp_v[i])
+            _print("R[%s]: %u → %u\n", r[i], _dp_cpy[i], _dp_v[i]);
+        memcpy(_dp_cpy, _dp_v, sizeof(_dp_cpy));
     }
 
     void run(int n = 1) {
-        assert(_dp->clk == 0);
+        assert(dp->clk == 0);
         while (n--) {
             for (int i = 0; i < 2; i++)
                 tick();
-
-            for (int i = 0; i < 32; i++)
-            if (_dp_cpy[i] != _dp_v[i])
-                printf("R[%s]: %u → %u\n", r[i], _dp_cpy[i], _dp_v[i]);
-            memcpy(_dp_cpy, _dp_v, sizeof(_dp_cpy));
+            checkout_register();
+            _print("> emit %u [pc = %d]\n", instr0(), pc0());
         }
     }
 
@@ -126,27 +101,31 @@ public:
     u32 iread(int addr) {
         _check_addr(addr, imem.size(), "imem/read");
         u32 data = imem[addr >> 2];
-        printf("%u ← imem[%d]\n", data, addr);
+        _print("%u ← imem[%d]\n", data, addr);
         return data;
     }
 
     void iwrite(int addr, u32 data) {
         _check_addr(addr, imem.size(), "imem/write");
-        imem[addr] = data;
-        printf("imem[addr] ← %u\n", addr, data);
+        imem[addr >> 2] = data;
+        _print("imem[addr] ← %u\n", addr, data);
     }
 
     u32 dread(int addr) {
         _check_addr(addr, dmem.size(), "dmem/read");
         u32 data = dmem[addr >> 2];
-        printf("%u ← dmem[%d]\n", data, addr);
+        _print("%u ← dmem[%d]\n", data, addr);
         return data;
     }
 
     void dwrite(int addr, u32 data) {
         _check_addr(addr, dmem.size(), "dmem/write");
-        dmem[addr] = data;
-        printf("dmem[addr] ← %u\n", addr, data);
+        dmem[addr >> 2] = data;
+        _print("dmem[addr] ← %u\n", addr, data);
+    }
+
+    void enable_print(bool en = true) {
+        _enable_print = en;
     }
 
     u32 &operator[](int i) {
@@ -154,19 +133,37 @@ public:
     }
 
 private:
-    VDatapath *_dp;
-    u32 *_dp_v = _dp->Datapath__DOT__register__DOT__v;
+    bool _enable_print = false;
+    u32 *_dp_v;
     u32 _dp_cpy[32];
 
     void _check_addr(int addr, int size, const char *category) {
-        if (addr < 0 || addr >= size) {
-            fprintf(stderr, "\033[33mERR!\033[0m %s: out of range: addr = %d\n", category, addr);
+        if (addr < 0 || addr > 4 * (size - 1)) {
+            _error("%s: out of range: addr = %d\n", category, addr);
             exit(-1);
         }
         if (addr & 3) {
-            fprintf(stderr, "\033[33mERR!\033[0m %s: addr not aligned: addr = %d\n", category, addr);
+            _error("%s: addr not aligned: addr = %d\n", category, addr);
             exit(-1);
         }
+    }
+
+    void _print(const char *fmt, ...) {
+        if (!_enable_print)
+            return;
+
+        va_list args;
+        va_start(args, fmt);
+        vprintf(fmt, args);
+        va_end(args);
+    }
+
+    void _error(const char *fmt, ...) {
+        va_list args;
+        va_start(args, fmt);
+        fprintf(stderr, "\033[33mERR!\033[0m ");
+        vfprintf(stderr, fmt, args);
+        va_end(args);
     }
 };
 
@@ -200,22 +197,3 @@ private:
 #define END(id, name) \
         } \
     } test##id(name);
-
-typedef void handler_t(int);
-
-void unix_error(const char *msg) {
-    fprintf(stdout, "%s: %s\n", msg, strerror(errno));
-    exit(1);
-}
-
-handler_t *Signal(int signum, handler_t *handler) {
-    struct sigaction action, old_action;
-
-    action.sa_handler = handler;
-    sigemptyset(&action.sa_mask); /* block sigs of type being handled */
-    action.sa_flags = SA_RESTART; /* restart syscalls if possible */
-
-    if (sigaction(signum, &action, &old_action) < 0)
-        unix_error("Signal error");
-    return (old_action.sa_handler);
-}
