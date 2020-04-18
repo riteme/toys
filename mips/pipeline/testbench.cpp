@@ -539,6 +539,131 @@ BEGIN(24)
     }
 END(24, "sra")
 
+BEGIN(25)
+    int n = 500;
+
+    dev.imem.clear();
+    vector<u32> arr;
+    for (int i = 0; i < n; i++) {
+        u32 v = int(randi() << 16) >> 16;
+        int k = randi() % 32;
+        dev.imem.push_back(ITYPE(ADDI, $0, $v0, v));
+        dev.imem.push_back(RTYPE(SRL, 0, $v0, $v0, k));
+        arr.push_back(v >> k);
+    }
+    dev.imem.resize(2 * n + 32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(3);
+    for (int i = 0; i < n; i++) {
+        dev.run(2);
+        // printf("%d <-> %d\n", dev[$v0], arr[i]);
+        assert(dev[$v0] == arr[i]);
+    }
+END(25, "srl")
+
+BEGIN(26)
+    dev.resize_dmem(32);
+    dev.resize_imem(128);
+
+    vector<int> arr;
+    for (int i = 0; i < 32; i++) {
+        int v = int(randi() << 16) >> 16;
+        dev.imem[i] = ITYPE(ADDI, $0, i, v);
+        arr.push_back(v);
+    }
+    for (int i = 0; i < 32; i++)
+        dev.imem[32 + i] = ITYPE(SW, $0, i, 4 * i);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(66);
+    assert(dev.dmem[0] == 0);  // $0 is hardcoded
+    for (int i = 1; i < 32; i++)
+        assert(dev.dmem[i] == arr[i]);
+END(26, "sw")
+
+BEGIN(27)
+    int n = 128;
+
+    dev.resize_dmem(2 * n);
+    for (int i = 0; i < n; i++)
+        dev.dmem[i] = randi();
+
+    dev.imem.clear();
+    for (int i = 0; i < n; i++) {
+        dev.imem.push_back(ITYPE(LW, $0, $t0, 4 * i));
+        dev.imem.push_back(ITYPE(SW, $0, $t0, 4 * (n + i)));
+    }
+    dev.imem.resize(2 * n + 32);
+
+    dev.reset();
+    dev.run(3 * n + 2);  // due to stalls
+    for (int i = 0; i < n; i++)
+        assert(dev.dmem[i] == dev.dmem[n + i]);
+END(27, "memcpy")
+
+/**
+ * NOTE:
+ * Too aggressive swap heuristics will result in
+ *  poor performance of memcpy2 & memcpy3.
+ * Since pipeline frontend have little knowledge
+ *  about programs. Compilers may have better
+ *  decision in the order of loads & stores.
+ *
+ * baseline:
+ *  * DO NOT swap consecutive `lw` instructions.
+ *  * DO NOT pre-emit non-branch & non-`lw` instructions.
+ */
+
+BEGIN(28)
+    int n = 128;
+
+    dev.resize_dmem(2 * n);
+    for (int i = 0; i < n; i++)
+        dev.dmem[i] = randi();
+
+    dev.imem.clear();
+    for (int i = 0; i < n / 2; i++) {
+        dev.imem.push_back(ITYPE(LW, $0, $t0, 8 * i));
+        dev.imem.push_back(ITYPE(LW, $0, $t1, 8 * i + 4));
+        dev.imem.push_back(ITYPE(SW, $0, $t0, 4 * n + 8 * i));
+        dev.imem.push_back(ITYPE(SW, $0, $t1, 4 * n + 8 * i + 4));
+    }
+    dev.imem.resize(2 * n + 32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(2 * n + 2);
+    for (int i = 0; i < n; i++)
+        assert(dev.dmem[i] == dev.dmem[n + i]);
+END(28, "memcpy2")
+
+BEGIN(29)
+    int n = 128;
+
+    dev.resize_dmem(2 * n);
+    for (int i = 0; i < n; i++)
+        dev.dmem[i] = randi();
+
+    dev.imem.clear();
+    dev.imem.push_back(NOP);
+    for (int i = 0; i < n / 2; i++) {
+        dev.imem.push_back(ITYPE(LW, $0, $t0, 8 * i));
+        dev.imem.push_back(ITYPE(LW, $0, $t1, 8 * i + 4));
+        dev.imem.push_back(ITYPE(SW, $0, $t0, 4 * n + 8 * i));
+        dev.imem.push_back(ITYPE(SW, $0, $t1, 4 * n + 8 * i + 4));
+    }
+    dev.imem.resize(2 * n + 32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(2 * n + 3);
+    for (int i = 0; i < n; i++)
+        assert(dev.dmem[i] == dev.dmem[n + i]);
+END(29, "memcpy3")
+
 
 //
 // MAIN

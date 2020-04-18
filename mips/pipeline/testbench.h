@@ -129,9 +129,12 @@ public:
     }
 
     void iwrite(int addr, u32 data) {
+        if (!dp->clk)
+            return;
+
         _check_addr(addr, imem.size(), "imem/write");
         imem[addr >> 2] = data;
-        _print("    imem[addr] ← %d\n", addr, data);
+        _print("    imem[%d] ← %d\n", addr, data);
     }
 
     u32 dread(int addr) {
@@ -145,9 +148,12 @@ public:
     }
 
     void dwrite(int addr, u32 data) {
+        if (!dp->clk)
+            return;
+
         _check_addr(addr, dmem.size(), "dmem/write");
         dmem[addr >> 2] = data;
-        _print("    dmem[addr] ← %d\n", addr, data);
+        _print("    dmem[%d] ← %d\n", addr, data);
     }
 
     void enable_print(bool en = true) {
@@ -165,6 +171,10 @@ public:
         _print(
             "  > can_swap = %d\n",
             dp->Datapath__DOT__frontend__DOT__select__DOT__can_swap
+        );
+        _print(
+            "  > allow_swap = %d\n",
+            dp->Datapath__DOT__frontend__DOT__select__DOT__allow_swap
         );
         _print(
             "  > buf: \"%s\" [pc = %d]\n",

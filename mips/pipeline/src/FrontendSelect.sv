@@ -48,13 +48,16 @@ module FrontendSelect(
     assign {pc, instr} = emit;
     assign {pred_pc, pred_instr} = pred;
 
+    logic allow_swap;  // avoid too aggressive heuristics
+    assign allow_swap = C_type[`BRANCH] || (C_instr[`LW] && !B_instr[`LW]);
+
     always_comb begin
         if (B_type[`BRANCH]) begin
             emit = B;
             pred = B;
             result = `INSERT_NOP;
             req = 0;
-        end else if (can_swap & C_type[`BRANCH]) begin
+        end else if (can_swap && C_type[`BRANCH]) begin
             emit = C;
             pred = C;
             result = `POP_DATA;
@@ -64,7 +67,7 @@ module FrontendSelect(
             pred = C;
             result = `POP_DATA;
             req = 1;
-        end else if (can_swap & data != 0) begin
+        end else if (can_swap && allow_swap) begin
             emit = C;
             pred = C;
             result = `POP_DATA;
