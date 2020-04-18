@@ -72,18 +72,19 @@ public:
     void tick() {
         dp->clk ^= 1;
         dp->eval();
-
         _print(
             "# clk ← %d [stall = %d]\n",
             dp->clk,
             dp->Datapath__DOT__stall
         );
 
-        if (dp->clk)
+        if (dp->clk) {
+            checkout_register();
             _print(
                 "  > new: \"%s\" [pc = %d]\n",
                 translate(instr0()).c_str(), pc0()
             );
+        }
 
         load_memory();
         dp->eval();
@@ -92,7 +93,7 @@ public:
     void checkout_register() {
         for (int i = 0; i < 32; i++)
         if (_dp_cpy[i] != _dp_v[i])
-            _print("    R[%s]: %u → %u\n", r[i], _dp_cpy[i], _dp_v[i]);
+            _print("    R[%s]: %d → %d\n", r[i], _dp_cpy[i], _dp_v[i]);
         memcpy(_dp_cpy, _dp_v, sizeof(_dp_cpy));
     }
 
@@ -103,7 +104,6 @@ public:
                 tick();
 
             print_forwarding();
-            checkout_register();
             print_frontend();
             _print("\n");
         }
@@ -131,20 +131,23 @@ public:
     void iwrite(int addr, u32 data) {
         _check_addr(addr, imem.size(), "imem/write");
         imem[addr >> 2] = data;
-        _print("    imem[addr] ← %u\n", addr, data);
+        _print("    imem[addr] ← %d\n", addr, data);
     }
 
     u32 dread(int addr) {
+        if (addr > 4 * (dmem.size() - 1))
+            return 0xcccccccc;
+
         _check_addr(addr, dmem.size(), "dmem/read");
         u32 data = dmem[addr >> 2];
-        _print("    %u @dmem[%d]\n", data, addr);
+        _print("    %d @dmem[%d]\n", data, addr);
         return data;
     }
 
     void dwrite(int addr, u32 data) {
         _check_addr(addr, dmem.size(), "dmem/write");
         dmem[addr >> 2] = data;
-        _print("    dmem[addr] ← %u\n", addr, data);
+        _print("    dmem[addr] ← %d\n", addr, data);
     }
 
     void enable_print(bool en = true) {

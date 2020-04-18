@@ -16,6 +16,7 @@ module ALU(
             4'b1000: out = v1 & v2;
             4'b1001: out = v1 | v2;
             4'b1010: out = v1 ^ v2;
+            4'b1011: out = ~(v1 | v2);
             4'b0110: out = {31'b0, v1 < v2};  // slt
 
             4'b1111: out = v2;

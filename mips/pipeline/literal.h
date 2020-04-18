@@ -79,7 +79,7 @@ const char *r[] = {
 #define _slot(data, hi, lo) (((data) & _mask((hi) - (lo) + 1)) << (lo))
 #define _take(data, hi, lo) (((data) >> (lo)) & _mask((hi) - (lo) + 1))
 
-#define RTYPE(rs, rt, rd, sht, funct) ( \
+#define RTYPE(funct, rs, rt, rd, sht) ( \
     _slot(rs, 25, 21) | _slot(rt, 20, 16) | \
     _slot(rd, 15, 11) | _slot(sht, 10, 6) | \
     _slot(funct, 5, 0))
