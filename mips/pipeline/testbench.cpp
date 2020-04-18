@@ -305,6 +305,37 @@ BEGIN(14)
     }
 END(14, "nor")
 
+BEGIN(15)
+    int n = 128;
+
+    dev.dmem.clear();
+    dev.imem.clear();
+    for (int i = 0; i < n; i++) {
+        dev.dmem.push_back(randi());
+        dev.dmem.push_back(randi());
+    }
+    for (int i = 0; i < n; i++) {
+        dev.imem.push_back(ITYPE(LW, $0, $t0, 8 * i));
+        dev.imem.push_back(ITYPE(LW, $0, $t1, 8 * i + 4));
+        dev.imem.push_back(RTYPE(SLT, $t0, $t1, $v0, 0));
+    }
+    dev.imem.resize(3 * n + 16);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(3);
+    for (int i = 0; i < n; i++) {
+        int a = dev.dmem[2 * i];
+        int b = dev.dmem[2 * i + 1];
+
+        dev.run(2);
+        assert(dev[$t0] == a);
+        assert(dev[$t1] == b);
+        dev.run(2);
+        assert(dev[$v0] == (a < b));
+    }
+END(15, "slt")
+
 
 //
 // MAIN
@@ -332,6 +363,7 @@ handler_t *Signal(int signum, handler_t *handler) {
 void abort_handler(int) {
     if (current_test)
         fprintf(stderr, "\033[31mERR!\033[0m abort in \"%s\"\n", current_test->name);
+    fflush(stdout);
 }
 
 void exit_handler() {

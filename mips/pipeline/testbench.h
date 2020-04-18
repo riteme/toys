@@ -73,9 +73,9 @@ public:
         dp->clk ^= 1;
         dp->eval();
         _print(
-            "# clk ← %d [stall = %d]\n",
+            "# clk ← %d %s\n",
             dp->clk,
-            dp->Datapath__DOT__stall
+            dp->Datapath__DOT__stall ? "[stalled]" : ""
         );
 
         if (dp->clk) {
@@ -138,7 +138,7 @@ public:
         if (addr > 4 * (dmem.size() - 1))
             return 0xcccccccc;
 
-        _check_addr(addr, dmem.size(), "dmem/read");
+        // _check_addr(addr, dmem.size(), "dmem/read");
         u32 data = dmem[addr >> 2];
         _print("    %d @dmem[%d]\n", data, addr);
         return data;

@@ -19,9 +19,12 @@ $(VDATAPATH_LIB): build/VDatapath.mk
 build/VDatapath.mk: src/*.sv src/*.vh
 	verilator -Wall -cc -Mdir build -I./src src/Datapath.sv
 
-.PHONY: clean verilator
+.PHONY: clean impl test
 clean:
 	rm build -rf
 	rm a.out -f
 
-verilator: build/VDatapath.mk
+impl: build/VDatapath.mk
+
+test: a.out
+	./a.out
