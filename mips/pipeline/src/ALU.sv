@@ -7,9 +7,9 @@ module ALU(
     always_comb begin
         case (op)
             4'b0000: out = v2 << v1;
-            4'b0001: out = v2 <<< v1;
+            // 4'b0001: out = v2 <<< v1;
             4'b0010: out = v2 >> v1;
-            4'b0011: out = v2 >>> v1;
+            4'b0011: out = $signed(v2) >>> v1;
 
             4'b1100: out = v1 + v2;
             4'b1110: out = v1 - v2;

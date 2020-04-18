@@ -166,7 +166,7 @@ BEGIN(9)
 END(9, "jal in buf")
 
 BEGIN(10)
-    int n = 128;
+    int n = 500;
 
     dev.dmem.clear();
     dev.imem.clear();
@@ -194,7 +194,7 @@ BEGIN(10)
 END(10, "add")
 
 BEGIN(11)
-    int n = 128;
+    int n = 500;
 
     dev.dmem.clear();
     dev.imem.clear();
@@ -221,8 +221,37 @@ BEGIN(11)
     }
 END(11, "sub")
 
+BEGIN(18)
+    int n = 32;
+
+    dev.dmem.clear();
+    dev.imem.clear();
+    for (int i = 0; i < n; i++)
+        dev.dmem.push_back(randi());
+    dev.imem.push_back(ITYPE(ADDI, $0, $v0, -1));
+    for (int i = 0; i < n; i++) {
+        dev.imem.push_back(ITYPE(LW, $0, $v1, 4 * i));
+        dev.imem.push_back(RTYPE(AND, $v0, $v1, $v0, 0));
+    }
+    dev.imem.resize(2 * n + 32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(4);
+
+    u32 sum = -1;
+    for (int i = 0; i < n; i++) {
+        dev.run(2);
+        assert(dev[$v1] == dev.dmem[i]);
+
+        dev.run(1);
+        sum &= dev.dmem[i];
+        assert(dev[$v0] == sum);
+    }
+END(18, "and")
+
 BEGIN(12)
-    int n = 16;
+    int n = 32;
 
     dev.dmem.clear();
     dev.imem.clear();
@@ -250,7 +279,7 @@ BEGIN(12)
 END(12, "or")
 
 BEGIN(13)
-    int n = 128;
+    int n = 500;
 
     dev.dmem.clear();
     dev.imem.clear();
@@ -278,7 +307,7 @@ BEGIN(13)
 END(13, "xor")
 
 BEGIN(14)
-    int n = 128;
+    int n = 500;
 
     dev.dmem.clear();
     dev.imem.clear();
@@ -306,7 +335,7 @@ BEGIN(14)
 END(14, "nor")
 
 BEGIN(15)
-    int n = 128;
+    int n = 500;
 
     dev.dmem.clear();
     dev.imem.clear();
@@ -335,6 +364,180 @@ BEGIN(15)
         assert(dev[$v0] == (a < b));
     }
 END(15, "slt")
+
+BEGIN(16)
+    dev.resize_dmem(32);
+    dev.resize_imem(64);
+    for (int i = 0; i < 32; i++) {
+        dev.dmem[i] = randi();
+        dev.imem[i] = ITYPE(LW, $0, i, 4 * i);
+    }
+
+    dev.reset();
+    dev.run(35);
+    assert(dev[0] == 0);
+    for (int i = 1; i < 32; i++)
+        assert(dev[i] == dev.dmem[i]);
+END(16, "write to registers")
+
+BEGIN(17)
+    int n = 500;
+    dev.resize_imem(n + 16);
+
+    int sum = 0;
+    vector<int> arr;
+    for (int i = 0; i < n; i++) {
+        int rv = int(randi() << 16) >> 16;  // note: sign extension
+        dev.imem[i] = ITYPE(ADDI, $v0, $v0, rv);
+        sum += rv;
+        arr.push_back(sum);
+    }
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(3);
+    for (int i = 0; i < n; i++) {
+        dev.run(1);
+        assert(dev[$v0] == arr[i]);
+    }
+END(17, "addi")
+
+BEGIN(19)
+    int n = 32;
+    dev.resize_imem(n + 32);
+
+    u32 sum = -1;
+    vector<u32> arr;
+    dev.imem[0] = ITYPE(ADDI, $0, $v0, -1);
+    for (int i = 0; i < n; i++) {
+        int rv = randi() & 0xffff;
+        dev.imem[i + 1] = ITYPE(ANDI, $v0, $v0, rv);
+        sum &= rv;
+        arr.push_back(sum);
+    }
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(4);
+    for (int i = 0; i < n; i++) {
+        dev.run(1);
+        assert(dev[$v0] == arr[i]);
+    }
+END(19, "andi")
+
+BEGIN(20)
+    int n = 32;
+    dev.resize_imem(n + 32);
+
+    u32 sum = 0;
+    vector<u32> arr;
+    for (int i = 0; i < n; i++) {
+        int rv = randi() & 0xffff;
+        dev.imem[i] = ITYPE(ORI, $v0, $v0, rv);
+        sum |= rv;
+        arr.push_back(sum);
+    }
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(3);
+    for (int i = 0; i < n; i++) {
+        dev.run(1);
+        assert(dev[$v0] == arr[i]);
+    }
+END(20, "ori")
+
+BEGIN(21)
+    int n = 500;
+    dev.resize_imem(n + 16);
+
+    int sum = 0;
+    vector<int> arr;
+    for (int i = 0; i < n; i++) {
+        int rv = randi() & 0xffff;
+        dev.imem[i] = ITYPE(XORI, $v0, $v0, rv);
+        sum ^= rv;
+        arr.push_back(sum);
+    }
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(3);
+    for (int i = 0; i < n; i++) {
+        dev.run(1);
+        assert(dev[$v0] == arr[i]);
+    }
+END(21, "xori")
+
+BEGIN(22)
+    int n = 500;
+    dev.imem.clear();
+
+    vector<int> arr;
+    for (int i = 0; i < n; i++) {
+        int a = int(randi() << 16) >> 16;
+        int b = int(randi() << 16) >> 16;
+        dev.imem.push_back(ITYPE(ADDI, $0, $t0, a));
+        dev.imem.push_back(ITYPE(SLTI, $t0, $v0, b));
+        arr.push_back(a < b);
+    }
+    dev.imem.resize(2 * n + 32);
+
+    dev.reset();
+    dev.run(3);
+    for (int i = 0; i < n; i++) {
+        dev.run(2);
+        assert(dev[$v0] == arr[i]);
+    }
+END(22, "slti")
+
+BEGIN(23)
+    int n = 500;
+
+    dev.imem.clear();
+    vector<u32> arr;
+    for (int i = 0; i < n; i++) {
+        u32 v = randi() & 0xffff;
+        int k = randi() % 32;
+        dev.imem.push_back(ITYPE(ORI, $0, $v0, v));
+        dev.imem.push_back(RTYPE(SLL, 0, $v0, $v0, k));
+        arr.push_back(v << k);
+    }
+    dev.imem.resize(2 * n + 32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(3);
+    for (int i = 0; i < n; i++) {
+        dev.run(2);
+        // printf("%d <-> %d\n", dev[$v0], arr[i]);
+        assert(dev[$v0] == arr[i]);
+    }
+END(23, "sll")
+
+BEGIN(24)
+    int n = 500;
+
+    dev.imem.clear();
+    vector<int> arr;
+    for (int i = 0; i < n; i++) {
+        int v = int(randi() << 16) >> 16;
+        int k = randi() % 32;
+        dev.imem.push_back(ITYPE(ADDI, $0, $v0, v));
+        dev.imem.push_back(RTYPE(SRA, 0, $v0, $v0, k));
+        arr.push_back(v >> k);
+    }
+    dev.imem.resize(2 * n + 32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(3);
+    for (int i = 0; i < n; i++) {
+        dev.run(2);
+        // printf("%d <-> %d\n", dev[$v0], arr[i]);
+        assert(dev[$v0] == arr[i]);
+    }
+END(24, "sra")
 
 
 //

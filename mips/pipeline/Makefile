@@ -5,12 +5,12 @@ CXX = g++
 CXXFLAGS = -g -std=c++17 -I /usr/share/verilator/include -I /usr/share/verilator/include/vltstd -I ./build
 
 a.out: $(LIBS)
-	$(CXX) $(CXXFLAGS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LIBS) -o a.out
 
 build/verilated.o: $(VERILATED_SRC)
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-build/testbench.o: testbench.cpp testbench.h literal.h build/VDatapath.mk
+build/testbench.o: testbench.cpp testbench.h utils.h build/VDatapath.mk
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
 $(VDATAPATH_LIB): build/VDatapath.mk
