@@ -1,16 +1,17 @@
 VDATAPATH_LIB = build/VDatapath__ALL.a
 VERILATED_SRC = /usr/share/verilator/include/verilated.cpp
 LIBS = build/testbench.o build/verilated.o $(VDATAPATH_LIB)
-CXXFLAGS = -g -std=c++17 -I /usr/share/verilator/include -I ./build
+CXX = g++
+CXXFLAGS = -g -std=c++17 -I /usr/share/verilator/include -I /usr/share/verilator/include/vltstd -I ./build
 
 a.out: $(LIBS)
-	g++ $(CXXFLAGS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LIBS)
 
 build/verilated.o: $(VERILATED_SRC)
-	g++ $(CXXFLAGS) $< -c -o $@
+	$(CXX) $(CXXFLAGS) $< -c -o $@
 
 build/testbench.o: testbench.cpp testbench.h literal.h build/VDatapath.mk
-	g++ $(CXXFLAGS) $< -c -o $@
+	$(CXX) $(CXXFLAGS) $< -c -o $@
 
 $(VDATAPATH_LIB): build/VDatapath.mk
 	cd build; make -f VDatapath.mk

@@ -21,9 +21,9 @@ module RWMask(
     assign read_rs = type_tb[`RTYPE] | type_tb[`IRTYPE] |
         instr_tb[`SW] | instr_tb[`LW] |
         instr_tb[`BEQ] | instr_tb[`BNE];
-    assign read_rt = type_tb[`RTYPE] | instr_tb[`LW] |
+    assign read_rt = type_tb[`RTYPE] | instr_tb[`SW] |
         instr_tb[`BEQ] | instr_tb[`BNE];
-    assign write_rt = instr_tb[`SW] | type_tb[`IRTYPE];
+    assign write_rt = instr_tb[`LW] | type_tb[`IRTYPE];
     assign write_rd = type_tb[`RTYPE];
     assign write_ra = instr_tb[`JAL];
 

@@ -1,3 +1,5 @@
+// #define NDEBUG
+
 #include <algorithm>
 
 #include "verilated.h"
@@ -17,7 +19,9 @@ ITest *current_test = nullptr;
 using namespace std;
 
 BEGIN(1)
-
+    assert(dev.pc0() == 0);
+    for (int i = 0; i < 32; i++)
+        assert(dev[i] == 0);
 END(1, "empty")
 
 BEGIN(2)
@@ -84,6 +88,40 @@ BEGIN(3)
         // printf("can_swap: %d\n", dev.dp->Datapath__DOT__frontend__DOT__select__DOT__can_swap);
     }
 END(3, "normal fetch")
+
+BEGIN(6)
+    dev.resize_imem(32);
+    dev.resize_dmem(32);
+
+    for (int i = 0; i < 8; i++)
+        dev.dmem[i] = i + 1;
+    for (int i = 0; i < 8; i++)
+        dev.imem[i] = ITYPE(LW, $0, $t0 + i, i * 4);
+
+    // dev.enable_print();
+    dev.reset();
+
+    dev.run(11);
+    for (int i = 0; i < 8; i++)
+        assert(dev[$t0 + i] == i + 1);
+END(6, "lw sequence")
+
+BEGIN(7)
+    dev.resize_imem(32);
+    dev.resize_dmem(32);
+
+    for (int i = 0; i < 16; i++)
+        dev.dmem[i] = i * 4;
+    for (int i = 0; i < 8; i++)
+        dev.imem[i] = ITYPE(LW, $t0 + i, $t0 + i + 1, 4);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(18);
+
+    for (int i = 0; i < 9; i++)
+        assert(dev[$t0 + i] == dev.dmem[i]);
+END(7, "lw sequence 2")
 
 
 //

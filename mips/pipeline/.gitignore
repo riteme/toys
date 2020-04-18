@@ -1,5 +1,6 @@
 obj_dir/
 build/
+assets/
 *.hex
 *.rev
 *.txt

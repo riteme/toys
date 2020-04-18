@@ -6,9 +6,10 @@ module HazardController(
     output logic stall, v1_mux, v2_mux,
     output logic [31:0] v1_fw, v2_fw
 );
-    assign stall = E_is_load & (E_rd == rs | E_rd == rt);
-    assign v1_mux = &rs & (rs == E_rd | rs == M_rd);
-    assign v2_mux = &rt & (rt == E_rd | rt == M_rd);
+    assign stall = E_is_load && E_rd != 0 &&
+        (E_rd == rs | E_rd == rt);
+    assign v1_mux = rs != 0 && (rs == E_rd || rs == M_rd);
+    assign v2_mux = rt != 0 && (rt == E_rd || rt == M_rd);
     assign v1_fw = rs == E_rd ? E_out : M_out;
     assign v2_fw = rt == E_rd ? E_out : M_out;
 endmodule

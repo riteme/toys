@@ -1,7 +1,7 @@
 `include "Common.vh"
 
 module FrontendSelect(
-    input logic [31:0] cpc, data, bf, bpc,
+    input logic [31:0] cpc, data, bpc, bf,
     output logic req,
     output logic [1:0] result,
     output logic [31:0] pc, instr, pred_pc, pred_instr

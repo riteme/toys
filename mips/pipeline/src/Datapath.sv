@@ -24,7 +24,7 @@ module Datapath(
 
     logic [31:0] v1, v2;  // controlled by HazardController
     logic [31:0] v1_reg, v2_reg;
-    RegisterFile register(
+    RegisterFile regfile(
         .clk(clk), .reset(reset),
         .r1(D_r1), .r2(D_r2), .r3(M_r3),
         .data(M_out), .v1(v1_reg), .v2(v2_reg)
