@@ -608,11 +608,11 @@ END(27, "memcpy")
  * NOTE:
  * Too aggressive swap heuristics will result in
  *  poor performance of memcpy2 & memcpy3.
- * Since pipeline frontend have little knowledge
- *  about programs. Compilers may have better
+ * Since pipeline frontend has little knowledge
+ *  about programs. Compilers may make better
  *  decision in the order of loads & stores.
  *
- * baseline:
+ * principles:
  *  * DO NOT swap consecutive `lw` instructions.
  *  * DO NOT pre-emit non-branch & non-`lw` instructions.
  */
@@ -707,6 +707,49 @@ BEGIN(31)
         assert(dev[$v0] == (0 < v ? 666 : 233));
     }
 END(31, "bne in buf")
+
+BEGIN(32)
+    dev.imem = {
+        ITYPE(ADDI, $0, $t0, 12),
+        RTYPE(JR, $t0, 0, 0, 0),
+        ITYPE(ADDI, $0, $v0, 233),
+        ITYPE(ADDI, $0, $v1, 666),
+        ITYPE(ADDI, $0, $a0, 10086)
+    };
+    dev.imem.resize(32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(8);
+    assert(dev[$t0] == 12);
+    assert(dev[$v0] == 0);
+    assert(dev[$v1] == 666);
+    assert(dev[$a0] == 10086);
+END(32, "jr in buf")
+
+BEGIN(33)
+    int n = 500;
+
+    dev.resize_dmem(2 * n);
+    for (int i = 0; i < n; i++)
+        dev.dmem[i] = randi();
+    dev.imem.clear();
+    vector<u32> arr;
+    for (int i = 0; i < n; i++) {
+        u32 v = randi() & 0xffff;
+        arr.push_back(v);
+        dev.append(ITYPE(LW, $0, $v0, 4 * i));
+        dev.append(ITYPE(ORI, $0, $v0, v));
+        dev.append(ITYPE(SW, $0, $v0, 4 * (n + i)));
+    }
+    dev.imem.resize(3 * n + 32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(3 * n + 2);
+    for (int i = 0; i < n; i++)
+        assert(arr[i] == dev.dmem[n + i]);
+END(33, "forwarding priority")
 
 /**
  * TODO:

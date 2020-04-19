@@ -77,6 +77,7 @@ module Datapath(
     logic [31:0] v1_fw, v2_fw;
     HazardController hazard(
         .E_is_load(E_is_load),
+        .D_opcode(instr0[31:26]),
         .rs(D_r1), .rt(D_r2),
         .E_rd(rd1), .M_rd(rd2),
         .E_out(E_out), .M_out(M_out),

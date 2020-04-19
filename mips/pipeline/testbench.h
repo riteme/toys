@@ -162,6 +162,10 @@ public:
         _print("    dmem[%d] ← %d\n", addr, data);
     }
 
+    void append(u32 instr) {
+        imem.push_back(instr);
+    }
+
     void enable_print(bool en = true) {
         _enable_print = en;
     }
@@ -203,7 +207,7 @@ public:
             dp->Datapath__DOT__frontend__DOT__select__DOT__pred >> 32
         );
         _print("  > result = %d\n", dp->Datapath__DOT__frontend__DOT__result);
-        _print("  > prev = %s\n", translate(dp->Datapath__DOT__instr0).c_str());
+        // _print("  > prev = %s\n", translate(dp->Datapath__DOT__instr0).c_str());
         _print("  > miss = %d\n", dp->Datapath__DOT__frontend__DOT__miss);
         // _print("  > pred pc = %d\n", dp->Datapath__DOT__frontend__DOT__select__DOT__pred);
     }
