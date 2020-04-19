@@ -155,9 +155,9 @@ inline auto translate_itype(u32 instr) -> string {
         case SLTI:
             return _format("%s %s, %s, %u", "slti", rt, rs, imm);
         case BEQ:
-            return _format("%s %s, %s, %u", "beq", rt, rs, imm);
+            return _format("%s %s, %s, %u", "beq", rs, rt, imm);
         case BNE:
-            return _format("%s %s, %s, %u", "bne", rt, rs, imm);
+            return _format("%s %s, %s, %u", "bne", rs, rt, imm);
         default:
             return "(unknown)";
     }

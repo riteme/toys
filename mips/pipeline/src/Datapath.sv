@@ -16,7 +16,7 @@ module Datapath(
 
     logic [31:0] F_pc, F_instr;
     Frontend frontend(
-        .clk(clk & ~stall), .reset(reset), .eq(D_eq),
+        .clk(clk), .stall(stall), .reset(reset), .eq(D_eq),
         .data(imem_out), .prev(instr0), .prev_pc(pc0),
         .vs(D_vs), .iaddr(iaddr),
         .pc(F_pc), .instr(F_instr)

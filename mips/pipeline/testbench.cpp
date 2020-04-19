@@ -664,6 +664,60 @@ BEGIN(29)
         assert(dev.dmem[i] == dev.dmem[n + i]);
 END(29, "memcpy3")
 
+BEGIN(30)
+    for (int _ = 0; _ < 500; _++) {
+        int v = int(randi() << 16) >> 16;
+
+        dev.imem = {
+            ITYPE(SLTI, $0, $t0, v),
+            ITYPE(BEQ, $0, $t0, 2),
+            ITYPE(ADDI, $0, $v0, 233),
+            JTYPE(JMP, 5),
+            ITYPE(ADDI, $0, $v0, 666),
+            NOP
+        };
+        dev.imem.resize(32);
+
+        // dev.enable_print();
+        dev.reset();
+        dev.run(0 < v ? 8 : 6);
+        assert(dev[$t0] == (0 < v));
+        assert(dev[$v0] == (0 < v ? 233 : 666));
+    }
+END(30, "beq in buf")
+
+BEGIN(31)
+    for (int _ = 0; _ < 500; _++) {
+        int v = int(randi() << 16) >> 16;
+
+        dev.imem = {
+            ITYPE(SLTI, $0, $t0, v),
+            ITYPE(BNE, $0, $t0, 2),
+            ITYPE(ADDI, $0, $v0, 233),
+            JTYPE(JMP, 5),
+            ITYPE(ADDI, $0, $v0, 666),
+            NOP
+        };
+        dev.imem.resize(32);
+
+        // dev.enable_print();
+        dev.reset();
+        dev.run(0 < v ? 6 : 8);
+        assert(dev[$t0] == (0 < v));
+        assert(dev[$v0] == (0 < v ? 666 : 233));
+    }
+END(31, "bne in buf")
+
+/**
+ * TODO:
+ *  * beq, bne, jr in buf
+ *  * data forwarding
+ *  * j, jal, beq, bne, jr, lw pre-emit
+ *  * consecutive jump/branch
+ *  * for loop
+ *  * function call, factorial
+ */
+
 
 //
 // MAIN

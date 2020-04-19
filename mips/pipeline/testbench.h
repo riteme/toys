@@ -72,17 +72,23 @@ public:
     void tick() {
         dp->clk ^= 1;
         dp->eval();
-        _print(
-            "# clk ← %d %s\n",
-            dp->clk,
-            dp->Datapath__DOT__stall ? "[stalled]" : ""
-        );
 
         if (dp->clk) {
+            _print(
+                "# clk ← %d %s\n",
+                dp->clk,
+                dp->Datapath__DOT__stall ? "[stalled]" : ""
+            );
+
             checkout_register();
             _print(
                 "  > new: \"%s\" [pc = %d]\n",
                 translate(instr0()).c_str(), pc0()
+            );
+        } else {
+            _print(
+                "# clk ← %d [ok = %d]\n",
+                dp->clk, dp->Datapath__DOT__frontend__DOT__ok
             );
         }
 
@@ -197,6 +203,7 @@ public:
             dp->Datapath__DOT__frontend__DOT__select__DOT__pred >> 32
         );
         _print("  > result = %d\n", dp->Datapath__DOT__frontend__DOT__result);
+        _print("  > prev = %s\n", translate(dp->Datapath__DOT__instr0).c_str());
         _print("  > miss = %d\n", dp->Datapath__DOT__frontend__DOT__miss);
         // _print("  > pred pc = %d\n", dp->Datapath__DOT__frontend__DOT__select__DOT__pred);
     }

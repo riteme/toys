@@ -1,7 +1,7 @@
 `include "Common.vh"
 
 module Frontend(
-    input logic clk, reset, eq,
+    input logic clk, stall, reset, eq,
     input logic [31:0] data, prev, prev_pc, vs,
     output logic [31:0] iaddr, pc, instr
 );
@@ -44,21 +44,23 @@ module Frontend(
         if (reset) begin
             {cpc, bf, bpc, ok} <= 0;
             // first_time <= 1;
-        end else if (clk) begin
-            ok <= normal;
-            cpc <= next_pc;
-            // cpc <= first_time ? 0 : next_pc;
-            // first_time <= 0;
-            if (result[1]) begin  // insert `nop`
-                bf <= 0;
-            end else if (result[0]) begin  // normal propagation
+        end else if (!stall) begin
+            if (clk) begin
+                ok <= normal;
+                cpc <= next_pc;
+                // cpc <= first_time ? 0 : next_pc;
+                // first_time <= 0;
+                if (result[1]) begin  // insert `nop`
+                    bf <= 0;
+                end else if (result[0]) begin  // normal propagation
+                    bf <= data;
+                    bpc <= cpc;
+                end
+            end else if (!ok) begin
                 bf <= data;
                 bpc <= cpc;
+                cpc <= cpc + 4;
             end
-        end else if (!ok) begin
-            bf <= data;
-            bpc <= cpc;
-            cpc <= cpc + 4;
         end
     end
 endmodule

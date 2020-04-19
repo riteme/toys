@@ -13,6 +13,8 @@ module FrontendLogic(
         6'b000000: if (funct == 6'b001000) begin  // jr, always retake
             miss = 1;
             rpc = vs;
+        end else begin
+            miss = 0;
         end
         6'b000100: if (!eq) begin  // beq
             miss = 1;
