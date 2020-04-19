@@ -45,7 +45,7 @@ module InstructionTraits(
     assign type_tb[`RTYPE] = is_rtype;
     assign type_tb[`IRTYPE] = is_irtype;
     // assign type_tb[`ITYPE] = is_itype;
-    // assign type_tb[`JTYPE] = is_jtype;
+    assign type_tb[`JTYPE] = is_jtype;
     assign type_tb[`BRANCH] = is_jtype |
         instr_tb[`BEQ] | instr_tb[`BNE] | instr_tb[`JR];
 endmodule

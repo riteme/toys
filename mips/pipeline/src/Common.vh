@@ -2,13 +2,13 @@
 `define __COMMON_VH__
 
 /* InstructionTraits */
-`define MAX_TYPE_ID 2
+`define MAX_TYPE_ID 3
 
 `define RTYPE   0
 `define IRTYPE  1
 // `define ITYPE   1
-// `define JTYPE   2
-`define BRANCH  2
+`define JTYPE   2
+`define BRANCH  3
 
 `define MAX_INSTR_ID 21
 

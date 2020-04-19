@@ -798,15 +798,259 @@ BEGIN(35)
     assert(dev[$ra] == 12);
 END(35, "swap jal")
 
+BEGIN(36)
+    dev.imem = {
+        NOP,
+        ITYPE(ADDI, $0, $t0, 1),
+        JTYPE(JAL, 4),
+        ITYPE(ADDI, $0, $t1, 2),
+        ITYPE(ADDI, $0, $t2, 3),
+        RTYPE(JR, $ra, 0, 0, 0),
+    };
+    dev.imem.resize(32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(2);
+    assert(dev.pc0() == 8);
+    assert(dev.instr0() == JTYPE(JAL, 4));
+    dev.run(1);
+    assert(dev.pc0() == 4);
+    assert(dev.instr0() == ITYPE(ADDI, $0, $t0, 1));
+    dev.run(1);
+    assert(dev.pc0() == 20);
+    assert(dev.instr0() == RTYPE(JR, $ra, 0, 0, 0));
+    dev.run(1);
+    assert(dev.pc0() == 16);
+    assert(dev.instr0() == ITYPE(ADDI, $0, $t2, 3));
+    dev.run(1);
+    assert(dev.pc0() == 12);
+    assert(dev.instr0() == ITYPE(ADDI, $0, $t1, 2));
+    dev.run(3);
+    assert(dev[$t0] == 1);
+    assert(dev[$t1] == 2);
+    assert(dev[$t2] == 3);
+    assert(dev[$ra] == 12);
+END(36, "swap jr")
+
+BEGIN(37)
+    dev.imem = {
+        ITYPE(ORI, $0, $t0, 0),
+        ITYPE(ORI, $0, $v0, 123),
+        ITYPE(BEQ, $t0, $0, 2),
+        ITYPE(ORI, $0, $v1, 233),
+        JTYPE(JMP, 6),
+        ITYPE(ORI, $0, $v1, 666),
+        NOP
+    };
+    dev.imem.resize(32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(2);
+    assert(dev.pc0() == 8);
+    assert(dev.instr0() == ITYPE(BEQ, $t0, $0, 2));
+    dev.run(5);
+    assert(dev[$v0] == 123);
+    assert(dev[$v1] == 666);
+
+    dev.imem[0] = ITYPE(ORI, $0, $t0, 1);
+    dev.reset();
+    dev.run(8);
+    assert(dev[$v0] == 123);
+    assert(dev[$v1] == 233);
+    dev.run(8);
+    assert(dev[$v0] == 123);
+    assert(dev[$v1] == 233);
+END(37, "swap beq")
+
+BEGIN(38)
+    dev.imem = {
+        ITYPE(ORI, $0, $t0, 1),
+        ITYPE(ORI, $0, $v0, 123),
+        ITYPE(BNE, $t0, $0, 2),
+        ITYPE(ORI, $0, $v1, 233),
+        JTYPE(JMP, 6),
+        ITYPE(ORI, $0, $v1, 666),
+        NOP
+    };
+    dev.imem.resize(32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(2);
+    assert(dev.pc0() == 8);
+    assert(dev.instr0() == ITYPE(BNE, $t0, $0, 2));
+    dev.run(5);
+    assert(dev[$v0] == 123);
+    assert(dev[$v1] == 666);
+
+    dev.imem[0] = ITYPE(ORI, $0, $t0, 0);
+    dev.reset();
+    dev.run(8);
+    assert(dev[$v0] == 123);
+    assert(dev[$v1] == 233);
+    dev.run(8);
+    assert(dev[$v0] == 123);
+    assert(dev[$v1] == 233);
+END(38, "swap bne")
+
+BEGIN(39)
+    dev.dmem = {666};
+    dev.imem = {
+        NOP,
+        ITYPE(ORI, $0, $v0, 233),
+        ITYPE(LW, $0, $v1, 0),
+        RTYPE(OR, $v1, $0, $t0, 0)
+    };
+    dev.imem.resize(32);
+
+    dev.reset();
+    dev.run(7);
+    assert(dev[$v0] == 233);
+    assert(dev[$v1] == 666);
+    assert(dev[$t0] == 666);
+END(39, "swap lw")
+
+BEGIN(40)
+    dev.imem = {
+        NOP,
+        JTYPE(JMP, 3),
+        JTYPE(JMP, 4),
+        ITYPE(ORI, $0, $t0, 233),
+        ITYPE(ORI, $0, $t1, 666)
+    };
+    dev.imem.resize(32);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(7);
+    assert(dev[$t0] == 233);
+    assert(dev[$t1] == 666);
+END(40, "double jmp")
+
+BEGIN(41)
+    dev.imem = {
+        ITYPE(ORI, $0, $at, 100),
+        ITYPE(ORI, $0, $a0, 1),
+        RTYPE(ADD, $v0, $a0, $v0, 0),
+        RTYPE(SLT, $a0, $at, $t0, 0),
+        ITYPE(ADDI, $a0, $a0, 1),
+        ITYPE(BNE, $t0, $0, -4),
+        NOP
+    };
+    int fin = dev.imem.size() * 4 - 4;
+    dev.imem.resize(64);
+
+    // dev.enable_print();
+    dev.reset();
+    while (dev.pc0() < fin)
+        dev.run();
+    assert(dev[$a0] == 100);
+    dev.run(4);
+    assert(dev[$a0] == 101);
+    assert(dev[$v0] == 5050);
+END(41, "for loop")
+
+BEGIN(42)
+    int T = 1000, n = 2048;
+    dev.resize_dmem(n + 1);
+    dev.imem = {
+        ITYPE(ORI, $0, $t0, 1),  // l
+        ITYPE(ORI, $0, $t1, n + 1),  // r
+        ITYPE(LW, $0, $at, 0),  // K
+        RTYPE(ADD, $t0, $t1, $t2, 0),
+        RTYPE(SRL, 0, $t2, $t2, 1),  // m = (l + r) / 2
+        RTYPE(SLL, 0, $t2, $t3, 2),  // addr = 4 * m
+        ITYPE(LW, $t3, $t4, 0),  // $t4 = arr[m]
+        RTYPE(SLT, $t4, $at, $t5, 0),
+        ITYPE(BNE, $t5, $0, 2),
+        RTYPE(ADD, $0, $t2, $t1, 0),  // $t4 >= $at
+        JTYPE(JMP, 13),
+        RTYPE(ADD, $0, $t2, $t0, 0),  // $t4 < $at
+        ITYPE(ADDI, $t0, $t0, 1),
+        ITYPE(BNE, $t0, $t1, -11)  // if $t0 != $t1 ?
+    };
+    int fin = dev.imem.size() * 4;
+    dev.imem.resize(128);
+
+    // dev.enable_print();
+    while (T--) {
+        for (int i = 0; i <= n; i++)
+            dev.dmem[i] = randi() >> 1;
+        sort(dev.dmem.begin() + 1, dev.dmem.end());
+        int ans = lower_bound(
+            dev.dmem.begin() + 1, dev.dmem.end(), dev.dmem[0]
+        ) - dev.dmem.begin();
+
+        // printf("%u, %u\n", dev.dmem[0], dev.dmem[ans]);
+
+        // printf("ans = %d\n", ans);
+        // for (int i = 0; i <= n; i++)
+        //     printf("%u\n", dev.dmem[i]);
+
+        dev.reset();
+        while (dev.pc0() <= fin)
+            dev.run();
+        dev.run(4);
+        assert(dev[$t0] == ans);
+    }
+END(42, "bisection")
+
+BEGIN(43)
+    dev.resize_dmem(8);
+    dev.imem = {
+        ITYPE(ORI, $0, $sp, 32),
+        JTYPE(JMP, 10),
+        ITYPE(ADDI, $sp, $sp, -4),
+        ITYPE(SW, $sp, $t0, 0),
+        RTYPE(ADD, $a0, $a0, $t0, 0),
+        RTYPE(ADD, $0, $t0, $v0, 0),
+        ITYPE(LW, $sp, $t0, 0),
+        ITYPE(ADDI, $sp, $sp, 4),
+        RTYPE(JR, $ra, 0, 0, 0),
+        ITYPE(ORI, $0, $t0, 233),  // useless
+
+        ITYPE(ORI, $0, $t0, 666),
+        ITYPE(ORI, $0, $a0, 123),
+        JTYPE(JAL, 2),
+        RTYPE(ADD, $0, $v0, $t1, 0)
+    };
+    dev.imem.resize(512);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(50);
+    assert(dev[$ra] == 52);
+    assert(dev[$a0] == 123);
+    assert(dev[$t0] == 666);
+    assert(dev[$t1] == 246);
+    assert(dev.dmem[7] == 666);
+END(43, "function call")
+
 /**
- * TODO:
- *  * beq, bne, jr in buf
- *  * data forwarding
- *  * j, jal, beq, bne, jr, lw pre-emit
- *  * consecutive jump/branch
- *  * for loop
- *  * function call, factorial
+ * NOTE:
+ * Prevent swap lw and jump instructions.
+ * Avoid implicit load stalls.
  */
+
+BEGIN(44)
+    dev.dmem = {233};
+    dev.imem = {
+        NOP,
+        ITYPE(LW, $0, $t0, 0),
+        JTYPE(JMP, 4),
+        ITYPE(ADDI, $0, $t1, 666),
+        RTYPE(ADD, $t0, $t0, $t1, 0)
+    };
+    dev.imem.resize(64);
+
+    // dev.enable_print();
+    dev.reset();
+    dev.run(7);
+    assert(dev[$t0] == 233);
+    assert(dev[$t1] == 466);
+END(44, "jmp after lw")
 
 
 //

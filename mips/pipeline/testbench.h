@@ -187,6 +187,10 @@ public:
             dp->Datapath__DOT__frontend__DOT__select__DOT__allow_swap
         );
         _print(
+            "  > jmp_after_lw = %d\n",
+            dp->Datapath__DOT__frontend__DOT__select__DOT__jmp_after_lw
+        );
+        _print(
             "  > buf: \"%s\" [pc = %d]\n",
             translate(dp->Datapath__DOT__frontend__DOT__bf).c_str(),
             dp->Datapath__DOT__frontend__DOT__bpc

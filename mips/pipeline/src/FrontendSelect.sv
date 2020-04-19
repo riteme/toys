@@ -36,11 +36,6 @@ module FrontendSelect(
         .rmask(C_rmask), .wmask(C_wmask)
     );
 
-    logic can_swap;
-    assign can_swap = ~|(
-        (B_wmask & (C_rmask | C_wmask)) |
-        (C_wmask & (B_rmask | B_wmask)));
-
     logic [63:0] emit, pred;
     logic [63:0] B, C;
     assign B = {bpc, bf};
@@ -48,8 +43,16 @@ module FrontendSelect(
     assign {pc, instr} = emit;
     assign {pred_pc, pred_instr} = pred;
 
+    logic can_swap;
+    assign can_swap = ~|(
+        (B_wmask & (C_rmask | C_wmask)) |
+        (C_wmask & (B_rmask | B_wmask)));
+
     logic allow_swap;  // avoid too aggressive heuristics
-    assign allow_swap = C_type[`BRANCH] || (C_instr[`LW] && !B_instr[`LW]);
+    assign allow_swap = C_instr[`LW] && !B_instr[`LW];
+
+    logic jmp_after_lw;  // prevent swapping lw & jump
+    assign jmp_after_lw = B_instr[`LW] && C_type[`JTYPE];
 
     always_comb begin
         if (B_type[`BRANCH]) begin
@@ -57,7 +60,7 @@ module FrontendSelect(
             pred = B;
             result = `INSERT_NOP;
             req = 0;
-        end else if (can_swap && C_type[`BRANCH]) begin
+        end else if (can_swap && C_type[`BRANCH] && !jmp_after_lw) begin
             emit = C;
             pred = C;
             result = `POP_DATA;
