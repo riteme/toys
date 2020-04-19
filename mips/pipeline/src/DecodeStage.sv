@@ -24,7 +24,7 @@ module DecodeStage(
         .sign_ext(sign_ext),
         .in(instr[15:0]), .out(ext_imm)
     );
-    assign imm = imm_src ? pc : ext_imm;
+    assign imm = imm_src ? pc + 4 : ext_imm;
 
     always_comb begin
         case (reg_dest)

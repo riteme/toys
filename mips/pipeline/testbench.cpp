@@ -161,7 +161,7 @@ BEGIN(9)
     // dev.enable_print();
     dev.reset();
     dev.run(6);
-    assert(dev[$ra] == 4);
+    assert(dev[$ra] == 8);
     assert(dev[$v0] == 666);
 END(9, "jal in buf")
 
@@ -750,6 +750,53 @@ BEGIN(33)
     for (int i = 0; i < n; i++)
         assert(arr[i] == dev.dmem[n + i]);
 END(33, "forwarding priority")
+
+BEGIN(34)
+    dev.imem = {
+        NOP,
+        ITYPE(ADDI, $0, $t0, 1),
+        JTYPE(JMP, 4),
+        ITYPE(ADDI, $0, $t1, 2),
+        ITYPE(ADDI, $0, $t2, 3)
+    };
+    dev.imem.resize(32);
+
+    dev.reset();
+    dev.run(2);
+    assert(dev.pc0() == 8);
+    assert(dev.instr0() == JTYPE(JMP, 4));
+    dev.run(1);
+    assert(dev.pc0() == 4);
+    assert(dev.instr0() == ITYPE(ADDI, $0, $t0, 1));
+    dev.run(4);
+    assert(dev[$t0] == 1);
+    assert(dev[$t1] == 0);
+    assert(dev[$t2] == 3);
+END(34, "swap jmp")
+
+BEGIN(35)
+    dev.imem = {
+        NOP,
+        ITYPE(ADDI, $0, $t0, 1),
+        JTYPE(JAL, 4),
+        ITYPE(ADDI, $0, $t1, 2),
+        ITYPE(ADDI, $0, $t2, 3)
+    };
+    dev.imem.resize(32);
+
+    dev.reset();
+    dev.run(2);
+    assert(dev.pc0() == 8);
+    assert(dev.instr0() == JTYPE(JAL, 4));
+    dev.run(1);
+    assert(dev.pc0() == 4);
+    assert(dev.instr0() == ITYPE(ADDI, $0, $t0, 1));
+    dev.run(4);
+    assert(dev[$t0] == 1);
+    assert(dev[$t1] == 0);
+    assert(dev[$t2] == 3);
+    assert(dev[$ra] == 12);
+END(35, "swap jal")
 
 /**
  * TODO:
