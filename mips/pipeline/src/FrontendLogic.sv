@@ -19,10 +19,14 @@ module FrontendLogic(
         6'b000100: if (!eq) begin  // beq
             miss = 1;
             rpc = prev_pc + 4;
+        end else begin
+            miss = 0;  // `verilator does not affect by this, but vivado does.
         end
         6'b000101: if (eq) begin  // bne
             miss = 1;
             rpc = prev_pc + 4;
+        end else begin
+            miss = 0;  // the same as above
         end
         default: miss = 0;
     endcase

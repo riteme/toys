@@ -179,8 +179,8 @@ public:
 
     void print_frontend() {
         _print(
-            "  > can_swap = %d\n",
-            dp->Datapath__DOT__frontend__DOT__select__DOT__can_swap
+            "  > no_deps = %d\n",
+            dp->Datapath__DOT__frontend__DOT__select__DOT__no_deps
         );
         _print(
             "  > allow_swap = %d\n",

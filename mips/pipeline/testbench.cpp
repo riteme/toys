@@ -1052,6 +1052,52 @@ BEGIN(44)
     assert(dev[$t1] == 466);
 END(44, "jmp after lw")
 
+BEGIN(45)
+    dev.imem = {
+        ITYPE(ORI, $0, $a0, 7),
+        ITYPE(ORI, $0, $v1, 12),
+        ITYPE(ORI, $0, $a1, 233),
+        RTYPE(SLT, $v1, $a0, $a0, 0),
+        ITYPE(BEQ, $0, $a0, 1),
+        ITYPE(ADDI, $0, $a1, 0),
+        NOP
+    };
+    dev.imem.resize(64);
+
+    dev.reset();
+    dev.run(20);
+    assert(dev[$a1] == 233);
+END(45, "beq test")
+
+BEGIN(46)
+    dev.imem = {
+        ITYPE(ORI, $0, $t0, 1),
+        ITYPE(BEQ, $0, $t0, 2),
+        ITYPE(BEQ, $0, $0, 1),
+        ITYPE(ORI, $0, $a0, 233),
+        NOP
+    };
+    dev.imem.resize(128);
+    dev.reset();
+    dev.run(16);
+    assert(dev[$a0] != 233);
+END(46, "double beq")
+
+BEGIN(47)
+    dev.resize_dmem(1);
+    dev.imem = {
+        ITYPE(ORI, $0, $t0, 233),
+        ITYPE(SW, $0, $t0, 0),
+        ITYPE(LW, $0, $t1, 0)
+    };
+    dev.imem.resize(64);
+
+    dev.reset();
+    dev.run(10);
+    assert(dev[$t0] == 233);
+    assert(dev[$t1] == 233);
+END(47, "load after store")
+
 
 //
 // MAIN

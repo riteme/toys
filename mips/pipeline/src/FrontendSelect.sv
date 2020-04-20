@@ -43,13 +43,13 @@ module FrontendSelect(
     assign {pc, instr} = emit;
     assign {pred_pc, pred_instr} = pred;
 
-    logic can_swap;
-    assign can_swap = ~|(
+    logic no_deps;
+    assign no_deps = ~|(
         (B_wmask & (C_rmask | C_wmask)) |
         (C_wmask & (B_rmask | B_wmask)));
 
-    logic allow_swap;  // avoid too aggressive heuristics
-    assign allow_swap = C_instr[`LW] && !B_instr[`LW];
+    logic allow_swap;  // more conservative heuristics. avoid store/load conflicts
+    assign allow_swap = C_instr[`LW] && !(B_instr[`LW] || B_instr[`SW]);
 
     logic jmp_after_lw;  // prevent swapping lw & jump
     assign jmp_after_lw = B_instr[`LW] && C_type[`JTYPE];
@@ -60,7 +60,7 @@ module FrontendSelect(
             pred = B;
             result = `INSERT_NOP;
             req = 0;
-        end else if (can_swap && C_type[`BRANCH] && !jmp_after_lw) begin
+        end else if (no_deps && C_type[`BRANCH] && !jmp_after_lw) begin
             emit = C;
             pred = C;
             result = `POP_DATA;
@@ -70,7 +70,7 @@ module FrontendSelect(
             pred = C;
             result = `POP_DATA;
             req = 1;
-        end else if (can_swap && allow_swap) begin
+        end else if (no_deps && allow_swap) begin
             emit = C;
             pred = C;
             result = `POP_DATA;
