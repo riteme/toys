@@ -158,7 +158,7 @@ lw  $t1, 64($0)
 
 采用 verilator [^verilator][^zipcpu] 和 Vivado [^vivado] 仿真进行测试。verilator 测试的相关代码可以查看 [^repo]。
 
-利用提前发射机制的架构在 Vivado 仿真的 benchtest 中报告的 CPI 为 $1.19324$。删去 `FrontendSelect` 中用于提前发射的逻辑后，benchtest 报告的 CPI 为 $1.20896$。
+利用提前发射机制的架构在 Vivado 仿真的 benchtest 中报告的 CPI 为 $1.189909$。删去 `FrontendSelect` 中关于 `jr`、`beq`、`bne` 和 `lw` 指令提前发射的逻辑后，benchtest 报告的 CPI 为 $1.205157$。
 
 ***
 

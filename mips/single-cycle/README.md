@@ -67,9 +67,10 @@ CPU 原理图总图：
 
 ### 参考资料
 
-[^verilator]: "Verilator", https://www.veripool.org/wiki/verilator.
-[^zipcpu]: "Verilog, Formal Verification and Verilator Beginner's Tutorial", The ZipCPU by Gisselquist Technology, https://zipcpu.com/tutorial/.
-[^ref]: "MIPS32® Instruction Set Quick Reference", https://s3-eu-west-1.amazonaws.com/downloads-mips/documents/MD00565-2B-MIPS32-QRC-01.01.pdf.
-[^tips]: "C to MIPS compiler", http://reliant.colab.duke.edu/c2mips/.
-[^no-delay]: "How to turn off MIPS-GCC automatic instruction reordering?", Stack Overflow, https://stackoverflow.com/questions/4042517/how-to-turn-off-mips-gcc-automatic-instruction-reordering.
-[^dyh]: "杜教筛", OI Wiki, https://oi-wiki.org/math/du/.
+[^verilator]: "Verilator", <https://www.veripool.org/wiki/verilator>.
+[^zipcpu]: "Verilog, Formal Verification and Verilator Beginner's Tutorial", The ZipCPU by Gisselquist Technology, <https://zipcpu.com/tutorial/>.
+
+[^ref]: "MIPS32® Instruction Set Quick Reference", <https://s3-eu-west-1.amazonaws.com/downloads-mips/documents/MD00565-2B-MIPS32-QRC-01.01.pdf>.
+[^tips]: "C to MIPS compiler", <http://reliant.colab.duke.edu/c2mips/>.
+[^no-delay]: "How to turn off MIPS-GCC automatic instruction reordering?", Stack Overflow, <https://stackoverflow.com/questions/4042517/how-to-turn-off-mips-gcc-automatic-instruction-reordering>.
+[^dyh]: "杜教筛", OI Wiki, <https://oi-wiki.org/math/du/>.
