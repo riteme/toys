@@ -27,7 +27,9 @@ module CacheSet #(
      * subsequent writes.
      */
     input logic [1:0] mode,
-    input logic [31:0] addr, data,
+    input logic [TAG_WIDTH - 1:0] target,
+    input logic [LINE_WIDTH - 1:0] index,
+    input logic [31:0] data,
     output logic hit,
     output logic [31:0] out,
 
@@ -40,11 +42,6 @@ module CacheSet #(
     output logic dirty,
     output logic [TAG_WIDTH - 1:0] tag
 );
-    logic [TAG_WIDTH - 1:0] target;
-    logic [SET_WIDTH - 1:0] idx;
-    logic [LINE_WIDTH - 1:0] index;
-    assign {target, idx, index} = addr;
-
     logic [SET_SIZE - 1:0] hits;
     logic [31:0] outs[SET_SIZE];
     logic dirty_array[SET_SIZE];
@@ -99,6 +96,4 @@ module CacheSet #(
         .clk(clk), .reset(reset), .en(en),
         .count(now)
     );
-
-    logic __unused_ok = &{1'b0, idx, 1'b0};
 endmodule

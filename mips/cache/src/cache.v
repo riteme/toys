@@ -49,8 +49,8 @@ module cache #(
 		.SET_WIDTH(SET_WIDTH),
 		.LINE_WIDTH(OFFSET_WIDTH),
 		.SET_SIZE(LINES)
-	) obj(
-		.clk(clk), .reset(reset), .stall(stall),
+	) inst(
+		.clk(clk), .reset(reset), .en(~stall),
 		.ready(input_ready), .write_en(w_en),
 		.hit(hit),
 		.addr(addr), .data(write_data), .out(read_data),

@@ -17,7 +17,8 @@ module LRUStrategy #(
 
     /**
      * heap-style tournament tree.
-     * not used due to UNOPTFLAT.
+     *
+     * deprecated due to UNOPTFLAT.
      */
     // logic [KEY_WIDTH - 1:0] keys[2 * SET_SIZE - 1:1];
     // logic [31:0] vals[2 * SET_SIZE - 1:1];
