@@ -102,15 +102,25 @@ module Cache #(
     assign line_out = out_array[idx];
     assign line_tag = tag_array[idx];
 
-    for (genvar i = 0; i < _NUM_SET; i++) begin
+    logic [31:0] now;
+    Counter #(
+        .START_COUNT(1)
+    ) counter(
+        .clk(clk), .reset(reset), .en(en),
+        .count(now)
+    );
+
+    for (genvar i = 0; i < _NUM_SET; i++)
+    begin: sets
         CacheSet #(
             .TAG_WIDTH(TAG_WIDTH),
             .SET_WIDTH(SET_WIDTH),
             .LINE_WIDTH(LINE_WIDTH),
             .SET_SIZE(SET_SIZE)
-        ) sets(
+        ) inst(
             .clk(clk), .reset(reset),
             .en(enabled & en_ports[i]),
+            .now(now),
 
             .tick_en(tick_en), .mode(mode),
             .target(target), .index(index),

@@ -11,6 +11,7 @@ module CacheSet #(
      * tick_en: reserved for LFU strategy. LRU does not need it.
      */
     input logic clk, reset, en, tick_en,
+    input logic [31:0] now,
 
     /**
      * mode [1:0]:
@@ -52,11 +53,12 @@ module CacheSet #(
     assign {need_write, need_tick} = mode;
     assign is_write = mode == 2'b11;
 
-    for (genvar i = 0; i < SET_SIZE; i++) begin
+    for (genvar i = 0; i < SET_SIZE; i++)
+    begin: lines
         CacheLine #(
             .TAG_WIDTH(TAG_WIDTH),
             .LINE_WIDTH(LINE_WIDTH)
-        ) lines(
+        ) inst(
             .clk(clk), .reset(reset), .en(en),
             .target(target), .index(index),
 
@@ -88,12 +90,4 @@ module CacheSet #(
     );
     assign dirty = dirty_array[select];
     assign tag = tag_array[select];
-
-    logic [31:0] now;
-    Counter #(
-        .START_COUNT(1)
-    ) counter(
-        .clk(clk), .reset(reset), .en(en),
-        .count(now)
-    );
 endmodule
