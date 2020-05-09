@@ -37,6 +37,9 @@ module Cache #(
     output logic [31:0] maddr, mdata,
     input logic [31:0] mout
 );
+    logic enabled;
+    assign enabled = en & ready;
+
     logic [TAG_WIDTH - 1:0] tag;
     logic [SET_WIDTH - 1:0] idx;
     logic [LINE_WIDTH - 1:0] offset;
@@ -68,9 +71,9 @@ module Cache #(
         .SET_WIDTH(SET_WIDTH),
         .LINE_WIDTH(LINE_WIDTH)
     ) cctrl(
-        .clk(clk), .reset(reset), .en(en),
+        .clk(clk), .reset(reset), .en(enabled),
 
-        .ready(ready), .write_en(write_en),
+        .write_en(write_en),
         .tag(tag), .idx(idx), .offset(offset),
         .data(data), .hit(hit), .out(out),
 
@@ -107,7 +110,7 @@ module Cache #(
             .SET_SIZE(SET_SIZE)
         ) sets(
             .clk(clk), .reset(reset),
-            .en(en & en_ports[i]),
+            .en(enabled & en_ports[i]),
 
             .tick_en(tick_en), .mode(mode),
             .target(target), .index(index),
