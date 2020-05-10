@@ -18,10 +18,10 @@ public:
 
     void reset() {
         _now = 0;
-        memset(_tick, 0, sizeof(_tick));
         memset(_dirty, 0, sizeof(_dirty));
         memset(_tag, 0, sizeof(_tag));
         memset(_line, 0, sizeof(_line));
+        memset(_tag, 0, sizeof(_tag));
     }
 
     auto resolve(u32 addr) -> std::tuple<u32, u32, u32> {

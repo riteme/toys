@@ -1,9 +1,14 @@
 `include "cache.vh"
+`include "CacheController.vh"
 
+/**
+ * the controller
+ */
 module CacheController #(
     TAG_WIDTH = `CACHE_T,
     SET_WIDTH = `CACHE_S,
     LINE_WIDTH = `CACHE_B,
+    KEY_WIDTH = $clog2(`CACHE_E),
     _COUNT_MAX = 2**(LINE_WIDTH - 2)
 ) (
     input logic clk, reset, en,
@@ -23,14 +28,17 @@ module CacheController #(
     /**
      * interface with cache set.
      */
-    output logic tick_en,
-    output logic [1:0] mode,
-    output logic [TAG_WIDTH - 1:0] target,
+    output logic by_tag,
+    output logic [TAG_WIDTH - 1:0] target_tag,
+    output logic [KEY_WIDTH - 1:0] target_key,
     output logic [LINE_WIDTH - 1:0] index,
-    output logic [31:0] write_data,
+    output logic [2:0] ctrl,
+    output logic [31:0] write_data, set_tick,
+    output logic [TAG_WIDTH - 1:0] set_tag,
     input logic line_hit, line_dirty,
     input logic [31:0] line_out,
     input logic [TAG_WIDTH - 1:0] line_tag,
+    input logic [KEY_WIDTH - 1:0] line_key,
 
     /**
      * interface with memory.
@@ -40,73 +48,69 @@ module CacheController #(
     input logic [31:0] mout
 );
     logic count_reset;
-    logic [31:0] count;
+    logic [31:0] now, count;
+    Counter #(
+        .START_COUNT(1)
+    ) timer(
+        .clk(clk), .reset(reset), .en(en), .out(now)
+    );
     Counter counter(
-        .clk(clk), .reset(count_reset), .en(1),
-        .count(count)
+        .clk(clk), .reset(count_reset || reset), .en(1),
+        .out(count)
     );
 
-    logic [2:0] state;
-    logic [TAG_WIDTH - 1:0] saved_tag;
+    logic [3:0] state;
     CacheControllerFSM #(
-        .TAG_WIDTH(TAG_WIDTH),
+        .KEY_WIDTH(KEY_WIDTH),
         .COUNT_MAX(_COUNT_MAX)
     ) fsm(
         .clk(clk), .reset(reset), .en(en),
-        .state(state), .saved_tag(saved_tag),
-
-        .count(count),
+        .state(state), .count(count),
         .line_hit(line_hit),
-        .line_dirty(line_dirty),
-        .line_tag(line_tag)
+        .line_dirty(line_dirty)
     );
 
     logic normal;
-    assign normal = state[2];
-    assign tick_en = normal;
-    assign hit = normal & line_hit;
+    assign normal = state[3];
+    assign hit = normal && line_hit;
     assign out = line_out;
+    assign by_tag = normal;
+    assign target_tag = tag;
+    assign target_key = line_key;
+    assign set_tick = now;
+    assign set_tag = tag;
+    assign mdata = line_out;
 
     logic [LINE_WIDTH - 1:0] pos;
     assign pos = count[LINE_WIDTH - 1:0] << 2;
-    assign mdata = line_out;
+    assign index = normal ? offset : pos;
 
     /**
      * dataflow & control signals for each state.
      */
     always_comb begin
-        {mode, mwrite_en, count_reset} = 0;
+        {ctrl, mwrite_en, write_data, count_reset} = 0;
         if (en) begin
-            if (normal)
-                mode = {1'b1, write_en};
-            else
-                mode = state[1:0];
+            case (normal)
+                0: ctrl = {1'b0, state[1:0]};
+                1: ctrl = {2'b10, write_en};
+            endcase
 
             case (state)
-                3'b000:  // req
+                `CHECK:
                     count_reset = 1;
-
-                3'b001: begin  // alloc
-                    target = tag;
+                `ALLOC:
                     count_reset = 1;
-                end
-
-                3'b010: begin  // writeback: cache -> mem
-                    {target, index} = {saved_tag, pos};
-                    maddr = {saved_tag, idx, pos};
+                `WRITE: begin
+                    maddr = {line_tag, idx, pos};
                     mwrite_en = 1;
                 end
-
-                3'b011: begin  // fetch: mem -> cache
-                    {target, index} = {tag, pos};
-                    maddr = {tag, idx, pos};
+                `FETCH: begin
+                    maddr = {line_tag, idx, pos};
                     write_data = mout;
                 end
-
-                default: begin  // normal
-                    {target, index} = {tag, offset};
+                default:
                     write_data = data;
-                end
             endcase
         end
     end

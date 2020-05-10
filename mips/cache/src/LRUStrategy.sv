@@ -2,18 +2,25 @@
 
 module LRUStrategy #(
     SET_SIZE = `CACHE_E,
-    KEY_WIDTH = $clog2(SET_SIZE)
+    _KEY_WIDTH = $clog2(SET_SIZE)
 ) (
-    input logic [31:0] tick[SET_SIZE],
-    output logic [KEY_WIDTH - 1:0] out
+    input logic [31:0] tick[1:SET_SIZE],
+    output logic [_KEY_WIDTH - 1:0] out
 );
+    logic [_KEY_WIDTH:0] pos;
+    logic [_KEY_WIDTH:0] index;
+    assign index = pos - 1;
+    assign out = index[_KEY_WIDTH - 1:0];
+
     RecursiveNode #(
         .LEFT(1),
         .RIGHT(SET_SIZE),
-        .KEY_WIDTH(KEY_WIDTH)
+        .KEY_WIDTH(_KEY_WIDTH + 1)
     ) root(
-        .tick(tick), .out(out)
+        .tick(tick), .out(pos)
     );
+
+    logic __unused_ok = &{1'b0, index[_KEY_WIDTH], 1'b0};
 
     /**
      * heap-style tournament tree.

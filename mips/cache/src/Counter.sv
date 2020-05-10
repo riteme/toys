@@ -2,12 +2,12 @@ module Counter #(
     START_COUNT = 0
 ) (
     input logic clk, reset, en,
-    output logic [31:0] count
+    output logic [31:0] out
 );
     always_ff @(posedge clk) begin
         if (reset)
-            count <= START_COUNT;
+            out <= START_COUNT;
         else if (en)
-            count <= count + 1;
+            out <= out + 1;
     end
 endmodule

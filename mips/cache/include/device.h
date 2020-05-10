@@ -99,7 +99,7 @@ public:
             }
         }
 
-        _fatal("operation runs for too long! [LIMIT = %d]", CLK_LIMIT);
+        _fatal("operation runs for too long! [LIMIT = %d]\n", CLK_LIMIT);
     }
 
     /**
@@ -168,22 +168,32 @@ public:
     }
 
     void print_all() {
-        printf("cache: {enabled=%d, ", top->enabled);
-        printf("now=%d, count=%d, ", top->now, top->count);
-        printf("state=%d, ", top->state);
-        printf("saved_tag=%x}\n", top->saved_tag);
+        _print("hit: %d, out: %08x", hit(), out());
+        _print(" [addr=%08x, data=%08x, ready=%d, write=%d]\n",
+            top->addr, top->data, top->ready, top->is_write);
+        _print("cache: {enabled=%d, ", top->enabled);
+        _print("now=%d, count=%d, ", top->now, top->count);
+        _print("state=%d}\n", top->state);
 
         for (int i = 0; i < SET_NUM; i++) {
-            printf("### set %d, req: {", i);
-            printf("tag=%d, dirty=%d}\n", top->req_tag[i], top->req_dirty[i]);
+            _print("### set %d, req: {", i);
+            _print("tag=%d, dirty=%d, en=%d, hit=%d",
+                top->req_tag[i], top->req_dirty[i],
+                top->set_en[i], top->set_hit[i]);
+            _print(", swap_key=%d}\n", top->swap_key[i]);
+
             for (int j = 0; j < CACHE_E; j++) {
-                printf("tag=%x, dirty=%d, tick=%d\n",
-                    top->tag[i][j], top->dirty[i][j], top->tick[i][j]);
+                _print("> tag=%x, valid=%d, dirty=%d, tick=%d, tick_en=%d, hit=%d\n",
+                    top->tag[i][j], top->valid[i][j],
+                    top->dirty[i][j], top->tick[i][j],
+                    top->tick_en[i][j],/*top->line_en[i][j],*/
+                    top->line_hit[i][j]);
+
                 for (int k = 0; k < LINE_SIZE; k += 8) {
-                    printf("\t");
+                    _print("\t");
                     for (int l = 0; l < 8; l++)
-                        printf(l == 3 ? "%08x  " : "%08x " , top->line[i][j][k + l]);
-                    puts("");
+                        _print(l == 3 ? "%08x  " : "%08x " , top->line[i][j][k + l]);
+                    _print("\n");
                 }
             }
         }

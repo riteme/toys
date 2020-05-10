@@ -5,5 +5,5 @@ module Decoder #(
     input [WIDTH - 1:0] idx,
     output [_OUT_SIZE - 1:0] out
 );
-    assign out[idx] = 1;
+    assign out = 1 << idx;
 endmodule

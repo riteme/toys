@@ -1,5 +1,8 @@
 `include "cache.vh"
 
+/**
+ * simply consists of multiple lines.
+ */
 module CacheSet #(
     TAG_WIDTH = `CACHE_T,
     SET_WIDTH = `CACHE_S,
@@ -7,41 +10,37 @@ module CacheSet #(
     SET_SIZE = `CACHE_E,
     KEY_WIDTH = $clog2(SET_SIZE)
 ) (
-    /**
-     * tick_en: reserved for LFU strategy. LRU does not need it.
-     */
-    input logic clk, reset, en, tick_en,
-    input logic [31:0] now,
+    input logic clk, reset, en,
 
     /**
-     * mode [1:0]:
-     *  10: read
-     *  11: write
-     *  00: req
-     *  01: alloc
+     * the following ports are directly passed to
+     * cache lines.
      *
-     * mode[0]: write_en?
-     * mode[1]: no tick?
-     *
-     * NOTE: alloc only resets tag & dirty flag, and does not
-     * clear cache line, which is expected to be filled by
-     * subsequent writes.
+     * see CacheLine.sv for more details.
      */
-    input logic [1:0] mode,
-    input logic [TAG_WIDTH - 1:0] target,
+    input logic by_tag,
+    input logic [TAG_WIDTH - 1:0] target_tag,
+    input logic [KEY_WIDTH - 1:0] target_key,
     input logic [LINE_WIDTH - 1:0] index,
-    input logic [31:0] data,
+    input logic [2:0] ctrl,
+    input logic [31:0] data, set_tick,
+    input logic [TAG_WIDTH - 1:0] set_tag,
+
+    /**
+     * hit: if any line matches?
+     * out: the output of the matched line.
+     */
     output logic hit,
     output logic [31:0] out,
 
     /**
-     * For `req` mode.
+     * replacement strategy outputs.
      *
      * dirty: is the line swapped out dirty?
-     * tag: if dirty = 1, tag contains the line tag.
      */
     output logic dirty,
-    output logic [TAG_WIDTH - 1:0] tag
+    output logic [TAG_WIDTH - 1:0] tag,
+    output logic [KEY_WIDTH - 1:0] key
 );
     logic [SET_SIZE - 1:0] hits;
     logic [31:0] outs[SET_SIZE];
@@ -49,45 +48,37 @@ module CacheSet #(
     logic [31:0] tick_array[SET_SIZE];
     logic [TAG_WIDTH - 1:0] tag_array[SET_SIZE];
 
-    logic need_write, need_tick, is_write;
-    assign {need_write, need_tick} = mode;
-    assign is_write = mode == 2'b11;
-
     for (genvar i = 0; i < SET_SIZE; i++)
     begin: lines
         CacheLine #(
             .TAG_WIDTH(TAG_WIDTH),
-            .LINE_WIDTH(LINE_WIDTH)
+            .LINE_WIDTH(LINE_WIDTH),
+            .KEY_WIDTH(KEY_WIDTH)
         ) inst(
             .clk(clk), .reset(reset), .en(en),
-            .target(target), .index(index),
-
-            .tick_en(tick_en & need_tick),
-            .set_tick(now),
-
-            .write_en(need_write),
-            .data(data),
-            .set_dirty(is_write),
-            .set_tag(is_write ? tag_array[i] : target),
-
-            .hit(hits[i]), .dirty(dirty_array[i]),
-            .tag(tag_array[i]), .tick(tick_array[i]),
-            .out(outs[i])
+            .key(i), .by_tag(by_tag),
+            .target_tag(target_tag), .target_key(target_key),
+            .index(index), .ctrl(ctrl), .data(data),
+            .set_tick(set_tick), .set_tag(set_tag),
+            .dirty(dirty_array[i]),
+            .tag(tag_array[i]),
+            .tick(tick_array[i]),
+            .hit(hits[i]), .out(outs[i])
         );
     end
+
     assign hit = |hits;
     Aggregate #(
         .VAL_WIDTH(32),
         .ARR_SIZE(SET_SIZE)
     ) sum_out(.array_in(outs), .out(out));
 
-    logic [KEY_WIDTH - 1:0] select;
     LRUStrategy #(
         .SET_SIZE(SET_SIZE)
     ) selector(
         .tick(tick_array),
-        .out(select)
+        .out(key)
     );
-    assign dirty = dirty_array[select];
-    assign tag = tag_array[select];
+    assign dirty = dirty_array[key];
+    assign tag = tag_array[key];
 endmodule

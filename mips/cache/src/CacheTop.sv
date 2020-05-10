@@ -4,7 +4,9 @@
 
 `include "cache.vh"
 
-module CacheTop(
+module CacheTop #(
+    KEY_WIDTH = $clog2(`CACHE_E)
+) (
     input logic clk, reset, en,
 
     input logic ready, is_write,
@@ -21,10 +23,16 @@ module CacheTop(
      */
     output logic enabled,
     output logic [31:0] now, count,
-    output logic [2:0] state,
-    output logic [`CACHE_T - 1:0] saved_tag,
+    output logic [3:0] state,
     output logic req_dirty[`SET_NUM],
     output logic [`CACHE_T - 1:0] req_tag[`SET_NUM],
+    output logic [KEY_WIDTH - 1:0] swap_key[`SET_NUM],
+    output logic set_en[`SET_NUM],
+    output logic line_en[`SET_NUM][`CACHE_E],
+    output logic set_hit[`SET_NUM],
+    output logic line_hit[`SET_NUM][`CACHE_E],
+    output logic tick_en[`SET_NUM][`CACHE_E],
+    output logic valid[`SET_NUM][`CACHE_E],
     output logic dirty[`SET_NUM][`CACHE_E],
     output logic [`CACHE_T - 1:0] tag[`SET_NUM][`CACHE_E],
     output logic [31:0] tick[`SET_NUM][`CACHE_E],
@@ -41,16 +49,23 @@ module CacheTop(
     );
 
     assign enabled = cache.enabled;
-    assign now = cache.now;
+    assign now = cache.cctrl.now;
     assign count = cache.cctrl.count;
     assign state = cache.cctrl.state;
-    assign saved_tag = cache.cctrl.saved_tag;
 
     for (genvar i = 0; i < `SET_NUM; i++) begin
         assign req_dirty[i] = cache.sets[i].inst.dirty;
         assign req_tag[i] = cache.sets[i].inst.tag;
+        assign set_en[i] = cache.sets[i].inst.en;
+        assign set_hit[i] = cache.sets[i].inst.hit;
+        assign swap_key[i] = cache.sets[i].inst.key;
 
         for (genvar j = 0; j < `CACHE_E; j++) begin
+            assign line_en[i][j] = cache.sets[i].inst.lines[j].inst.en;
+            assign line_hit[i][j] = cache.sets[i].inst.lines[j].inst.hit;
+            assign tick_en[i][j] = cache.sets[i].inst.lines[j].inst.tick_en;
+
+            assign valid[i][j] = cache.sets[i].inst.lines[j].inst.valid;
             assign dirty[i][j] = cache.sets[i].inst.lines[j].inst.dirty;
             assign tag[i][j] = cache.sets[i].inst.lines[j].inst.tag;
             assign tick[i][j] = cache.sets[i].inst.lines[j].inst.tick;
