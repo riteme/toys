@@ -3,19 +3,19 @@
 #include <vector>
 #include <numeric>
 
-#include "utils.h"
 #include "top.h"
+#include "utils.h"
+#include "reference_cache.h"
 
 class Device {
 public:
     std::vector<u32> mem;
     VCacheTop *top;
+    ReferenceCache *ref;
 
     Device() {
         top = new VCacheTop;
-
         mem.resize(MEMSIZE);
-
         reset();
     }
 
@@ -31,7 +31,7 @@ public:
         top->clk = 0;
         top->en = 1;
         top->eval();
-        load_memory();
+        update_memory();
 
         tick();
 
@@ -39,11 +39,17 @@ public:
         top->eval();
         enable_print(old_en);
 
-        load_memory();
+        update_memory();
+
+        if (ref)
+            ref->reset();
     }
 
     void init() {
         std::iota(mem.begin(), mem.end(), 0);
+
+        if (ref)
+            ref->mem = mem;
     }
 
     void resize(int n) {
@@ -51,7 +57,10 @@ public:
         init();
     }
 
-    void load_memory() {
+    /**
+     * interact with Cache's memory interface.
+     */
+    void update_memory() {
         if (top->mwrite_en)
             _write(top->maddr, top->mdata);
 
@@ -63,13 +72,16 @@ public:
         top->clk ^= 1;
         top->eval();
 
-        load_memory();
+        update_memory();
     }
 
-    void run() {
+    /**
+     * keeps running until cache is finished, or due to clock limit.
+     */
+    auto invoke() -> int {
         assert(top->clk == 1);
         top->eval();
-        load_memory();
+        update_memory();
 
         for (int cnt = 0; cnt < CLK_LIMIT; cnt++) {
             tick();
@@ -82,39 +94,69 @@ public:
             _print("\n");
 
             if (ok) {
-                _print("run: count=%d\n", cnt + 1);
-                return;
+                _print("invoke: count=%d\n", cnt + 1);
+                return cnt + 1;
             }
         }
 
-        _error("operation runs for too long! [LIMIT = %d]", CLK_LIMIT);
-        abort();
+        _fatal("operation runs for too long! [LIMIT = %d]", CLK_LIMIT);
     }
 
+    /**
+     * no operation, i.e. ready = 0.
+     */
     void nop() {
         top->ready = 0;
         top->is_write = randi(0, 1);
         top->addr = randi(0, mem.size() - 1);
         top->data = DEFAULT_DATA;
-        run();
+        invoke();
+
+        if (ref)
+            _check_ref();
     }
 
-    u32 read(int addr) {
+    /**
+     * issue a read operation at address `addr`.
+     */
+    u32 read(u32 addr) {
         top->ready = 1;
         top->is_write = 0;
         top->addr = addr;
         top->data = DEFAULT_DATA;
-        run();
+        int cnt = invoke();
+
+        if (ref) {
+            bool hit;
+            u32 data;
+            std::tie(data, hit) = ref->read(addr);
+
+            assert(top->out == data);
+            _check_hit(hit, cnt);
+            _check_ref();
+        }
+
         return out();
     }
 
-    void write(int addr, u32 data) {
+    /**
+     * issue a write operation at address `addr` with `data`.
+     */
+    void write(u32 addr, u32 data) {
         top->ready = 1;
         top->is_write = 1;
         top->addr = addr;
         top->data = data;
-        run();
-        assert(out() == data);
+        int cnt = invoke();
+
+        if (ref) {
+            bool hit = ref->write(addr, data);
+
+            _check_hit(hit, cnt);
+            _check_ref();
+        }
+
+        assert(top->out == data);
     }
 
     bool hit() const {
@@ -154,24 +196,53 @@ public:
 private:
     bool _enable_print = false;
 
-    void _check_addr(int addr, int size, const char *category) {
-        if (addr < 0 || addr > 4 * (size - 1)) {
-            _error("%s: out of range: addr = %d\n", category, addr);
-            exit(-1);
-        }
-        if (addr & 3) {
-            _error("%s: addr not aligned: addr = %d\n", category, addr);
-            exit(-1);
+    void _check_hit(bool hit, int cnt) {
+        if (hit && cnt != 1)
+            _fatal("expected hit.");
+        if (!hit && cnt == 1)
+            _fatal("expected miss.");
+    }
+
+    /**
+     * compare top's internal memory with reference implementation.
+     *
+     * NOTE: `ref` variable must not be `nullptr`.
+     */
+    void _check_ref() {
+        assert(ref != nullptr);
+
+        for (int i = 0; i < SET_NUM; i++)
+        for (int j = 0; j < CACHE_E; j++) {
+            if (top->tag[i][j] != ref->_tag[i][j])
+                _fatal("@tag[%d][%d], expected: %x, got: %x\n",
+                    i, j, ref->_tag[i][j], top->tag[i][j]);
+
+            if (top->dirty[i][j] != ref->_dirty[i][j])
+                _fatal("@dirty[%d][%d], expected: %d, got: %d\n",
+                    i, j, ref->_dirty[i][j], top->dirty[i][j]);
+
+            for (int k = 0; k < LINE_SIZE; k++) {
+                if (top->line[i][j][k] != ref->_line[i][j][k])
+                    _fatal("@line[%d][%d][%d], expected = %08x, got: %08x\n",
+                        i, j, k, ref->_line[i][j][k], top->line[i][j][k]);
+            }
         }
     }
 
-    u32 _read(int addr) {
-        if (addr > 4 * (mem.size() - 1))
-            return 0xcccccccc;
+    void _check_addr(u32 addr, u32 size, const char *category) {
+        if (addr < 0 || addr > 4 * (std::max(1u, size) - 1))
+            _fatal("%s: out of range: addr = %d\n", category, addr);
+        if (addr & 3)
+            _fatal("%s: addr not aligned: addr = %d\n", category, addr);
+    }
+
+    u32 _read(u32 addr) {
+        if (addr > 4 * (std::max(1ul, mem.size()) - 1))
+            return DEFAULT_DATA;
 
         // _check_addr(addr, mem.size(), "mem/read");
         u32 data = mem[addr >> 2];
-        _print("    %08x @M[%08x]\n", data, addr);
+        _print("  %08x @M[%08x]\n", data, addr);
         return data;
     }
 
@@ -181,7 +252,7 @@ private:
 
         _check_addr(addr, mem.size(), "mem/write");
         mem[addr >> 2] = data;
-        _print("    M[%08x] ← %08x\n", addr, data);
+        _print("  M[%08x] ← %08x\n", addr, data);
     }
 
     void _print(const char *fmt, ...) {
@@ -200,5 +271,11 @@ private:
         fprintf(stderr, "\033[33mERR!\033[0m ");
         vfprintf(stderr, fmt, args);
         va_end(args);
+    }
+
+    template <typename ... TArgs>
+    void _fatal(const char *fmt, const TArgs & ... args) {
+        _error(fmt, args...);
+        abort();
     }
 };

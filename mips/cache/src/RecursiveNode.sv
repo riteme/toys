@@ -25,6 +25,6 @@ module RecursiveNode #(
             .KEY_WIDTH(KEY_WIDTH)
         ) rch(tick[_MID + 1:RIGHT], rout);
 
-        assign out = tick[lout] < tick[rout] ? lout : rout;
+        assign out = tick[lout] <= tick[rout] ? lout : rout;
     end
 endmodule
