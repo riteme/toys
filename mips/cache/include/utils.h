@@ -4,7 +4,7 @@
 
 using u64 = unsigned long long;
 using u32 = unsigned int;
-using cstr = char*;
+using cstr = const char*;
 
 #define CACHE_T 24
 #define CACHE_S 2

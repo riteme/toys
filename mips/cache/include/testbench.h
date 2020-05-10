@@ -6,20 +6,27 @@
 
 #include "utils.h"
 
-extern std::vector<class ITest*> *p_test_list;
-extern class ITest *current_test;
+using TestList = std::vector<class ITest*>;
+
+extern TestList *__p_test_list;
+extern class ITest *__current_test;
+
+#define SETUP_TEST \
+    static TestList __test_list; \
+    TestList *__p_test_list = &__test_list; \
+    ITest *__current_test = nullptr;
 
 class ITest {
 public:
     ITest(cstr _name) : name(_name) {
-        p_test_list->push_back(this);
+        __p_test_list->push_back(this);
     }
 
     void run() {
-        current_test = this;
+        __current_test = this;
         _run();
         printf("\033[32m[OK]\033[0m %s\n", name);
-        current_test = nullptr;
+        __current_test = nullptr;
     }
 
     cstr name;
@@ -36,3 +43,8 @@ private:
 #define END(id, name) \
         } \
     } test##id(name);
+
+void run_test() {
+    for (auto t : *__p_test_list)
+        t->run();
+}

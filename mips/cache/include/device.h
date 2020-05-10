@@ -13,7 +13,7 @@ public:
     VCacheTop *top;
     ReferenceCache *ref;
 
-    Device() {
+    Device(ReferenceCache *_ref = nullptr) : ref(_ref) {
         top = new VCacheTop;
         mem.resize(MEMSIZE);
         reset();
@@ -168,14 +168,14 @@ public:
     }
 
     void print_all() {
-        printf("cache.enabled=%d\n", top->enabled);
-        printf("cache.now=%d, cache.count=%d\n", top->now, top->count);
-        printf("cache.state=%d\n", top->state);
-        printf("cache.saved_tag=%x\n", top->saved_tag);
+        printf("cache: {enabled=%d, ", top->enabled);
+        printf("now=%d, count=%d, ", top->now, top->count);
+        printf("state=%d, ", top->state);
+        printf("saved_tag=%x}\n", top->saved_tag);
 
         for (int i = 0; i < SET_NUM; i++) {
-            printf("### set %d\n", i);
-            printf("req_tag[%d]=%d, dirty=%d\n", i, top->req_tag[i], top->req_dirty[i]);
+            printf("### set %d, req: {", i);
+            printf("tag=%d, dirty=%d}\n", top->req_tag[i], top->req_dirty[i]);
             for (int j = 0; j < CACHE_E; j++) {
                 printf("tag=%x, dirty=%d, tick=%d\n",
                     top->tag[i][j], top->dirty[i][j], top->tick[i][j]);
@@ -274,6 +274,7 @@ private:
     }
 
     template <typename ... TArgs>
+    [[noreturn]]
     void _fatal(const char *fmt, const TArgs & ... args) {
         _error(fmt, args...);
         abort();
