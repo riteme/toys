@@ -3,30 +3,51 @@
 #include <cstdio>
 
 #include <vector>
+#include <functional>
 
 #include "utils.h"
 
-using TestList = std::vector<class ITest*>;
+using TestList = std::vector<class ITestbench*>;
+using PretestHook = std::function<void(void)>;
+using PosttestHook = std::function<void(void)>;
 
-extern TestList *__p_test_list;
-extern class ITest *__current_test;
+extern TestList *_p_test_list;
+extern class ITestbench *_current_test;
+extern PretestHook _pretest_hook;
+extern PosttestHook _posttest_hook;
 
-#define SETUP_TEST \
+/**
+ * example:
+ * SETUP_TESTLIST
+ * PRETEST_HOOK = [] {
+ *     dev->reset();
+ * };
+ * POSTTEST_HOOK = [] {
+ *     // source code here.
+ * };
+ */
+#define SETUP_TESTLIST \
     static TestList __test_list; \
-    TestList *__p_test_list = &__test_list; \
-    ITest *__current_test = nullptr;
+    TestList *_p_test_list = &__test_list; \
+    ITestbench *_current_test = nullptr;
+#define PRETEST_HOOK PretestHook _pretest_hook
+#define POSTTEST_HOOK PosttestHook _posttest_hook
 
-class ITest {
+class ITestbench {
 public:
-    ITest(cstr _name) : name(_name) {
-        __p_test_list->push_back(this);
+    ITestbench(cstr _name) : name(_name) {
+        _p_test_list->push_back(this);
     }
 
     void run() {
-        __current_test = this;
+        _current_test = this;
+
+        _pretest_hook();
         _run();
+        _posttest_hook();
+
         printf("\033[32m[OK]\033[0m %s\n", name);
-        __current_test = nullptr;
+        _current_test = nullptr;
     }
 
     cstr name;
@@ -35,16 +56,30 @@ private:
     virtual void _run() = 0;
 };
 
-#define BEGIN(id) \
-    static class Test##id : public ITest { \
-        using ITest::ITest; \
+// unique id magic: https://stackoverflow.com/a/2419720/7434327
+#define _TESTBENCH_CAT_IMPL(x, y) x##y
+#define _TESTBENCH_CAT(x, y) _TESTBENCH_CAT_IMPL(x, y)
+#define _TESTBENCH_UNIQUE(x) _TESTBENCH_CAT(x, __LINE__)
+
+#define _TESTBENCH_BEGIN(id) \
+    static class id : public ITestbench { \
+        using ITestbench::ITestbench; \
         void _run() {
 
-#define END(id, name) \
-        } \
-    } test##id(name);
+#define _TESTBENCH_END(id, name) \
+    } } id(name);
 
-void run_test() {
-    for (auto t : *__p_test_list)
+/**
+ * usage:
+ * WITH [TRACE] {
+ *     // source code here.
+ * } AS("test name")
+ */
+#define WITH _TESTBENCH_BEGIN(_TESTBENCH_UNIQUE(__Testbench))
+#define AS(name) _TESTBENCH_END(_TESTBENCH_UNIQUE(__testbench), name)
+#define TRACE { dev->enable_print(); }
+
+void run_tests() {
+    for (auto t : *_p_test_list)
         t->run();
 }
