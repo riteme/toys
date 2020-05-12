@@ -22,9 +22,12 @@ void hook_signal(int sig, handler_t *handler) {
 }
 
 void abort_handler(int) {
+    auto fmt = isatty(STDERR_FILENO) ?
+        "\033[31mERR!\033[0m abort in \"%s\"\n":
+        "ERR! abort in \"%s\"\n";
+
     if (_current_test)
-        fprintf(stderr, "\033[31mERR!\033[0m abort in \"%s\"\n",
-            _current_test->name);
+        fprintf(stderr, fmt, _current_test->name);
     fflush(stdout);
 }
 

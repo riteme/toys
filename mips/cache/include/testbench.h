@@ -5,6 +5,8 @@
 #include <vector>
 #include <functional>
 
+#include "unistd.h"
+
 #include "utils.h"
 
 using TestList = std::vector<class ITestbench*>;
@@ -46,7 +48,10 @@ public:
         _run();
         _posttest_hook();
 
-        printf("\033[32m[OK]\033[0m %s\n", name);
+        auto fmt = isatty(STDOUT_FILENO) ?
+            "\033[32m[OK]\033[0m %s\n" :
+            "[OK] %s\n";
+        printf(fmt, name);
         _current_test = nullptr;
     }
 

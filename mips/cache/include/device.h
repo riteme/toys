@@ -284,7 +284,12 @@ private:
     void _error(const char *fmt, ...) {
         va_list args;
         va_start(args, fmt);
-        fprintf(stderr, "\033[33mERR!\033[0m ");
+
+        auto err_fmt = isatty(STDERR_FILENO) ?
+            "\033[33mERR!\033[0m " :
+            "ERR! ";
+        fprintf(stderr, err_fmt);
+
         vfprintf(stderr, fmt, args);
         va_end(args);
     }

@@ -44,11 +44,14 @@ WITH {
     dev->read(0x3c);
 } AS("sequential read M[0x30]")
 
-WITH {
-
+WITH TRACE {
+    dev->read(ADDR(0x7a, 0, 0));
+    dev->read(ADDR(0x99, 0, 0));
+    dev->read(ADDR(0xcc, 0, 0));
+    dev->read(ADDR(0x32, 0, 0));
 } AS("read multiline")
 
-WITH TRACE {
+WITH {
     dev->read(ADDR(0x7a, 0, 0));
     dev->read(ADDR(0x99, 1, 1));
     dev->read(ADDR(0xcc, 2, 0));
