@@ -27,6 +27,8 @@ module CacheController #(
 
     /**
      * interface with cache set.
+     *
+     * write_data: data for cache write.
      */
     output logic by_tag,
     output logic [TAG_WIDTH - 1:0] target_tag,
@@ -59,7 +61,7 @@ module CacheController #(
         .out(count)
     );
 
-    logic [3:0] state;
+    logic [1:0] state;
     CacheControllerFSM #(
         .KEY_WIDTH(KEY_WIDTH),
         .COUNT_MAX(_COUNT_MAX)
@@ -71,7 +73,7 @@ module CacheController #(
     );
 
     logic normal;
-    assign normal = state[3];
+    assign normal = state[1];
     assign hit = normal && line_hit;
     assign out = line_out;
     assign by_tag = normal;
@@ -89,28 +91,29 @@ module CacheController #(
      * dataflow & control signals for each state.
      */
     always_comb begin
-        {ctrl, mwrite_en, write_data, count_reset} = 0;
+        {ctrl, mwrite_en, maddr, write_data, count_reset} = 0;
         if (en) begin
-            case (normal)
-                0: ctrl = {1'b0, state[1:0]};
-                1: ctrl = {2'b10, write_en};
-            endcase
-
             case (state)
-                `CHECK:
-                    count_reset = 1;
-                `ALLOC:
-                    count_reset = 1;
                 `WRITE: begin
-                    maddr = {line_tag, idx, pos};
+                    ctrl = 3'b000;
                     mwrite_en = 1;
+                    maddr = {line_tag, idx, pos};
+                    if (count == _COUNT_MAX - 1)
+                        count_reset = 1;
                 end
                 `FETCH: begin
-                    maddr = {line_tag, idx, pos};
+                    if (count == _COUNT_MAX - 1)
+                        ctrl = 3'b011;
+                    else
+                        ctrl = 3'b001;
+                    maddr = {tag, idx, pos};
                     write_data = mout;
                 end
-                default:
+                default: begin
+                    ctrl = {2'b10, write_en};
                     write_data = data;
+                    count_reset = !line_hit;
+                end
             endcase
         end
     end

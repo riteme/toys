@@ -24,7 +24,6 @@ public:
     }
 
     void reset(bool _init = true) {
-        bool old_en = _enable_print;
         enable_print(false);
 
         top->reset = 1;
@@ -37,7 +36,6 @@ public:
 
         top->reset = 0;
         top->eval();
-        enable_print(old_en);
 
         update_memory();
 

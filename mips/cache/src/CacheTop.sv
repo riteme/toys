@@ -23,7 +23,7 @@ module CacheTop #(
      */
     output logic enabled,
     output logic [31:0] now, count,
-    output logic [3:0] state,
+    output logic [1:0] state,
     output logic req_dirty[`SET_NUM],
     output logic [`CACHE_T - 1:0] req_tag[`SET_NUM],
     output logic [KEY_WIDTH - 1:0] swap_key[`SET_NUM],

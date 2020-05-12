@@ -44,11 +44,15 @@ WITH {
     dev->read(0x3c);
 } AS("sequential read M[0x30]")
 
-WITH TRACE {
+WITH {
     dev->read(ADDR(0x7a, 0, 0));
     dev->read(ADDR(0x99, 0, 0));
     dev->read(ADDR(0xcc, 0, 0));
     dev->read(ADDR(0x32, 0, 0));
+    dev->read(ADDR(0x11, 0, 0));
+    dev->read(ADDR(0x22, 0, 0));
+    dev->read(ADDR(0x33, 0, 0));
+    dev->read(ADDR(0x44, 0, 0));
 } AS("read multiline")
 
 WITH {
@@ -56,4 +60,8 @@ WITH {
     dev->read(ADDR(0x99, 1, 1));
     dev->read(ADDR(0xcc, 2, 0));
     dev->read(ADDR(0x32, 3, 0));
+    dev->read(ADDR(0x11, 0, 0));
+    dev->read(ADDR(0x11, 1, 0));
+    dev->read(ADDR(0x11, 2, 0));
+    dev->read(ADDR(0x11, 3, 0));
 } AS("read multiset")

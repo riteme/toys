@@ -71,13 +71,12 @@ module CacheLine #(
             end
             {tag, valid, dirty, tick} <= 0;
         end else if (en && hit) begin
-            if (write_en) begin
-                dirty <= 1;
+            dirty <= !update_en && write_en;
+
+            if (write_en)
                 line[aligned_index] <= data;
-            end
             if (update_en) begin
                 valid <= 1;
-                dirty <= 0;
                 tag <= set_tag;
             end
             if (tick_en)
