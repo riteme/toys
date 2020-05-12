@@ -1,29 +1,56 @@
-#include <cstdio>
-
 #include "testbench.h"
 #include "device.h"
 
-SETUP_TEST
+/**
+ * SETUP
+ */
 
 static ReferenceCache *ref = new ReferenceCache;
 static Device *dev = new Device(ref);
 
-BEGIN(1)
+SETUP_TESTLIST
+PRETEST_HOOK = [] {
     dev->reset();
-    dev->init();
-    // dev->enable_print();
+};
+POSTTEST_HOOK = [] {
+    // nothing.
+};
+
+/**
+ * TESTBENCH
+ */
+
+WITH {
     dev->nop();
-END(1, "nop")
+} AS("nop")
 
-BEGIN(2)
-    dev->reset();
-    dev->init();
-    dev->enable_print();
+WITH {
     dev->read(0);
-END(2, "read")
+} AS("read M[0]")
 
-int main(int argc, char *argv[]) {
-    Verilated::commandArgs(argc, argv);
-    run_test();
-    return 0;
-}
+WITH {
+    dev->read(0xdead);
+} AS("read M[0xdead]")
+
+WITH {
+    dev->read(0xdead);
+    dev->read(0xdead);
+} AS("double read M[0xabcd]")
+
+WITH {
+    dev->read(0x30);
+    dev->read(0x34);
+    dev->read(0x38);
+    dev->read(0x3c);
+} AS("sequential read M[0x30]")
+
+WITH {
+
+} AS("read multiline")
+
+WITH TRACE {
+    dev->read(ADDR(0x7a, 0, 0));
+    dev->read(ADDR(0x99, 1, 1));
+    dev->read(ADDR(0xcc, 2, 0));
+    dev->read(ADDR(0x32, 3, 0));
+} AS("read multiset")

@@ -1,7 +1,7 @@
 VERILATED_LIB = build/VCacheTop__ALL.a
 VERILATED_SRC = /usr/share/verilator/include/verilated.cpp
 HEADERS = $(wildcard include/*.h)
-LIBS = build/testbench.o build/verilated.o $(VERILATED_LIB)
+LIBS = $(addprefix build/, main.o testbench.o verilated.o) $(VERILATED_LIB)
 CXX = g++
 CXX_INCLUDE = \
 	-I /usr/share/verilator/include \
@@ -15,8 +15,10 @@ a.out: $(LIBS)
 
 build/verilated.o: $(VERILATED_SRC)
 	$(CXX) $(CXXFLAGS) $< -c -o $@
-
 build/testbench.o: testbench.cpp $(HEADERS) build/VCacheTop.mk
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+build/main.o: main.cpp include/testbench.h
+	@mkdir -p build
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
 $(VERILATED_LIB): build/VCacheTop.mk

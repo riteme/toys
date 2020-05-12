@@ -79,7 +79,7 @@ private:
 #define AS(name) _TESTBENCH_END(_TESTBENCH_UNIQUE(__testbench), name)
 #define TRACE { dev->enable_print(); }
 
-void run_tests() {
+inline void run_tests() {
     for (auto t : *_p_test_list)
         t->run();
 }

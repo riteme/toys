@@ -23,7 +23,7 @@ public:
         delete top;
     }
 
-    void reset() {
+    void reset(bool _init = true) {
         bool old_en = _enable_print;
         enable_print(false);
 
@@ -43,6 +43,9 @@ public:
 
         if (ref)
             ref->reset();
+
+        if (_init)
+            init();
     }
 
     void init() {
@@ -94,7 +97,7 @@ public:
             _print("\n");
 
             if (ok) {
-                _print("invoke: count=%d\n", cnt + 1);
+                _print("invoke: count=%d\n\n", cnt + 1);
                 return cnt + 1;
             }
         }
@@ -189,10 +192,14 @@ public:
                     top->tick_en[i][j],/*top->line_en[i][j],*/
                     top->line_hit[i][j]);
 
-                for (int k = 0; k < LINE_SIZE; k += 8) {
+                int step = std::min(8, LINE_SIZE);
+                for (int k = 0; k < LINE_SIZE; k += step) {
                     _print("\t");
-                    for (int l = 0; l < 8; l++)
-                        _print(l == 3 ? "%08x  " : "%08x " , top->line[i][j][k + l]);
+                    for (int l = 0; l < step; l++) {
+                        _print(
+                            l == 3 ? "%08x  " : "%08x ",
+                            top->line[i][j][k + l]);
+                    }
                     _print("\n");
                 }
             }
@@ -223,18 +230,17 @@ private:
 
         for (int i = 0; i < SET_NUM; i++)
         for (int j = 0; j < CACHE_E; j++) {
-            if (top->tag[i][j] != ref->_tag[i][j])
-                _fatal("@tag[%d][%d], expected: %x, got: %x\n",
-                    i, j, ref->_tag[i][j], top->tag[i][j]);
-
-            if (top->dirty[i][j] != ref->_dirty[i][j])
-                _fatal("@dirty[%d][%d], expected: %d, got: %d\n",
-                    i, j, ref->_dirty[i][j], top->dirty[i][j]);
+            _expect(
+                ref->_tag[i][j], top->tag[i][j],
+                "@tag[%d][%d]", i, j);
+            _expect(
+                ref->_dirty[i][j], bool(top->dirty[i][j]),
+                "@dirty[%d][%d]", i, j);
 
             for (int k = 0; k < LINE_SIZE; k++) {
-                if (top->line[i][j][k] != ref->_line[i][j][k])
-                    _fatal("@line[%d][%d][%d], expected = %08x, got: %08x\n",
-                        i, j, k, ref->_line[i][j][k], top->line[i][j][k]);
+                _expect(
+                    ref->_line[i][j][k], top->line[i][j][k],
+                    "@line[%d][%d][%d]", i, j, k);
             }
         }
     }
@@ -288,5 +294,18 @@ private:
     void _fatal(const char *fmt, const TArgs & ... args) {
         _error(fmt, args...);
         abort();
+    }
+
+    template <typename T, typename ... TArgs>
+    void _expect(
+        const T &expected, const T &got,
+        const char *fmt, const TArgs & ... args
+    ) {
+        if (got != expected) {
+            _error(fmt, args...);
+            fprintf(stderr, ", expected: %x, got: %x\n",
+                expected, got);
+            abort();
+        }
     }
 };

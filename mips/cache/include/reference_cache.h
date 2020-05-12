@@ -21,7 +21,7 @@ public:
         memset(_dirty, 0, sizeof(_dirty));
         memset(_tag, 0, sizeof(_tag));
         memset(_line, 0, sizeof(_line));
-        memset(_tag, 0, sizeof(_tag));
+        memset(_tick, 0, sizeof(_tick));
     }
 
     auto resolve(u32 addr) -> std::tuple<u32, u32, u32> {
@@ -70,17 +70,17 @@ public:
             if (_tick[idx][j] < _tick[idx][i])
                 i = j;
         }
-        assert(_tag[idx][i] != tag);
+        assert(!_tick[idx][i] || _tag[idx][i] != tag);
 
         if (_dirty[idx][i]) {
-            u32 s = ADDR(_tag[idx][i], idx, 0);
+            u32 s = ADDR(_tag[idx][i], idx, 0) >> 2;
             assert(0 <= s && s + LINE_SIZE <= mem.size());
             memcpy(&mem[s], _line[idx][i], sizeof(u32) * LINE_SIZE);
             _dirty[idx][i] = false;
         }
 
         _tag[idx][i] = tag;
-        u32 s = ADDR(tag, idx, 0);
+        u32 s = ADDR(tag, idx, 0) >> 2;
         assert(0 <= s && s + LINE_SIZE <= mem.size());
         memcpy(_line[idx][i], &mem[s], sizeof(u32) * LINE_SIZE);
         return i;
