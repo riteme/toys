@@ -15,7 +15,7 @@ public:
 
     Device(ReferenceCache *_ref = nullptr) : ref(_ref) {
         top = new VCacheTop;
-        mem.resize(MEMSIZE);
+        mem.resize(MEM_SIZE);
         reset();
     }
 
@@ -178,7 +178,7 @@ public:
 
         for (int i = 0; i < SET_NUM; i++) {
             _print("### set %d, req: {", i);
-            _print("tag=%d, dirty=%d, en=%d, hit=%d",
+            _print("tag=%x, dirty=%d, en=%d, hit=%d",
                 top->req_tag[i], top->req_dirty[i],
                 top->set_en[i], top->set_hit[i]);
             _print(", swap_key=%d}\n", top->swap_key[i]);
@@ -206,6 +206,10 @@ public:
 
     void enable_print(bool en = true) {
         _enable_print = en;
+    }
+
+    void check_mem() {
+        _check_mem();
     }
 
 private:
@@ -240,6 +244,15 @@ private:
                     ref->_line[i][j][k], top->line[i][j][k],
                     "@line[%d][%d][%d]", i, j, k);
             }
+        }
+    }
+
+    void _check_mem() {
+        assert(ref != nullptr);
+        assert(mem.size() == ref->mem.size());
+
+        for (int i = 0; i < mem.size(); i++) {
+            _expect(ref->mem[i], mem[i], "@mem[%d]", i);
         }
     }
 

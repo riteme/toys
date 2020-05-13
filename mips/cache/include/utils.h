@@ -22,13 +22,18 @@ using cstr = const char*;
     (u32(idx) << (CACHE_B)) | \
     (u32(offset) << 2))
 
-#define MEMSIZE 16384  // in words, 65536 bytes
-#define CLK_LIMIT 50  // maximum number of clocks in one operation (read/write/nop)
+#define MEM_SIZE 16384  // in words, 65536 bytes
+#define ADDR_MAX ((MEM_SIZE) * 4 - 1)
+#define CLK_LIMIT 10  // maximum number of clocks in one operation (read/write/nop)
 #define DEFAULT_DATA 0xcccccccc
 
 #define DEFAULT_SEED 19260817
 
-inline u64 randi(u64 l, u64 r) {
+inline u64 randi() {
     static std::mt19937_64 gen(DEFAULT_SEED);
-    return gen() % (r - l + 1) + l;
+    return gen();
+}
+
+inline u64 randi(u64 l, u64 r) {
+    return randi() % (r - l + 1) + l;
 }
