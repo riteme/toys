@@ -22,7 +22,7 @@ using cstr = const char*;
     (u32(idx) << (CACHE_B)) | \
     (u32(offset) << 2))
 
-#define MEM_SIZE 16384  // in words, 65536 bytes
+#define MEM_SIZE 262144  // in words
 #define ADDR_MAX ((MEM_SIZE) * 4 - 1)
 #define CLK_LIMIT 10  // maximum number of clocks in one operation (read/write/nop)
 #define DEFAULT_DATA 0xcccccccc

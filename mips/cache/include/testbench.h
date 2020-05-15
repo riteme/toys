@@ -12,6 +12,7 @@
 using TestList = std::vector<class ITestbench*>;
 using PretestHook = std::function<void(void)>;
 using PosttestHook = std::function<void(void)>;
+using DeferHook = std::function<void(void)>;
 
 extern TestList *_p_test_list;
 extern class ITestbench *_current_test;
@@ -69,10 +70,16 @@ private:
 #define _TESTBENCH_BEGIN(id) \
     static class id : public ITestbench { \
         using ITestbench::ITestbench; \
-        void _run() {
+        void _run() { \
+            std::vector<DeferHook> __testbench_defer_hooks;
 
-#define _TESTBENCH_END(id, name) \
-    } } id(name);
+#define _TESTBENCH_END(id, name) { \
+            for (auto &hook : __testbench_defer_hooks) { \
+                hook(); \
+            } \
+        } \
+    } \
+} id(name);
 
 /**
  * usage:
@@ -82,7 +89,11 @@ private:
  */
 #define WITH _TESTBENCH_BEGIN(_TESTBENCH_UNIQUE(__Testbench))
 #define AS(name) _TESTBENCH_END(_TESTBENCH_UNIQUE(__testbench), name)
+
 #define TRACE { dev->enable_print(); }
+#define STATISTICS { __testbench_defer_hooks.push_back([] { \
+    dev->print_statistics(); \
+}); }
 
 inline void run_tests() {
     for (auto t : *_p_test_list)

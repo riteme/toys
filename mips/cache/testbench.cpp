@@ -1,7 +1,12 @@
+#include <vector>
+#include <numeric>
+#include <algorithm>
+
 #include "testbench.h"
 #include "device.h"
+#include "cell.h"
 
-constexpr int TEST_LOAD = 500000;
+constexpr int TEST_LOAD = 200000;
 
 /**
  * SETUP
@@ -15,7 +20,7 @@ PRETEST_HOOK = [] {
     dev->reset();
 };
 POSTTEST_HOOK = [] {
-    dev->check_mem();
+    dev->check_memory();
 };
 
 /**
@@ -137,3 +142,48 @@ WITH {
             dev->write(addr, randi());
     }
 } AS("random read/write")
+
+/**
+ * some sort algorithms.
+ */
+
+struct Provider {
+    auto operator()() const -> Device* {
+        return dev;
+    }
+};
+
+using MemoryCell = Cell<Provider>;
+
+auto sort_setup(int n) -> std::vector<MemoryCell> {
+    std::vector<MemoryCell> vec(n);
+    for (int i = 0; i < n; i++) {
+        vec[i].set(randi());
+    }
+    return vec;
+}
+
+WITH STATISTICS {
+    int n = 10000;
+    auto vec = sort_setup(n);
+
+    std::sort(vec.begin(), vec.end());
+    assert(std::is_sorted(vec.begin(), vec.end()));
+} AS("std::sort")
+
+WITH STATISTICS {
+    int n = 10000;
+    auto vec = sort_setup(n);
+
+    std::stable_sort(vec.begin(), vec.end());
+    assert(std::is_sorted(vec.begin(), vec.end()));
+} AS("std::stable_sort")
+
+WITH STATISTICS {
+    int n = 10000;
+    auto vec = sort_setup(n);
+
+    std::make_heap(vec.begin(), vec.end());
+    std::sort_heap(vec.begin(), vec.end());
+    assert(std::is_sorted(vec.begin(), vec.end()));
+} AS("std::sort_heap")

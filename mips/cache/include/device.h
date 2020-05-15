@@ -24,6 +24,9 @@ public:
     }
 
     void reset(bool _init = true) {
+        memset(&_stat, 0, sizeof(_stat));
+        _last_alloc = 0;
+
         enable_print(false);
 
         top->reset = 1;
@@ -117,6 +120,13 @@ public:
             _check_ref();
     }
 
+    u32 alloc() {
+        u32 addr = _last_alloc;
+        assert(addr < mem.size() * 4);
+        _last_alloc += 4;
+        return addr;
+    }
+
     /**
      * issue a read operation at address `addr`.
      */
@@ -125,7 +135,12 @@ public:
         top->is_write = 0;
         top->addr = addr;
         top->data = DEFAULT_DATA;
+
         int cnt = invoke();
+        _stat.cycles += cnt;
+        _stat.read_cnt++;
+        if (cnt == 1)
+            _stat.read_hit++;
 
         if (ref) {
             bool hit;
@@ -148,7 +163,12 @@ public:
         top->is_write = 1;
         top->addr = addr;
         top->data = data;
+
         int cnt = invoke();
+        _stat.cycles += cnt;
+        _stat.write_cnt++;
+        if (cnt == 1)
+            _stat.write_hit++;
 
         if (ref) {
             bool hit = ref->write(addr, data);
@@ -204,16 +224,39 @@ public:
         }
     }
 
+    /**
+     * print_statistics ignores _enable_print flag.
+     */
+    void print_statistics() {
+        double n_read = _stat.read_cnt;
+        double n_write = _stat.write_cnt;
+        double n_op = n_read + n_write;
+        double read_hit = _stat.read_hit / n_read * 100;
+        double write_hit = _stat.write_hit / n_write * 100;
+        double hit = (_stat.read_hit + _stat.write_hit) / n_op * 100;
+        printf("cycles = %u\n", _stat.cycles);
+        printf("hit = %.2lf%%, read_hit = %.2lf%%, write_hit = %.2lf%%\n",
+            hit, read_hit, write_hit);
+        printf("mem_write = %u\n", _stat.mem_write);
+    }
+
     void enable_print(bool en = true) {
         _enable_print = en;
     }
 
-    void check_mem() {
+    void check_memory() {
         _check_mem();
     }
 
 private:
     bool _enable_print = false;
+    struct {
+        u32 cycles;
+        u32 read_cnt, read_hit;
+        u32 write_cnt, write_hit;
+        u32 mem_write;  // see _write
+    } _stat;
+    u32 _last_alloc;
 
     void _check_hit(bool hit, int cnt) {
         if (hit && cnt != 1)
@@ -277,6 +320,7 @@ private:
         if (!top->clk)
             return;
 
+        _stat.mem_write++;
         _check_addr(addr, mem.size(), "mem/write");
         mem[addr >> 2] = data;
         _print("  M[%08x] ← %08x\n", addr, data);
@@ -299,7 +343,7 @@ private:
         auto err_fmt = isatty(STDERR_FILENO) ?
             "\033[33mERR!\033[0m " :
             "ERR! ";
-        fprintf(stderr, err_fmt);
+        fprintf(stderr, "%s", err_fmt);
 
         vfprintf(stderr, fmt, args);
         va_end(args);
