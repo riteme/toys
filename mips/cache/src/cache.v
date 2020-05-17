@@ -50,7 +50,9 @@ module cache #(
 		.LINE_WIDTH(OFFSET_WIDTH),
 		.SET_SIZE(LINES)
 	) inst(
-		.clk(clk), .reset(reset), .en(~stall),
+		.clk(clk), .reset(reset),
+		.en(~stall),
+		/*.en(1),*/  // ignore stall
 		.ready(input_ready), .write_en(w_en),
 		.hit(hit),
 		.addr(addr), .data(write_data), .out(read_data),
