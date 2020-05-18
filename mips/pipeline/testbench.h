@@ -85,11 +85,6 @@ public:
                 "  > new: \"%s\" [pc = %d]\n",
                 translate(instr0()).c_str(), pc0()
             );
-        } else {
-            _print(
-                "# clk ← %d [ok = %d]\n",
-                dp->clk, dp->Datapath__DOT__frontend__DOT__ok
-            );
         }
 
         load_memory();
@@ -178,39 +173,39 @@ public:
     }
 
     void print_frontend() {
-        _print(
-            "  > no_deps = %d\n",
-            dp->Datapath__DOT__frontend__DOT__select__DOT__no_deps
-        );
-        _print(
-            "  > allow_swap = %d\n",
-            dp->Datapath__DOT__frontend__DOT__select__DOT__allow_swap
-        );
-        _print(
-            "  > jmp_after_lw = %d\n",
-            dp->Datapath__DOT__frontend__DOT__select__DOT__jmp_after_lw
-        );
-        _print(
-            "  > buf: \"%s\" [pc = %d]\n",
-            translate(dp->Datapath__DOT__frontend__DOT__bf).c_str(),
-            dp->Datapath__DOT__frontend__DOT__bpc
-        );
+        // _print(
+        //     "  > no_deps = %d\n",
+        //     dp->Datapath__DOT__frontend__DOT__select__DOT__no_deps
+        // );
+        // _print(
+        //     "  > allow_swap = %d\n",
+        //     dp->Datapath__DOT__frontend__DOT__select__DOT__allow_swap
+        // );
+        // _print(
+        //     "  > jmp_after_lw = %d\n",
+        //     dp->Datapath__DOT__frontend__DOT__select__DOT__jmp_after_lw
+        // );
+        // _print(
+        //     "  > buf: \"%s\" [pc = %d]\n",
+        //     translate(dp->Datapath__DOT__frontend__DOT__bf).c_str(),
+        //     dp->Datapath__DOT__frontend__DOT__bpc
+        // );
         _print(
             "  > cur: \"%s\" [pc = %d]\n",
             translate(last_imem_read).c_str(),
             dp->Datapath__DOT__frontend__DOT__cpc
         );
-        _print(
-            "  > emit \"%s\" [pc = %d]\n",
-            translate(dp->Datapath__DOT__frontend__DOT__select__DOT__emit & 0xffffffff).c_str(),
-            dp->Datapath__DOT__frontend__DOT__select__DOT__emit >> 32
-        );
-        _print(
-            "  > pred \"%s\" [pc = %d]\n",
-            translate(dp->Datapath__DOT__frontend__DOT__select__DOT__pred & 0xffffffff).c_str(),
-            dp->Datapath__DOT__frontend__DOT__select__DOT__pred >> 32
-        );
-        _print("  > result = %d\n", dp->Datapath__DOT__frontend__DOT__result);
+        // _print(
+        //     "  > emit \"%s\" [pc = %d]\n",
+        //     translate(dp->Datapath__DOT__frontend__DOT__select__DOT__emit & 0xffffffff).c_str(),
+        //     dp->Datapath__DOT__frontend__DOT__select__DOT__emit >> 32
+        // );
+        // _print(
+        //     "  > pred \"%s\" [pc = %d]\n",
+        //     translate(dp->Datapath__DOT__frontend__DOT__select__DOT__pred & 0xffffffff).c_str(),
+        //     dp->Datapath__DOT__frontend__DOT__select__DOT__pred >> 32
+        // );
+        // _print("  > result = %d\n", dp->Datapath__DOT__frontend__DOT__result);
         // _print("  > prev = %s\n", translate(dp->Datapath__DOT__instr0).c_str());
         _print("  > miss = %d\n", dp->Datapath__DOT__frontend__DOT__miss);
         // _print("  > pred pc = %d\n", dp->Datapath__DOT__frontend__DOT__select__DOT__pred);

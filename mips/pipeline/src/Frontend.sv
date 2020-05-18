@@ -5,27 +5,16 @@ module Frontend(
     input logic [31:0] data, prev, prev_pc, vs,
     output logic [31:0] iaddr, pc, instr
 );
-    logic [31:0] cpc, bf, bpc;
-    logic ok;
+    logic [31:0] cpc;
 
     assign iaddr = cpc;
 
-    logic normal, miss, req;
-    logic [1:0] result;
-    logic [31:0] next_pc, pred_pc, pred_instr;
+    logic miss;
+    logic [31:0] next_pc;
     logic [31:0] pred, rpc;
 
-    logic [31:0] _pc, _instr;
-    FrontendSelect select(
-        .cpc(cpc), .data(data),
-        .bpc(bpc), .bf(bf),
-        .pc(_pc), .instr(_instr),
-        .pred_pc(pred_pc), .pred_instr(pred_instr),
-        .result(result), .req(req)
-    );
-
     FrontendPredict predict(
-        .pc(pred_pc), .instr(pred_instr),
+        .pc(cpc), .instr(data),
         .pred(pred)
     );
 
@@ -35,32 +24,14 @@ module Frontend(
         .miss(miss), .rpc(rpc)
     );
 
-    assign normal = ~(miss | req);
     assign next_pc = miss ? rpc : pred;
-    assign {pc, instr} = miss ? {bpc, bf} : {_pc, _instr};
+    assign {pc, instr} = miss ? 0 : {cpc, data};
 
-    // logic first_time;
-    always_ff @(posedge clk, posedge reset, negedge clk) begin
+    always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
-            {cpc, bf, bpc, ok} <= 0;
-            // first_time <= 1;
+            cpc <= 0;
         end else if (!stall) begin
-            if (clk) begin
-                ok <= normal;
-                cpc <= next_pc;
-                // cpc <= first_time ? 0 : next_pc;
-                // first_time <= 0;
-                if (result[1]) begin  // insert `nop`
-                    bf <= 0;
-                end else if (result[0]) begin  // normal propagation
-                    bf <= data;
-                    bpc <= cpc;
-                end
-            end else if (!ok) begin
-                bf <= data;
-                bpc <= cpc;
-                cpc <= cpc + 4;
-            end
+            cpc <= next_pc;
         end
     end
 endmodule

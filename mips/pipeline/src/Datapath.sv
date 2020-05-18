@@ -2,17 +2,21 @@ module Datapath(
     input logic clk, reset,
     input logic [31:0] imem_out, mem_out,
     output logic mem_en,
-    output logic [31:0] iaddr, addr, mem_data
+    output logic [31:0] iaddr, addr, mem_data,
+    output logic req
 );
     logic [31:0] pc0, instr0;
 
     logic [4:0] rd1, sht1;
     logic [31:0] imm1, vs1, vt1;
     logic [8:0] signal1;
+    logic req1;
 
     logic [4:0] rd2;
     logic [31:0] out2, vt2;
     logic [1:0] signal2;
+    logic req2;
+    assign req = req2;
 
     logic [31:0] F_pc, F_instr;
     Frontend frontend(
@@ -66,11 +70,11 @@ module Datapath(
     );
 
     logic [12:0] signal0;
-    logic E_is_load;
+    logic E_is_load, D_req;
     assign E_is_load = signal1[8];
     PipelineController pipeline(
         .opcode(instr0[31:26]), .funct(instr0[5:0]),
-        .signal(signal0)
+        .signal(signal0), .req(D_req)
     );
 
     logic stall, v1_mux, v2_mux;
@@ -92,16 +96,17 @@ module Datapath(
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
             {pc0, instr0} <= 0;
-            {signal1, rd1, imm1, vs1, vt1, sht1} <= 0;
-            {signal2, rd2, out2, vt2} <= 0;
+            {signal1, rd1, imm1, vs1, vt1, sht1, req1} <= 0;
+            {signal2, rd2, out2, vt2, req2} <= 0;
         end else begin
             rd2 <= E_rd;
             out2 <= E_out;
             vt2 <= E_vt;
             signal2 <= signal1[1:0];
+            req2 <= req1;
 
             if (stall) begin
-                {signal1, rd1, imm1, vs1, vt1, sht1} <= 0;
+                {signal1, rd1, imm1, vs1, vt1, sht1, req1} <= 0;
             end else begin
                 rd1 <= D_rd;
                 imm1 <= D_imm;
@@ -109,6 +114,7 @@ module Datapath(
                 vt1 <= D_vt;
                 sht1 <= D_sht;
                 signal1 <= signal0[8:0];
+                req1 <= D_req;
 
                 pc0 <= F_pc;
                 instr0 <= F_instr;

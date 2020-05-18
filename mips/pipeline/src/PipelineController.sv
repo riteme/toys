@@ -1,12 +1,15 @@
 module PipelineController(
     input logic [5:0] opcode, funct,
-    output logic [12:0] signal
+    output logic [12:0] signal,
+    output logic req
 );
     logic [3:0] alu_op;
     assign alu_op = funct[3:0] ^ {{2{funct[5]}}, 2'b0};
 
     logic is_shift;
     assign is_shift = ~|funct[5:2];
+
+    assign req = opcode == 6'b101011 || opcode == 6'b100011;
 
     always_comb
     case (opcode)
