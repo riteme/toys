@@ -10,7 +10,7 @@ module RegisterFile(
     assign v1 = v[r1];
     assign v2 = v[r2];
 
-    always_ff @(posedge clk) begin
+    always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
             for (int i = 1; i < 32; i++)  // do not reset $0
                 v[i] <= 0;

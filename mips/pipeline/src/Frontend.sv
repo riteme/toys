@@ -40,7 +40,7 @@ module Frontend(
     assign {pc, instr} = miss ? {bpc, bf} : {_pc, _instr};
 
     // logic first_time;
-    always_ff @(posedge clk, negedge clk) begin
+    always_ff @(posedge clk, posedge reset, negedge clk) begin
         if (reset) begin
             {cpc, bf, bpc, ok} <= 0;
             // first_time <= 1;

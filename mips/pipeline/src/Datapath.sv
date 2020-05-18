@@ -89,7 +89,7 @@ module Datapath(
     assign v1 = v1_mux ? v1_fw : v1_reg;
     assign v2 = v2_mux ? v2_fw : v2_reg;
 
-    always_ff @(posedge clk) begin
+    always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
             {pc0, instr0} <= 0;
             {signal1, rd1, imm1, vs1, vt1, sht1} <= 0;
