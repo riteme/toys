@@ -1,3 +1,5 @@
+`include "Opcode.vh"
+
 module PipelineController(
     input logic [5:0] opcode, funct,
     output logic [12:0] signal,
@@ -9,35 +11,35 @@ module PipelineController(
     logic is_shift;
     assign is_shift = ~|funct[5:2];
 
-    assign req = opcode == 6'b101011 || opcode == 6'b100011;
+    assign req = opcode == `SW || opcode == `LW;
 
     always_comb
     case (opcode)
-        6'b000000: if (funct != 6'b001000)
+        `RTYPE: if (funct != `JR)
             signal = {5'b10_0_0_0, is_shift, 1'b_0, alu_op, 2'b0_0};
         else  // jr
             signal = 13'b00_0_0_0_0_0_0000_0_0;
-        6'b001000:  // addi
+        `ADDI:  // addi
             signal = 13'b11_1_0_0_0_1_1100_0_0;
-        6'b001100:  // andi
+        `ANDI:  // andi
             signal = 13'b11_0_0_0_0_1_1000_0_0;
-        6'b001101:  // ori
+        `ORI:  // ori
             signal = 13'b11_0_0_0_0_1_1001_0_0;
-        6'b001110:  // xori
+        `XORI:  // xori
             signal = 13'b11_0_0_0_0_1_1010_0_0;
-        6'b001010:  // slti
+        `SLTI:  // slti
             signal = 13'b11_1_0_0_0_1_0110_0_0;
-        6'b101011:  // sw
+        `SW:  // sw
             signal = 13'b00_1_0_0_0_1_1100_1_0;
-        6'b100011:  // lw
+        `LW:  // lw
             signal = 13'b11_1_0_1_0_1_1100_0_1;
-        6'b000010:  // j
+        `JMP:  // j
             signal = 13'b00_0_0_0_0_0_0000_0_0;
-        6'b000100:  // beq
+        `BEQ:  // beq
             signal = 13'b00_0_0_0_0_0_0000_0_0;
-        6'b000101:  // bne
+        `BNE:  // bne
             signal = 13'b00_0_0_0_0_0_0000_0_0;
-        6'b000011:  // jal
+        `JAL:  // jal
             signal = 13'b01_0_1_0_0_1_1111_0_0;
         default: signal = 0;
     endcase

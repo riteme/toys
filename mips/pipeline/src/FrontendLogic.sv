@@ -1,31 +1,48 @@
+`include "Opcode.vh"
+
 module FrontendLogic(
     input logic eq,
-    input logic [31:0] prev, prev_pc, vs,
-    output logic miss,
+    input logic [31:0] prev_instr, prev_pc, vs,
     output logic [31:0] rpc
 );
+    logic [31:0] addr, next_pc;
+    AddressExtract parser(
+        .pc(prev_pc), .instr(prev_instr),
+        .out(addr)
+    );
+    assign next_pc = prev_pc + 4;
+
     logic [5:0] opcode, funct;
-    assign opcode = prev[31:26];
-    assign funct = prev[5:0];
+    assign opcode = prev_instr[31:26];
+    assign funct = prev_instr[5:0];
 
     always_comb begin
-    miss = 0;
     case (opcode)
-        6'b000000: if (funct == 6'b001000) begin  // jr, always retake
-            miss = 1;
+        `RTYPE:
+        if (funct == `JR)  // jr
             rpc = vs;
-        end
-        6'b000100: if (!eq) begin  // beq
-            miss = 1;
-            rpc = prev_pc + 4;
-        end
-        6'b000101: if (eq) begin  // bne
-            miss = 1;
-            rpc = prev_pc + 4;
-        end
-        default: rpc = 32'hDEADBEEF;
+        else
+            rpc = next_pc;
+
+        `BEQ:
+        if (!eq)// beq
+            rpc = next_pc;
+        else
+            rpc = addr;
+
+        `BNE:
+        if (eq)  // bne
+            rpc = next_pc;
+        else
+            rpc = addr;
+
+        `JMP:
+            rpc = addr;
+        `JAL:
+            rpc = addr;
+
+        default:
+            rpc = next_pc;
     endcase
     end
-
-    logic _unused_ok = &{1'b0, prev, 1'b0};
 endmodule

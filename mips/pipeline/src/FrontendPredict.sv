@@ -1,28 +1,18 @@
+`include "Opcode.vh"
+
 module FrontendPredict(
-    input logic [31:0] pc, instr,
-    output logic [31:0] pred
+    input logic [31:0] cur_pc, cur_instr,
+    input logic miss,
+    input logic [31:0] prev_pc, prev_instr,
+    output logic [31:0] pred_pc
 );
-    logic [5:0] opcode;
-    logic [31:0] next_pc;
-    logic [25:0] addr;
-    logic [15:0] imm;
-    logic [31:0] sign_imm;
-    assign opcode = instr[31:26];
-    assign next_pc = pc + 4;
-    assign addr = instr[25:0];
-    assign imm = instr[15:0];
-    assign sign_imm = {{16{imm[15]}}, imm};
+    logic [31:0] addr;
+    AddressExtract parser(
+        .pc(cur_pc), .instr(cur_instr),
+        .out(addr)
+    );
 
-    logic [31:0] jta, bta;
-    assign jta = {next_pc[31:28], addr, 2'b00};
-    assign bta = next_pc + (sign_imm << 2);
+    assign pred_pc = addr;
 
-    always_comb
-    case (opcode)
-        6'b000010: pred = jta;  // j
-        6'b000011: pred = jta;  // jal
-        6'b000100: pred = bta;  // beq
-        6'b000101: pred = bta;  // bne
-        default: pred = next_pc;
-    endcase
+    logic __unused_ok = &{1'b0, miss, prev_pc, prev_instr,1'b0};
 endmodule
