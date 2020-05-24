@@ -72,7 +72,7 @@ public:
         _print("\n# NOP\n");
 
         top->cur_pc = top->cur_instr = 0;
-        top->miss = randi(0, 1);
+        top->miss = randu(0, 1);
         top->last_pc = top->last_instr = 0;
         top->eval();
         print_lookup();
@@ -99,18 +99,18 @@ public:
     }
 
     bool lookup(bool expr, u32 id, int offset) {
-        _print("\n# BRANCH: expr = %d, id = %x, offset = %d\n",
+        _print("\n# BRANCH: expr = %d, id = 0x%x, offset = %d\n",
             expr, id, offset);
-        _idx.insert(id);
+        _idx.insert(id & 0x3f);
         id <<= 2;
 
         u32 instr = ITYPE(
-            (randi(0, 1) ? BEQ : BNE),
-            randi(0, 31), randi(0, 31), offset
+            (randu(0, 1) ? BEQ : BNE),
+            randu(0, 31), randu(0, 31), offset
         );
         top->cur_pc = id;
         top->cur_instr = instr;
-        top->miss = randi(0, 1);
+        top->miss = randu(0, 1);
         top->last_pc = top->last_instr = 0;
         top->eval();
 

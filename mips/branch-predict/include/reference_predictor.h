@@ -69,8 +69,8 @@ private:
         u32 track = bht[tag];
         u32 imm = (int(instr) << 16) >> 16;
         u32 addr = pc + 1 + imm;
-        u32 gindex = tag ^ ght;
-        u32 lindex = tag ^ track;
+        u32 gindex = tag ^ (ght << 2);
+        u32 lindex = tag ^ (track << 2);
 
         bool btfnt = addr <= pc;
         int fallback = 1 + btfnt;

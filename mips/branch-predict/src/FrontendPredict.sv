@@ -73,8 +73,8 @@ module FrontendPredict #(
     logic [IWIDTH - 1:0] gindex, lindex;
     /* verilator lint_save */
     /* verilator lint_off WIDTH */
-    assign gindex = tag ^ ght;
-    assign lindex = tag ^ bht;
+    assign gindex = tag ^ (ght << 2);
+    assign lindex = tag ^ (bht << 2);
     /* verilator lint_restore */
 
     PHT #(

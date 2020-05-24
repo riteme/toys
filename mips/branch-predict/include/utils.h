@@ -32,7 +32,7 @@ using cstr = const char*;
 /**
  * generate a random 64-bit unsigned integer.
  */
-inline u64 randi() {
+inline u64 randu() {
     static std::mt19937_64 gen(DEFAULT_SEED);
     return gen();
 }
@@ -40,8 +40,8 @@ inline u64 randi() {
 /**
  * generate an unsigned integer in [l, r].
  */
-inline u64 randi(u64 l, u64 r) {
-    return randi() % (r - l + 1) + l;
+inline u64 randu(u64 l, u64 r) {
+    return randu() % (r - l + 1) + l;
 }
 
 inline auto bitcast(u32 data, int hi, int lo) -> std::string {
