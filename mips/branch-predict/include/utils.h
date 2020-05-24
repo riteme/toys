@@ -15,8 +15,8 @@ using cstr = const char*;
     (u32(op) << 26) | \
     (u32(addr) & 0x03ffffff) \
 )
-#define JMP(addr) JTYPE(0b000010, addr)
-#define JAL(addr) JTYPE(0b000011, addr)
+#define JMP 0b000010
+#define JAL 0b000011
 
 #define ITYPE(op, rs, rt, imm) ( \
     (u32(op) << 26) | \
@@ -24,8 +24,8 @@ using cstr = const char*;
     ((u32(rt) & 0x3f) << 16) | \
     (u32(imm) & 0xffff) \
 )
-#define BEQ(rs, rt, offset) ITYPE(0b000100, rs, rt, offset)
-#define BNE(rs, rt, offset) ITYPE(0b000101, rs, rt, offset)
+#define BEQ 0b000100
+#define BNE 0b000101
 
 #define DEFAULT_SEED 19260817
 

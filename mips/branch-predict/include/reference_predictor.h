@@ -8,22 +8,22 @@
 
 class PHT {
 public:
-    char tb[BPB_SIZE];
+    int tb[BPB_SIZE];
 
     void reset() {
         memset(tb, -1, sizeof(tb));
     }
 
-    char get(u32 index, char fallback) {
-        char &v = tb[index];
+    bool get(u32 index, int fallback) {
+        int &v = tb[index];
         if (v < 0)
             v = fallback;
-        return v;
+        return v & 2;
     }
 
     void update(u32 index, bool taken) {
-        char delta = taken ? 1 : -1;
-        char &v = tb[index];
+        int delta = taken ? 1 : -1;
+        int &v = tb[index];
         assert(v >= 0);
         v = std::min(3, std::max(0, v + delta));
     }
@@ -67,15 +67,17 @@ private:
         -> std::tuple<bool, bool, u32, u32, u32> {
         u32 tag = (pc >> 2) & 0x3f;
         u32 track = bht[tag];
-        u32 addr = (int(instr) << 16) >> 16;
+        u32 imm = (int(instr) << 16) >> 16;
+        u32 addr = pc + 1 + imm;
         u32 gindex = tag ^ ght;
         u32 lindex = tag ^ track;
 
-        bool fallback = addr <= pc;
+        bool btfnt = addr <= pc;
+        int fallback = 1 + btfnt;
         bool mux = selector.get(tag, 0b01);
         bool pred = mux ?
-            lshare.get(gindex, fallback) :
-            gshare.get(lindex, fallback);
+            lshare.get(lindex, fallback) :
+            gshare.get(gindex, fallback);
 
         return std::make_tuple(
             pred, mux, tag, gindex, lindex

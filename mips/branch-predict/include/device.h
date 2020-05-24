@@ -69,6 +69,8 @@ public:
      * no operation, i.e. ready = 0.
      */
     void nop() {
+        _print("\n# NOP\n");
+
         top->cur_pc = top->cur_instr = 0;
         top->miss = randi(0, 1);
         top->last_pc = top->last_instr = 0;
@@ -77,18 +79,59 @@ public:
 
         invoke();
         print_update();
-
         _check_ref();
     }
 
-    bool beq(bool expr, u32 id, int offset) {
-        _print("#BEQ: expr = %d, id = %u, offset = %d\n",
-            expr, id, offset);
+    void update(bool miss) {
+        _print("\n# UPDATE: miss = %d\n", miss);
+
+        top->miss = miss;
+        top->last_pc = top->cur_pc;
+        top->last_instr = top->cur_instr;
+        top->cur_pc = top->cur_instr = 0;
+
+        invoke();
+        print_update();
+
+        if (ref)
+            ref->update(top->last_pc, top->last_instr, miss);
+        _check_ref();
     }
 
-    bool bne(bool expr, u32 id, int offset) {
-        _print("#BNE: expr = %d, id = %u, offset = %d\n",
+    bool lookup(bool expr, u32 id, int offset) {
+        _print("\n# BRANCH: expr = %d, id = %x, offset = %d\n",
             expr, id, offset);
+        _idx.insert(id);
+        id <<= 2;
+
+        u32 instr = ITYPE(
+            (randi(0, 1) ? BEQ : BNE),
+            randi(0, 31), randi(0, 31), offset
+        );
+        top->cur_pc = id;
+        top->cur_instr = instr;
+        top->miss = randi(0, 1);
+        top->last_pc = top->last_instr = 0;
+        top->eval();
+
+        print_lookup();
+        if (ref) {
+            bool ref_pred = ref->predict(id, instr);
+            assert(top->pred == ref_pred);
+        }
+
+        invoke();
+        print_update();
+        _check_ref();
+
+        bool miss = expr ^ top->pred;
+        update(miss);
+
+        _stat.count++;
+        if (miss)
+            _stat.miss++;
+
+        return expr;
     }
 
     void print_lookup() {
@@ -146,7 +189,7 @@ private:
      * valid: is valid (in PHT.sv)
      * sw: software (referenece) result.
      */
-    void _check_pht_entry(u32 hw, bool valid, char sw) {
+    void _check_pht_entry(u32 hw, bool valid, int sw) {
         if (sw < 0)
             assert(!valid);
         else {

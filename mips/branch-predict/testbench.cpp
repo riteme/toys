@@ -20,10 +20,30 @@ POSTTEST_HOOK = [] {
     // do nothing
 };
 
+#define IF(expr) if (dev->lookup((expr), __LINE__, randi(1, 100)))
+
 /**
  * TESTBENCH
  */
 
-WITH TRACE {
+WITH {
     dev->nop();
-} AS("nop")
+} AS("nop");
+
+WITH {
+    IF (1 == 1) {}
+} AS("single branch");
+
+WITH {
+    IF (1 == 1) {}
+    IF (1 == 1) {}
+} AS("double branches");
+
+WITH {
+    IF (1 == 1) {
+
+    }
+    IF (1 == 1) {
+
+    }
+} AS("double branches 2");
