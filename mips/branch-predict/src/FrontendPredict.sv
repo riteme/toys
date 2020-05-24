@@ -2,7 +2,7 @@
 `include "Opcode.vh"
 
 module FrontendPredict #(
-    IWIDTH = 6
+    IWIDTH = `BPB_T
 ) (
     input logic clk, reset, en,
     input logic [31:0] cur_pc, cur_instr,
@@ -10,22 +10,23 @@ module FrontendPredict #(
     input logic [31:0] last_pc, last_instr,
     output logic [31:0] pred_pc
 );
-    logic last_pred;
+    logic last_pred, last_mux;
+
     logic pred, last_taken;
     assign last_taken = last_pred ^ miss;
 
     logic [31:0] taddr, next_pc;
     logic [`TMAX:0] cur_traits, last_traits;
-    logic [5:0] last_op, last_funct;
-    assign next_pc = cur_pc + 4;
+    // logic [5:0] last_op, last_funct;
 
     InstructionParser cur_parser(
         .pc(cur_pc), .instr(cur_instr),
-        .traits(cur_traits), .taddr(taddr)
+        .next_pc(next_pc), .traits(cur_traits),
+        .taddr(taddr)
     );
     InstructionTraits last_parser(
         .instr(last_instr),
-        .op(last_op), .funct(last_funct),
+        // .op(last_op), .funct(last_funct),
         .traits(last_traits)
     );
 
@@ -34,7 +35,7 @@ module FrontendPredict #(
     assign do_lookup = cur_traits[`T_BR];
 
     logic [IWIDTH - 1:0] ght, bht, tag;
-    assign tag = cur_pc[IWIDTH - 1:0];
+    assign tag = cur_pc[IWIDTH + 1:2];  // ignore aligned bits
     GHT #(
         .HWIDTH(IWIDTH)
     ) _ght(
@@ -61,7 +62,6 @@ module FrontendPredict #(
     `define GSHARE 0
     `define LSHARE 1
     logic fallback, gpred, lpred, mux, auto_mux;
-    logic last_mux;
     BTFNT fallback_predictor(
         .next_pc(next_pc),
         .cur_addr(taddr),
@@ -73,7 +73,7 @@ module FrontendPredict #(
         .clk(clk), .reset(reset), .en(en),
         .do_update(do_update && last_mux == `GSHARE),
         .last_taken(last_taken),
-        .do_lookup(do_lookup),
+        .do_lookup(do_lookup && mux == `GSHARE),
         .index(tag ^ ght),
         .fallback(fallback),
         .pred(gpred)
@@ -84,7 +84,7 @@ module FrontendPredict #(
         .clk(clk), .reset(reset), .en(en),
         .do_update(do_update && last_mux == `LSHARE),
         .last_taken(last_taken),
-        .do_lookup(do_lookup),
+        .do_lookup(do_lookup && mux == `LSHARE),
         .index(tag ^ bht),
         .fallback(fallback),
         .pred(lpred)
@@ -101,6 +101,9 @@ module FrontendPredict #(
         .pred(auto_mux)
     );
 
+    /**
+     * generate prediction
+     */
     always_comb begin
     `ifdef USE_BTFNT
         mux = 0;
@@ -121,12 +124,16 @@ module FrontendPredict #(
      * translate predictions into pc addresses.
      */
     always_comb begin
-        if (cur_traits[`T_BR])
-            pred_pc = pred ? taddr : next_pc;
+        if (cur_traits[`T_JMP] ||
+            cur_traits[`T_JAL] ||
+            (cur_traits[`T_BR] && pred))
+            pred_pc = taddr;
+        else
+            pred_pc = next_pc;
     end
 
     /**
-     * save last prediction states.
+     * save last prediction states for later updates.
      */
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
@@ -138,7 +145,8 @@ module FrontendPredict #(
     end
 
     logic __unused_ok = &{1'b0,
-        last_op, last_funct, last_pc,
+        // last_op, last_funct,
+        last_pc,
         cur_traits, last_traits,
     1'b0};
 endmodule

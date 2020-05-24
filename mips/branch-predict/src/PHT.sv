@@ -3,6 +3,7 @@
  */
 module PHT #(
     IWIDTH = 6,
+    CWIDTH = 2,
     _SIZE = 2**IWIDTH
 ) (
     input logic clk, reset, en,
@@ -28,16 +29,18 @@ module PHT #(
     output logic pred
 );
     logic [_SIZE - 1:0] valid;
-    logic [1:0] cnt[_SIZE];
+    logic [CWIDTH - 1:0] cnt[_SIZE];
     logic [IWIDTH - 1:0] last_index;
 
     logic hit;
     assign hit = valid[index];
-    assign pred = hit ? cnt[index][1] : fallback;
+    assign pred = hit ? cnt[index][CWIDTH - 1] : fallback;
 
-    logic [1:0] next_cnt, fallback_cnt;
-    assign fallback_cnt = {fallback, ~fallback};
-    SaturateCounter inc(
+    logic [CWIDTH - 1:0] next_cnt, fallback_cnt;
+    assign fallback_cnt = 2**(CWIDTH - 1) - (!fallback);
+    SaturateCounter #(
+        .WIDTH(CWIDTH)
+    ) inc(
         .taken(last_taken),
         .in(cnt[last_index]), .out(next_cnt)
     );

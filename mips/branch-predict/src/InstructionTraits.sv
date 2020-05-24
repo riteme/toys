@@ -3,9 +3,10 @@
 
 module InstructionTraits(
     input logic [31:0] instr,
-    output logic [5:0] op, funct,
+    // output logic [5:0] op, funct,
     output logic [`TMAX:0] traits
 );
+    logic [5:0] op, funct;
     assign op = instr[31:26];
     assign funct = instr[5:0];
 
