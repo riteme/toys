@@ -2,7 +2,8 @@
 `include "Opcode.vh"
 
 module FrontendPredict #(
-    IWIDTH = `BPB_T
+    IWIDTH = `BPB_T,
+    HWIDTH = `BPB_H
 ) (
     input logic clk, reset, en,
     input logic [31:0] cur_pc, cur_instr,
@@ -34,10 +35,11 @@ module FrontendPredict #(
     assign do_update = last_traits[`T_BR];
     assign do_lookup = cur_traits[`T_BR];
 
-    logic [IWIDTH - 1:0] ght, bht, tag;
+    logic [IWIDTH - 1:0] tag;
+    logic [HWIDTH - 1:0] ght, bht;
     assign tag = cur_pc[IWIDTH + 1:2];  // ignore aligned bits
     GHT #(
-        .HWIDTH(IWIDTH)
+        .HWIDTH(HWIDTH)
     ) _ght(
         .clk(clk), .reset(reset), .en(en),
         .do_update(do_update),
@@ -46,7 +48,7 @@ module FrontendPredict #(
     );
     BHT #(
         .IWIDTH(IWIDTH),
-        .HWIDTH(IWIDTH)
+        .HWIDTH(HWIDTH)
     ) _bht(
         .clk(clk), .reset(reset), .en(en),
         .do_update(do_update),
@@ -67,6 +69,14 @@ module FrontendPredict #(
         .cur_addr(taddr),
         .pred(fallback)
     );
+
+    logic [IWIDTH - 1:0] gindex, lindex;
+    /* verilator lint_save */
+    /* verilator lint_off WIDTH */
+    assign gindex = tag ^ ght;
+    assign lindex = tag ^ bht;
+    /* verilator lint_restore */
+
     PHT #(
         .IWIDTH(IWIDTH)
     ) gshare_predictor(
@@ -74,7 +84,7 @@ module FrontendPredict #(
         .do_update(do_update && last_mux == `GSHARE),
         .last_taken(last_taken),
         .do_lookup(do_lookup && mux == `GSHARE),
-        .index(tag ^ ght),
+        .index(gindex),
         .fallback(fallback),
         .pred(gpred)
     );
@@ -85,7 +95,7 @@ module FrontendPredict #(
         .do_update(do_update && last_mux == `LSHARE),
         .last_taken(last_taken),
         .do_lookup(do_lookup && mux == `LSHARE),
-        .index(tag ^ bht),
+        .index(lindex),
         .fallback(fallback),
         .pred(lpred)
     );
@@ -133,7 +143,7 @@ module FrontendPredict #(
     end
 
     /**
-     * save last prediction states for later updates.
+     * save prediction states for later updates.
      */
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin

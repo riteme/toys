@@ -135,8 +135,8 @@ public:
     }
 
     void print_lookup() {
-        auto ght_s = bitcast(top->ght, 5, 0);
-        auto bht_s = bitcast(top->bht, 5, 0);
+        auto ght_s = bitcast(top->ght, 3, 0);
+        auto bht_s = bitcast(top->bht, 3, 0);
         auto tag_s = bitcast(top->tag, 5, 0);
         _print("GHT: %s, BHT: %s, TAG: %s\n",
             ght_s.data(), bht_s.data(), tag_s.data());
@@ -158,7 +158,7 @@ public:
 
         for (auto i : _idx) {
             auto index = bitcast(i, 5, 0);
-            auto value = bitcast(top->bht_tb[i], 5, 0);
+            auto value = bitcast(top->bht_tb[i], 3, 0);
             _print("BHT@%s: %s\n", index.data(), value.data());
         }
     }

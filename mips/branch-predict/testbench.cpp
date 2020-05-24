@@ -47,3 +47,9 @@ WITH {
 
     }
 } AS("double branches 2");
+
+WITH {
+    for (int i = 0; i < 10; i++) {
+        IF (1 == 1) {}
+    }
+} AS("repeat branch");

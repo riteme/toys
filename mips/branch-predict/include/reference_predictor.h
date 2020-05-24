@@ -56,8 +56,8 @@ public:
         else
             gshare.update(gindex, real_taken);
 
-        ght = ((ght << 1) | real_taken) & 0x3f;
-        bht[tag] = ((bht[tag] << 1) | real_taken) & 0x3f;
+        ght = ((ght << 1) | real_taken) & 0xf;
+        bht[tag] = ((bht[tag] << 1) | real_taken) & 0xf;
     }
 
 private:

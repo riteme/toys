@@ -3,7 +3,7 @@
  */
 module BHT #(
     IWIDTH = 6,
-    HWIDTH = 6,
+    HWIDTH = 4,
     _SIZE = 2**IWIDTH
 ) (
     input logic clk, reset, en,

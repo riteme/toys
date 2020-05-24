@@ -5,8 +5,9 @@ module TestTop #(SIZE = 2**6) (
     input logic [31:0] last_pc, last_instr,
     output logic [31:0] pred_pc,
 
-    output logic [5:0] ght, bht, tag, gindex, lindex,
-    output logic [5:0] bht_last_index, bht_tb[SIZE],
+    output logic [3:0] ght, bht, bht_tb[SIZE],
+    output logic [5:0] tag, gindex, lindex,
+    output logic [5:0] bht_last_index,
     output logic fallback,
     output logic [5:0] glast_index, llast_index, slast_index,
     output logic [1:0] gcnt[SIZE], lcnt[SIZE], scnt[SIZE],
@@ -24,8 +25,8 @@ module TestTop #(SIZE = 2**6) (
     assign ght = dev.ght;
     assign bht = dev.bht;
     assign tag = dev.tag;
-    assign gindex = dev.tag ^ ght;
-    assign lindex = dev.tag ^ bht;
+    assign gindex = dev.gindex;
+    assign lindex = dev.lindex;
 
     assign bht_last_index = dev._bht.last_index;
     for (genvar i = 0; i < SIZE; i++) begin
