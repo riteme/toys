@@ -182,17 +182,15 @@ public:
             fprintf(fd, "miss rate: %.2lf%% [miss = %u, count = %u]\n",
                 ratio * 100, _stat.miss, _stat.count);
 
-            int gcnt = 0, lcnt = 0;
+            int cnt[4] = {0};
             for (int i = 0; i < BPB_SIZE; i++) {
                 if (!top->svalid[i])
                     continue;
-                if (top->scnt[i] & 2)
-                    lcnt++;
-                else
-                    gcnt++;
+                cnt[top->scnt[i]]++;
             }
 
-            fprintf(fd, "gcnt = %d, lcnt = %d\n", gcnt, lcnt);
+            fprintf(fd, "cnt = {%d, %d, %d, %d}\n",
+                cnt[0], cnt[1], cnt[2], cnt[3]);
         }
     }
 

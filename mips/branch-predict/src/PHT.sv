@@ -4,6 +4,7 @@
 module PHT #(
     IWIDTH = 6,
     CWIDTH = 2,
+    TRUST_FALLBACK = 0,
     _SIZE = 2**IWIDTH
 ) (
     input logic clk, reset, en,
@@ -37,7 +38,11 @@ module PHT #(
     assign pred = hit ? cnt[index][CWIDTH - 1] : fallback;
 
     logic [CWIDTH - 1:0] next_cnt, fallback_cnt;
-    assign fallback_cnt = 2**(CWIDTH - 1) - (!fallback);
+    if (TRUST_FALLBACK)
+        assign fallback_cnt = fallback ? 2**CWIDTH - 1 : 0;
+    else
+        assign fallback_cnt = 2**(CWIDTH - 1) - (!fallback);
+
     SaturateCounter #(
         .WIDTH(CWIDTH)
     ) inc(

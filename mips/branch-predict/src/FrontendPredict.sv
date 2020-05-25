@@ -16,7 +16,7 @@ module FrontendPredict #(
     typedef logic [IWIDTH - 1:0] Index;
     typedef logic [HWIDTH - 1:0] Track;
 
-    logic last_pred, last_mux;
+    logic last_pred, last_mux, last_not_same;
 
     logic pred, last_taken;
     assign last_taken = last_pred ^ miss;
@@ -93,9 +93,9 @@ module FrontendPredict #(
         .IWIDTH(IWIDTH)
     ) gshare_predictor(
         .clk(clk), .reset(reset), .en(en),
-        .do_update(do_update && last_mux == `GSHARE),
+        .do_update(do_update),
         .last_taken(last_taken),
-        .do_lookup(do_lookup && mux == `GSHARE),
+        .do_lookup(do_lookup),
         .index(gindex),
         .fallback(fallback),
         .pred(gpred)
@@ -104,18 +104,19 @@ module FrontendPredict #(
         .IWIDTH(IWIDTH)
     ) lshare_predictor(
         .clk(clk), .reset(reset), .en(en),
-        .do_update(do_update && last_mux == `LSHARE),
+        .do_update(do_update),
         .last_taken(last_taken),
-        .do_lookup(do_lookup && mux == `LSHARE),
+        .do_lookup(do_lookup),
         .index(lindex),
         .fallback(fallback),
         .pred(lpred)
     );
     PHT #(
-        .IWIDTH(IWIDTH)
+        .IWIDTH(IWIDTH),
+        .TRUST_FALLBACK(1)
     ) selector(
         .clk(clk), .reset(reset), .en(en),
-        .do_update(do_update),
+        .do_update(do_update && last_not_same),
         .last_taken(last_mux ^ miss),
         .do_lookup(do_lookup),
         .index(tag),
@@ -159,10 +160,11 @@ module FrontendPredict #(
      */
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
-            {last_pred, last_mux} <= 0;
+            {last_pred, last_mux, last_not_same} <= 0;
         end else if (en) begin
             last_pred <= pred;
             last_mux <= mux;
+            last_not_same <= gpred != lpred;
         end
     end
 
