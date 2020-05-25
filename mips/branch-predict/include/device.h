@@ -135,18 +135,19 @@ public:
     }
 
     void print_lookup() {
-        auto ght_s = bitcast(top->ght, 3, 0);
-        auto bht_s = bitcast(top->bht, 3, 0);
-        auto tag_s = bitcast(top->tag, 5, 0);
-        _print("GHT: %s, BHT: %s, TAG: %s\n",
-            ght_s.data(), bht_s.data(), tag_s.data());
+        auto ght_s = bitcast(top->ght, BPB_H - 1, 0);
+        auto bht_s = bitcast(top->bht, BPB_H - 1, 0);
+        auto tag_s = bitcast(top->tag, BPB_T - 1, 0);
+        auto htag_s = bitcast(top->htag, BPB_T - 1, 0);
+        _print("GHT: %s, BHT: %s, TAG: %s, HTAG: %s\n",
+            ght_s.data(), bht_s.data(), tag_s.data(), htag_s.data());
         _print("pred = %d\n", top->pred);
         _print("{gpred = %d, lpred = %d, mux = %d, fallback = %d}\n",
             top->gpred, top->lpred, top->mux, top->fallback);
 
-        ght_s = bitcast(top->glast_index, 5, 0);
-        bht_s = bitcast(top->llast_index, 5, 0);
-        tag_s = bitcast(top->slast_index, 5, 0);
+        ght_s = bitcast(top->glast_index, BPB_T - 1, 0);
+        bht_s = bitcast(top->llast_index, BPB_T - 1, 0);
+        tag_s = bitcast(top->slast_index, BPB_T - 1, 0);
         _print("glast: %s, llast: %s, slast: %s\n",
             ght_s.data(), bht_s.data(), tag_s.data());
     }
@@ -157,8 +158,8 @@ public:
         _print_pht(top->scnt, top->svalid, "mux");
 
         for (auto i : _idx) {
-            auto index = bitcast(i, 5, 0);
-            auto value = bitcast(top->bht_tb[i], 3, 0);
+            auto index = bitcast(i, BPB_T - 1, 0);
+            auto value = bitcast(top->bht_tb[i], BPB_H - 1, 0);
             _print("BHT@%s: %s\n", index.data(), value.data());
         }
     }
@@ -218,7 +219,7 @@ private:
     void _print_pht(CData *cnt, CData *valid, const char *name) {
         for (int i = 0; i < BPB_SIZE; i++)
         if (valid[i]) {
-            auto index = bitcast(i, 5, 0);
+            auto index = bitcast(i, BPB_T - 1, 0);
             _print("%s@%s: %d\n", name, index.data(), cnt[i]);
         }
     }

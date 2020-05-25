@@ -11,13 +11,18 @@ module FrontendPredict #(
     input logic [31:0] last_pc, last_instr,
     output logic [31:0] pred_pc
 );
+    typedef logic [31:0] Word;
+    typedef logic [`TMAX:0] Traits;
+    typedef logic [IWIDTH - 1:0] Index;
+    typedef logic [HWIDTH - 1:0] Track;
+
     logic last_pred, last_mux;
 
     logic pred, last_taken;
     assign last_taken = last_pred ^ miss;
 
-    logic [31:0] taddr, next_pc;
-    logic [`TMAX:0] cur_traits, last_traits;
+    Word taddr, next_pc;
+    Traits cur_traits, last_traits;
     // logic [5:0] last_op, last_funct;
 
     InstructionParser cur_parser(
@@ -35,9 +40,16 @@ module FrontendPredict #(
     assign do_update = last_traits[`T_BR];
     assign do_lookup = cur_traits[`T_BR];
 
-    logic [IWIDTH - 1:0] tag;
-    logic [HWIDTH - 1:0] ght, bht;
+    Word hashed_pc;
+    Index tag, hashed_tag;
+    Track ght, bht;
+    assign hashed_pc[31:18] = cur_pc[31:18];
+    assign hashed_pc[1:0] = 0;
+    HashFunction hash(.in(cur_pc[17:2]), .out(hashed_pc[17:2]));
+
     assign tag = cur_pc[IWIDTH + 1:2];  // ignore aligned bits
+    assign hashed_tag = hashed_pc[IWIDTH + 1:2];
+
     GHT #(
         .HWIDTH(HWIDTH)
     ) _ght(
@@ -70,11 +82,11 @@ module FrontendPredict #(
         .pred(fallback)
     );
 
-    logic [IWIDTH - 1:0] gindex, lindex;
+    Index gindex, lindex;
     /* verilator lint_save */
     /* verilator lint_off WIDTH */
-    assign gindex = tag ^ (ght << 2);
-    assign lindex = tag ^ (bht << 2);
+    assign gindex = hashed_tag ^ ght;
+    assign lindex = hashed_tag ^ bht;
     /* verilator lint_restore */
 
     PHT #(
@@ -156,7 +168,7 @@ module FrontendPredict #(
 
     logic __unused_ok = &{1'b0,
         // last_op, last_funct,
-        last_pc,
+        last_pc, hashed_pc,
         cur_traits, last_traits,
     1'b0};
 endmodule

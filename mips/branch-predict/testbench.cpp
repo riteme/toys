@@ -125,6 +125,35 @@ WITH STATISTICS {
     }
 } AS("local repeat pattern 2");
 
+WITH STATISTICS {
+    for (int i = 0; i < 500; i++) {
+        IF (i % 2 == 0) {
+            // On a dark desert highway,
+            // cool wind in my hair.
+            // we saying~~~~~
+            // we song~~~~~~~
+            // we saying~~~~~
+            // we song~~~~~~~
+        }
+        IF (i % 3 == 0) {
+            // Warm smell of colitas,
+            // rising up through the air.
+            // we saying~~~~~
+            // we song~~~~~~~
+            // we saying~~~~~
+            // we song~~~~~~~
+        }
+        IF (i % 4 == 0) {
+            // Up ahead in the distance,
+            // I saw a shimmering light.
+            // we saying~~~~~
+            // we song~~~~~~~
+            // we saying~~~~~
+            // we song~~~~~~~
+        }
+    }
+} AS("local repeat pattern 3");
+
 #define FOR(initial, condition, final) \
     for (initial; dev->lookup((condition), __LINE__, -10); final)
 

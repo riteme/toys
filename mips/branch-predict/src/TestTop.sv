@@ -1,15 +1,21 @@
-module TestTop #(SIZE = 2**6) (
-    input logic clk, reset, en,
-    input logic [31:0] cur_pc, cur_instr,
-    input logic miss,
-    input logic [31:0] last_pc, last_instr,
-    output logic [31:0] pred_pc,
+`include "bpb.vh"
 
-    output logic [3:0] ght, bht, bht_tb[SIZE],
-    output logic [5:0] tag, gindex, lindex,
-    output logic [5:0] bht_last_index,
+typedef logic [31:0] Word;
+typedef logic [`BPB_T - 1:0] Index;
+typedef logic [`BPB_H - 1:0] Track;
+
+module TestTop #(SIZE = 2**`BPB_T) (
+    input logic clk, reset, en,
+    input Word cur_pc, cur_instr,
+    input logic miss,
+    input Word last_pc, last_instr,
+    output Word pred_pc,
+
+    output Track ght, bht, bht_tb[SIZE],
+    output Index tag, htag, gindex, lindex,
+    output Index bht_last_index,
     output logic fallback,
-    output logic [5:0] glast_index, llast_index, slast_index,
+    output Index glast_index, llast_index, slast_index,
     output logic [1:0] gcnt[SIZE], lcnt[SIZE], scnt[SIZE],
     output logic gvalid[SIZE], lvalid[SIZE], svalid[SIZE],
     output logic pred, gpred, lpred, mux
@@ -25,6 +31,7 @@ module TestTop #(SIZE = 2**6) (
     assign ght = dev.ght;
     assign bht = dev.bht;
     assign tag = dev.tag;
+    assign htag = dev.hashed_tag;
     assign gindex = dev.gindex;
     assign lindex = dev.lindex;
 

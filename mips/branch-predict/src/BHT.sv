@@ -30,9 +30,10 @@ module BHT #(
 
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
-            for (int i = 0; i < _SIZE; i++) begin
-                tb[i] <= 0;
-            end
+            // for (int i = 0; i < _SIZE; i++) begin
+            //     tb[i] <= 0;
+            // end
+            tb <= '{default: 0};
             last_index <= 0;
         end else if (en) begin
             if (do_update)

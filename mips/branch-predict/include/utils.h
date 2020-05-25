@@ -8,8 +8,11 @@ using u64 = unsigned long long;
 using u32 = unsigned int;
 using cstr = const char*;
 
-#define BPB_T 6
+#define BPB_T 8
+#define BPB_H 4
 #define BPB_SIZE (1 << BPB_T)
+#define BPB_TMASK ((1u << BPB_T) - 1)
+#define BPB_HMASK ((1u << BPB_H) - 1)
 
 #define JTYPE(op, addr) ( \
     (u32(op) << 26) | \

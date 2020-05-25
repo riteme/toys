@@ -6,6 +6,26 @@
 
 #include "utils.h"
 
+constexpr u32 M_hash[16] = {
+    0xaaaa, 0x5555, 0x33b3,
+    51295, 13543, 54947, 49066, 64334, 32201,
+    17399, 35255, 41252, 30113, 4540, 56082, 14591
+};
+
+inline u32 hash_multiply(u32 x) {
+    u32 val = 0;
+    for (int i = 0; i < 16; i++) {
+        if ((x >> i) & 1)
+            val ^= M_hash[i];
+    }
+    return val;
+}
+
+inline u32 evaluate_hash(u32 x) {
+    assert((x & 3) == 0);
+    return (x & 0xfffc0000) | (hash_multiply((x & 0x0003fffc) >> 2) << 2);
+}
+
 class PHT {
 public:
     int tb[BPB_SIZE];
@@ -56,8 +76,8 @@ public:
         else
             gshare.update(gindex, real_taken);
 
-        ght = ((ght << 1) | real_taken) & 0xf;
-        bht[tag] = ((bht[tag] << 1) | real_taken) & 0xf;
+        ght = ((ght << 1) | real_taken) & BPB_HMASK;
+        bht[tag] = ((bht[tag] << 1) | real_taken) & BPB_HMASK;
     }
 
 private:
@@ -65,12 +85,15 @@ private:
 
     auto _predict(u32 pc, u32 instr)
         -> std::tuple<bool, bool, u32, u32, u32> {
-        u32 tag = (pc >> 2) & 0x3f;
+        u32 hashed_pc = evaluate_hash(pc);
+        u32 tag = (pc >> 2) & BPB_TMASK;
+        u32 hashed_tag = (hashed_pc >> 2) & BPB_TMASK;
         u32 track = bht[tag];
         u32 imm = (int(instr) << 16) >> 16;
         u32 addr = pc + 1 + imm;
-        u32 gindex = tag ^ (ght << 2);
-        u32 lindex = tag ^ (track << 2);
+        u32 gindex = hashed_tag ^ ght;
+        u32 lindex = hashed_tag ^ track;
+        // printf("hashed_pc=%x, hashed_tag=%x\n", hashed_pc, hashed_tag);
 
         bool btfnt = addr <= pc;
         int fallback = 1 + btfnt;

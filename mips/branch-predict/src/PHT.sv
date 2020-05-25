@@ -47,9 +47,10 @@ module PHT #(
 
     always_ff @(posedge clk, posedge reset) begin
         if (reset) begin
-            for (int i = 0; i < _SIZE; i++) begin
-                cnt[i] <= 0;
-            end
+            // for (int i = 0; i < _SIZE; i++) begin
+            //     cnt[i] <= 0;
+            // end
+            cnt <= '{default: 0};
             valid <= 0;
             last_index <= 0;
         end else if (en) begin
