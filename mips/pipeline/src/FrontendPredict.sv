@@ -1,6 +1,7 @@
 `include "Opcode.vh"
 
 module FrontendPredict(
+    input logic clk, reset, en,
     input logic [31:0] cur_pc, cur_instr,
     input logic miss,
     input logic [31:0] prev_pc, prev_instr,
@@ -14,5 +15,8 @@ module FrontendPredict(
 
     assign pred_pc = addr;
 
-    logic __unused_ok = &{1'b0, miss, prev_pc, prev_instr,1'b0};
+    logic __unused_ok = &{1'b0,
+        miss, prev_pc, prev_instr,
+        clk, reset, en,
+    1'b0};
 endmodule

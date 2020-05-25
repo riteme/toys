@@ -12,6 +12,7 @@ module Frontend(
     assign miss = prev != 0 && cpc != rpc;
 
     FrontendPredict predict(
+        .clk(clk), .reset(reset), .en(!stall),
         .cur_pc(cpc), .cur_instr(data),
         .miss(miss),
         .prev_pc(prev_pc), .prev_instr(prev),
