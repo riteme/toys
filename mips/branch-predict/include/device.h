@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdio>
+
 #include <set>
 #include <vector>
 #include <numeric>
@@ -7,6 +9,8 @@
 #include "top.h"
 #include "utils.h"
 #include "reference_predictor.h"
+
+#define REPORT_TO(filename) { dev->open_report(filename); }
 
 using TDeviceTop = VTestTop;
 using TReference = ReferencePredictor;
@@ -27,7 +31,9 @@ public:
 
     void reset(bool _init = true) {
         enable_print(false);
-        memset(&_stat, 0, sizeof(_stat));
+        open_report(nullptr);
+        reset_statistics();
+        enable_reference();
         _idx.clear();
 
         top->reset = 1;
@@ -126,10 +132,7 @@ public:
 
         bool miss = expr ^ top->pred;
         update(miss);
-
-        _stat.count++;
-        if (miss)
-            _stat.miss++;
+        _update_stat(miss);
 
         return expr;
     }
@@ -164,26 +167,79 @@ public:
         }
     }
 
+    void reset_statistics() {
+        memset(&_stat, 0, sizeof(_stat));
+    }
+
     /**
      * NOTE: print_statistics ignores _enable_print flag.
      */
-    void print_statistics() {
-        double ratio = static_cast<double>(_stat.miss) / _stat.count * 100;
-        printf("miss rate: %.2lf%% [miss = %u, count = %u]\n",
-            ratio, _stat.miss, _stat.count);
+    void print_statistics(bool simple_print = false, FILE *fd = stdout) {
+        double ratio = static_cast<double>(_stat.miss) / _stat.count;
+        if (simple_print)
+            fprintf(fd, "%.4lf\n", ratio);
+        else {
+            fprintf(fd, "miss rate: %.2lf%% [miss = %u, count = %u]\n",
+                ratio * 100, _stat.miss, _stat.count);
+
+            int gcnt = 0, lcnt = 0;
+            for (int i = 0; i < BPB_SIZE; i++) {
+                if (!top->svalid[i])
+                    continue;
+                if (top->scnt[i] & 2)
+                    lcnt++;
+                else
+                    gcnt++;
+            }
+
+            fprintf(fd, "gcnt = %d, lcnt = %d\n", gcnt, lcnt);
+        }
     }
 
     void enable_print(bool en = true) {
         _enable_print = en;
     }
 
+    void open_report(const char *filename) {
+        close_report();
+        _report_fd = fopen(filename, "w");
+    }
+
+    void close_report() {
+        if (_report_fd)
+            fclose(_report_fd);
+        _report_fd = nullptr;
+    }
+
+    void disable_reference() {
+        assert(!_ref_cpy);
+        _ref_cpy = ref;
+        ref = nullptr;
+    }
+
+    void enable_reference() {
+        if (_ref_cpy) {
+            ref = _ref_cpy;
+            _ref_cpy = nullptr;
+        }
+    }
+
 private:
     bool _enable_print = false;
+    FILE *_report_fd = nullptr;
+    TReference *_ref_cpy = nullptr;
     struct {
         u32 count;
         u32 miss;
     } _stat;
     std::set<u32> _idx;
+
+    void _update_stat(bool miss) {
+        _stat.count++;
+        _stat.miss += miss ? 1 : 0;
+        if (_report_fd)
+            print_statistics(true, _report_fd);
+    }
 
     /**
      * hw: hardware result.

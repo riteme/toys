@@ -12,7 +12,7 @@ CXX_INCLUDE = \
 	-I /usr/share/verilator/include/vltstd \
 	-I ./include \
 	-I ./build
-CXXFLAGS = -g -std=c++17 $(CXX_INCLUDE)
+CXXFLAGS = -O2 -std=c++17 $(CXX_INCLUDE)
 
 a.out: $(LIBS)
 	$(CXX) $(CXXFLAGS) $(LIBS) -o a.out

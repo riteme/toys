@@ -17,10 +17,12 @@ PRETEST_HOOK = [] {
     dev->reset();
 };
 POSTTEST_HOOK = [] {
-    // do nothing
+    dev->close_report();
 };
 
 #define IF(expr) if (dev->lookup((expr), __LINE__, randu(1, 100)))
+#define FOR(initial, condition, final) \
+    for (initial; dev->lookup((condition), __LINE__, -10); final)
 
 /**
  * TESTBENCH
@@ -154,9 +156,6 @@ WITH STATISTICS {
     }
 } AS("local repeat pattern 3");
 
-#define FOR(initial, condition, final) \
-    for (initial; dev->lookup((condition), __LINE__, -10); final)
-
 WITH STATISTICS {
     for (int i = 0; i < 100; i++) {
         FOR (int j = 0, j < 5, j++) {
@@ -173,8 +172,108 @@ WITH STATISTICS {
     }
 } AS("nested for loops");
 
-/**
- * TODO:
- * * quick sort
- * * floyd
- */
+void _qsort(int *a, int l, int r) {
+    if (r <= l)
+        return;
+
+    int pivot = a[l];
+    int p = l;
+    // for (int i = l; i <= r; i++) {
+    FOR (int i = l, i <= r, i++) {
+        // if (a[i] < pivot)
+        IF (a[i] < pivot)
+            std::swap(a[i], a[p++]);
+    }
+
+    int q = p;
+    // for (int i = p; i <= r; i++) {
+    FOR (int i = p, i <= r, i++) {
+        // if (a[i] <= pivot)
+        IF (a[i] <= pivot)
+            std::swap(a[i], a[q++]);
+    }
+
+    _qsort(a, l, p - 1);
+    _qsort(a, q, r);
+}
+
+WITH REPORT_TO("result/qsort.out") STATISTICS {
+    int n = 500;
+
+    int a[n];
+    for (int i = 0; i < n; i++) {
+        a[i] = randu();
+    }
+
+    _qsort(a, 0, n - 1);
+    assert(std::is_sorted(a, a + n));
+} AS("qsort");
+
+WITH REPORT_TO("result/calc.out") STATISTICS {
+    int n = 1000;
+
+    int ans = randu();
+    // for (int i = 0; i < n; i++) {
+    FOR (int i = 0, i < n, i++) {
+        // if (i % 2 == 0) {
+        IF (i % 2 == 0) {
+            ans ^= ans << 7;
+        }
+        // if (i % 3 == 1) {
+        IF (i % 3 == 1) {
+            ans ^= ans << 17;
+        }
+        // if ((i & 3) >= 1) {
+        IF ((i & 3) >= 1) {
+            ans ^= ans >> 11;
+        }
+        // if ((i % 3) ^ (i % 2)) {
+        IF ((i % 3) ^ (i % 2)) {
+            ans ^= ans >> 20;
+        }
+        // if ((i & 3) < 2) {
+        IF ((i & 3) < 2) {
+            ans ^= ans << 3;
+        }
+        // if (i % 9 > 3) {
+        IF (i % 9 > 3) {
+            ans ^= ans << 12;
+        }
+        // if ((i & 3) < 3) {
+        IF ((i & 3) < 3) {
+            ans ^= ans >> 6;
+        }
+    }
+
+    printf("ans = %d\n", ans);
+} AS("calc");
+
+WITH REPORT_TO("result/collatz.out") STATISTICS {
+    int n = 500, cnt = 0;
+    // for (int i = 1; i <= n; i++) {
+    FOR (int i = 1, i <= n, i++) {
+        int x = i;
+        while (true) {
+            cnt++;
+
+            // if (x % 2 == 1) {
+            IF (x % 2 == 1) {
+                x = 3 * x;
+            }
+            // if (x % 2 != 0 && x % 3 == 0) {
+            IF (x % 2 != 0 && x % 3 == 0) {
+                x = x + 1;
+            }
+            // if (x % 2 == 0) {
+            IF (x % 2 == 0) {
+                x = x / 2;
+            }
+            // if (x == 1) {
+            IF (x == 1) {
+                break;
+            }
+        }
+    }
+
+    printf("cnt = %d\n", cnt);
+} AS("collatz");
