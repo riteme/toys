@@ -85,7 +85,9 @@ public:
 
         invoke();
         print_update();
-        _check_ref();
+
+        if (ref)
+            _check_ref();
     }
 
     void update(bool miss) {
@@ -99,9 +101,10 @@ public:
         invoke();
         print_update();
 
-        if (ref)
+        if (ref) {
             ref->update(top->last_pc, top->last_instr, miss);
-        _check_ref();
+            _check_ref();
+        }
     }
 
     bool lookup(bool expr, u32 id, int offset) {
@@ -128,7 +131,8 @@ public:
 
         invoke();
         print_update();
-        _check_ref();
+        if (ref)
+            _check_ref();
 
         bool miss = expr ^ top->pred;
         update(miss);

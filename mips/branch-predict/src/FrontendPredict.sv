@@ -170,7 +170,7 @@ module FrontendPredict #(
 
     logic __unused_ok = &{1'b0,
         // last_op, last_funct,
-        last_pc, hashed_pc,
+        last_pc, hashed_pc, auto_mux,
         cur_traits, last_traits,
     1'b0};
 endmodule

@@ -2,6 +2,7 @@ obj_dir/
 build/
 tmp/
 result/*.out
+.ipynb_checkpoints/
 *.hex
 *.rev
 *.txt

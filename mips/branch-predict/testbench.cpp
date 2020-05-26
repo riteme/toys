@@ -5,12 +5,19 @@
 #include "testbench.h"
 #include "device.h"
 
+// #define DISABLE_REFERENCE
+
 /**
  * SETUP
  */
 
 static auto ref = new ReferencePredictor;
-static auto dev = new Device(ref);
+
+#ifdef DISABLE_REFERENCE
+static auto dev = new Device;
+#else
+static auto dev = new Device(/* ref */);
+#endif
 
 SETUP_TESTLIST
 PRETEST_HOOK = [] {
