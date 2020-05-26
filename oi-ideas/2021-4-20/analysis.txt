@@ -1,0 +1,15 @@
+p1^a1*p2^a2*...*pm^am
+
+prod ai^2 <= 60^2
+
+sum ai <= 60
+
+upper bound:
+
+sum ai = 60 && ai >= a(i+1)
+
+complexity <= prod ai^2
+
+for m, prod ai^2 <= (60 - m)^2
+
+complexity <= sum C(60 + m - 1, m - 1) (60 - m)^2
